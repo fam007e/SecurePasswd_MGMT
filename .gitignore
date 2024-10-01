@@ -1,0 +1,18 @@
+# Compiled files
+*.o
+securepass
+
+# Data files
+data/*.csv
+
+# Libraries
+lib/*
+!lib/README.md
+
+# IDE files
+.vscode/
+.idea/
+
+# OS generated files
+.DS_Store
+Thumbs.db
