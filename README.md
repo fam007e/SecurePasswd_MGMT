@@ -4,9 +4,9 @@
 
 SecurePassManager is a robust, command-line password manager and two-factor authenticator (TOTP) designed with security and ease of use in mind. It provides a secure solution for managing passwords and 2FA tokens locally, ensuring your sensitive data remains protected and easily accessible.
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![Version](https://img.shields.io/github/v/release/fam007e/SecurePasswd_MGMT?style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
-![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)
+![Build Status](https://img.shields.io/github/workflow/status/yourusername/SecurePasswd_MGMT/C%20CI%20and%20Release?style=flat-square)
 
 ## Table of Contents
 
@@ -17,11 +17,10 @@ SecurePassManager is a robust, command-line password manager and two-factor auth
 5. [Security](#security)
 6. [Project Structure](#project-structure)
 7. [Contributing](#contributing)
-8. [Testing](#testing)
-9. [License](#license)
-10. [Disclaimer](#disclaimer)
-11. [Support](#support)
-12. [Acknowledgments](#acknowledgments)
+8. [License](#license)
+9. [Disclaimer](#disclaimer)
+10. [Support](#support)
+11. [Acknowledgments](#acknowledgments)
 
 ## Features
 
@@ -54,7 +53,7 @@ Ensure you have the required libraries installed:
 #### Ubuntu/Debian:
 ```bash
 sudo apt-get update
-sudo apt-get install gcc libssl-dev liboath-dev
+sudo apt-get install build-essential libssl-dev oathtool liboath0 liboath-dev
 ```
 
 #### macOS (using Homebrew):
@@ -80,11 +79,6 @@ sudo pacman -S gcc openssl oath-toolkit
    make
    ```
 
-3. (Optional) Run tests:
-   ```bash
-   make test
-   ```
-
 The compiled binary `securepass` will be created in the project root directory.
 
 ## Usage
@@ -101,8 +95,6 @@ Follow the on-screen prompts to:
 - Generate TOTP codes
 - Import or export password data
 
-For detailed usage instructions, refer to the [User Manual](docs/USER_MANUAL.md).
-
 ## Security
 
 - **Encryption**: AES-256 encryption for all stored data
@@ -115,45 +107,33 @@ For a detailed security analysis, see our [Security Policy](SECURITY.md).
 ## Project Structure
 
 ```
-SecurePasswd_MGMT/
-├── src/
-│   ├── main.c
-│   ├── encryption.c
-│   ├── csv_handler.c
-│   ├── totp.c
-│   └── utils.c
-├── include/
-│   ├── encryption.h
-│   ├── csv_handler.h
-│   ├── totp.h
-│   └── utils.h
-├── tests/
-│   └── test_main.c
-├── data/
-│   └── README.md
-├── lib/
-│   └── README.md
-├── docs/
-│   └── USER_MANUAL.md
+SecurePasswd_MGMT
+├── data
+│  └── README.md
+├── lib
+│  ├── liboath
+│  │  └── oath.h
+│  └── README.md
+├── LICENSE
 ├── Makefile
 ├── README.md
-├── LICENSE
-├── CONTRIBUTING.md
-└── SECURITY.md
+└── src
+   ├── csv_handler.c
+   ├── csv_handler.h
+   ├── encryption.c
+   ├── encryption.h
+   ├── main.c
+   ├── totp.c
+   ├── totp.h
+   ├── utils.c
+   ├── utils.h
+   └── version.h
+
 ```
 
 ## Contributing
 
-We welcome contributions to SecurePassManager! Please read our [Contributing Guidelines](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
-
-## Testing
-
-Run the test suite with:
-```bash
-make test
-```
-
-For more information on testing, see [TESTING.md](TESTING.md).
+We welcome contributions to SecurePassManager! Please read our [Contributing Guidelines](CONTRIBUTION.md) for details on our code of conduct and the process for submitting pull requests.
 
 ## License
 
