@@ -4,7 +4,7 @@ First off, thank you for considering contributing to SecurePassManager. It's peo
 
 ## Code of Conduct
 
-By participating in this project, you are expected to uphold our Code of Conduct. Please report unacceptable behavior to [fam007e@gmail.com](mailto:faisalmoshiur+secpasswdreport@gmail.com).
+By participating in this project, you are expected to uphold our Code of Conduct. Please report unacceptable behavior to [@fam007e](mailto:faisalmoshiur+secpasswdreport@gmail.com).
 
 ## How Can I Contribute?
 
