@@ -15,7 +15,7 @@ SecurePassManager is a robust, command-line password manager and two-factor auth
 4. [Usage](#usage)
 5. [Security](#security)
 6. [Project Structure](#project-structure)
-7. [Contributing](#contributing)
+7. [Contribution](#contribution)
 8. [License](#license)
 9. [Disclaimer](#disclaimer)
 10. [Support](#support)
@@ -133,7 +133,7 @@ SecurePasswd_MGMT
 
 ## Contribution
 
-We welcome contributions to SecurePassManager! Please read our [Contributing Guidelines](CONTRIBUTION.md) for details on our code of conduct and the process for submitting pull requests.
+We welcome contributions to SecurePassManager! Please read our [Contribution Guidelines](CONTRIBUTION.md) for details on our code of conduct and the process for submitting pull requests.
 
 ## License
 
