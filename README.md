@@ -145,10 +145,9 @@ While SecurePassManager is designed with security as a top priority, no system c
 
 ## Support
 
-For bug reports, feature requests, or general questions:
-1. Check the [FAQ](docs/FAQ.md) for common questions
-2. Search existing [Issues](https://github.com/yourusername/SecurePasswd_MGMT/issues) on GitHub
-3. Open a new issue if your question remains unanswered
+For bug reports, feature requests, or general requests:
+1. Search existing [Issues](https://github.com/yourusername/SecurePasswd_MGMT/issues) on GitHub
+2. Open a new issue if your question remains unanswered
 
 ## Acknowledgments
 
