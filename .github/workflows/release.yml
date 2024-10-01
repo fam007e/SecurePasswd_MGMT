@@ -43,16 +43,17 @@ jobs:
         run: |
           mkdir -p release
           cp securepass release/
-          tar -czvf release/securepass-$(date +'%Y.%m.%d').tar.gz release/securepass
+          version=$(./securepass --version | awk '{print $NF}')
+          tar -czvf release/securepass-${version}.tar.gz release/securepass
 
       - name: Create release
         id: create_release
         run: |
-          version=$(date +'%Y.%m.%d')
+          version=$(./securepass --version | awk '{print $NF}')
           changelog=$(git log --oneline --pretty=format:"* %s (%h)" | head -n 20)
           echo "Changelog: $changelog" > release/changelog.txt
 
-          gh release create "v${version}.$(git rev-list --count HEAD)" release/securepass-${version}.tar.gz release/changelog.txt --title "Release v${version}.$(git rev-list --count HEAD)" --notes "$changelog"
+          gh release create "v${version}" release/securepass-${version}.tar.gz release/changelog.txt --title "Release v${version}" --notes "$changelog"
 
       - name: Clean up
         run: |
