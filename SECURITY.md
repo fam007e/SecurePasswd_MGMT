@@ -97,7 +97,7 @@ We monitor these dependencies for security updates and incorporate them promptly
 
 ## Security Audits
 
-We are open to independent security audits. If you're interested in conducting a security audit, please contact us at [audit@securepassmanager.com](mailto:audit@securepassmanager.com).
+We are open to independent security audits. If you're interested in conducting a security audit, please contact us at [audit@securepassmanager](mailto:faisalmoshiur+secpasswdaudit@gmail.com).
 
 ## Threat Model
 
