@@ -33,6 +33,11 @@ jobs:
         run: |
           make clean
           make
+          
+      - name: Run
+        run: |
+          ./securepass --version
+          ./securepass --help
 
       - name: Create release package
         run: |
