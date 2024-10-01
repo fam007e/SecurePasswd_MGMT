@@ -12,7 +12,7 @@
 char* generate_totp(const char* secret) {
     char otp[TOTP_DIGITS + 1];
     time_t now = time(NULL);
-    oath_totp_generate(secret, strlen(secret), now, TOTP_STEP, OATH_TOTP_DEFAULT_FLAGS, TOTP_DIGITS, otp);
+    oath_totp_generate(secret, strlen(secret), now, TOTP_STEP, 0, TOTP_DIGITS, otp);
     return strdup(otp);
 }
 
