@@ -4,9 +4,9 @@
 
 SecurePassManager is a robust, command-line password manager and two-factor authenticator (TOTP) designed with security and ease of use in mind. It provides a secure solution for managing passwords and 2FA tokens locally, ensuring your sensitive data remains protected and easily accessible.
 
-![Version](https://img.shields.io/github.com/fam007e/SecurePasswd_MGMT/releases?style=flat-square)
+![GitHub Release](https://img.shields.io/github/v/release/fam007e/%20SecurePasswd_MGMT?display_name=tag)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
-![Build Status](https://img.shields.io/github/workflow/status/yourusername/SecurePasswd_MGMT/C%20CI%20and%20Release?style=flat-square)
+![Build Status](https://img.shields.io/github/workflow/status/fam007e/SecurePasswd_MGMT/C%20CI%20and%20Release?style=flat-square)
 
 ## Table of Contents
 
