@@ -5,6 +5,7 @@
 #include "csv_handler.h"
 #include "totp.h"
 #include "utils.h"
+#include "version.h" 
 
 #define MAX_PASSWORD_LENGTH 128
 #define MAX_INPUT_LENGTH 256
@@ -21,7 +22,30 @@ void print_menu() {
     printf("Enter your choice: ");
 }
 
-int main() {
+void print_version() {
+    printf("SecurePassManager version %s\n", VERSION);
+}
+
+void print_help(const char* program_name) {
+    printf("Usage: %s [OPTION]\n", program_name);
+    printf("Options:\n");
+    printf("  --version     Display version information and exit\n");
+    printf("  --help        Display this help message and exit\n");
+    printf("\nRun without options to start the interactive SecurePassManager.\n");
+}
+
+int main(int argc, char *argv[]) {
+    // Check for command line arguments
+    if (argc > 1) {
+        if (strcmp(argv[1], "--version") == 0) {
+            print_version();
+            return 0;
+        } else if (strcmp(argv[1], "--help") == 0) {
+            print_help(argv[0]);
+            return 0;
+        }
+    }
+
     char master_password[MAX_PASSWORD_LENGTH];
     int choice;
 

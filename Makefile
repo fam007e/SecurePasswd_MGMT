@@ -16,6 +16,7 @@ endif
 
 SRCS = src/main.c src/encryption.c src/csv_handler.c src/totp.c src/utils.c
 OBJS = $(SRCS:.c=.o)
+HEADERS = src/encryption.h src/csv_handler.h src/totp.h src/utils.h src/version.h
 TARGET = securepass
 
 .PHONY: all clean
@@ -25,7 +26,7 @@ all: $(TARGET)
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 
-%.o: %.c
+%.o: %.c $(HEADERS)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
