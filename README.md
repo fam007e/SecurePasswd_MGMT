@@ -69,7 +69,7 @@ sudo pacman -S gcc openssl oath-toolkit
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/SecurePasswd_MGMT.git
+   git clone https://github.com/fam007e/SecurePasswd_MGMT.git
    cd SecurePasswd_MGMT
    ```
 
@@ -146,7 +146,7 @@ While SecurePassManager is designed with security as a top priority, no system c
 ## Support
 
 For bug reports, feature requests, or general requests:
-1. Search existing [Issues](https://github.com/yourusername/SecurePasswd_MGMT/issues) on GitHub
+1. Search existing [Issues](https://github.com/fam007e/SecurePasswd_MGMT/issues) on GitHub
 2. Open a new issue if your question remains unanswered
 
 ## Acknowledgments
