@@ -3,7 +3,7 @@ CFLAGS = -Wall -Wextra -I./src -I/usr/include
 LDFLAGS = -lcrypto -loath -lssl
 
 # Check if oath.h exists in the system
-OATH_SYSTEM := $(shell if [ -f /usr/include/oath.h ]; then echo 1; else echo 0; fi)
+OATH_SYSTEM := $(shell if [ -f /usr/include/liboath/oath.h ]; then echo 1; else echo 0; fi)
 
 ifeq ($(OATH_SYSTEM),0)
     # Use local oath.h
