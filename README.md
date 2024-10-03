@@ -51,7 +51,6 @@ Ensure you have the required libraries installed:
 
 #### Ubuntu/Debian:
 ```bash
-sudo apt-get update
 sudo apt-get install build-essential libssl-dev oathtool liboath0 liboath-dev
 ```
 
