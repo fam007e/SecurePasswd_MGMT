@@ -1,0 +1,60 @@
+name: Release SecurePassManager Binary
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/**'
+      - 'Makefile'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update && sudo apt-get upgrade -y
+          sudo apt-get install -y build-essential libssl-dev oathtool liboath0 liboath-dev && sudo apt-get update
+
+      - name: Install GitHub CLI
+        run: |
+          sudo apt-get install -y gh
+
+      - name: Authenticate GitHub CLI
+        run: |
+          echo "${{ secrets.SECPASSWD_TOKEN }}" | gh auth login --with-token
+
+      - name: Build and Release
+        run: |
+          make clean
+          make
+          
+      - name: Run
+        run: |
+          ./securepass --version
+          ./securepass --help
+
+      - name: Create release package
+        run: |
+          mkdir -p release
+          cp securepass release/
+          version=$(./securepass --version | awk '{print $NF}')
+          tar -czvf release/securepass-${version}.tar.gz release/securepass
+
+      - name: Create release
+        id: create_release
+        run: |
+          version=$(./securepass --version | awk '{print $NF}')
+          changelog=$(git log --oneline --pretty=format:"* %s (%h)" | head -n 20)
+          echo "Changelog: $changelog" > release/changelog.txt
+
+          gh release create "v${version}" release/securepass-${version}.tar.gz release/changelog.txt --title "Release v${version}" --notes "$changelog"
+
+      - name: Clean up
+        run: |
+          rm -rf release
