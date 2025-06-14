@@ -1,5 +1,4 @@
 name: Release SecurePassManager Binary
-
 on:
   push:
     branches:
@@ -7,50 +6,51 @@ on:
     paths:
       - 'src/**'
       - 'Makefile'
-      - 'lib/**'  # Add this if you have local headers
-
+      - 'lib/**'  # if there is local header
 jobs:
   release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4  # Updated to v4
-
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history for changelog generation
+          
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential libssl-dev liboath-dev liboath0 oathtool
-
+          
       - name: Install security analysis tools (optional)
         run: |
           sudo apt-get install -y cppcheck checksec
-
+          
       - name: Install GitHub CLI
         run: |
           sudo apt-get install -y gh
-
+          
       - name: Authenticate GitHub CLI
         run: |
           echo "${{ secrets.SECPASSWD_TOKEN }}" | gh auth login --with-token
-
+          
       - name: Run security checks (optional)
         run: |
           make static-analysis || true  # Don't fail if cppcheck has warnings
-
+          
       - name: Build release version
         run: |
           make clean
           make release  # Use release target for optimized build
-
+          
       - name: Run security analysis on binary
         run: |
           make security-check || true  # Don't fail if checksec not available
-
+          
       - name: Test binary
         run: |
           ./securepass --version
           ./securepass --help
-
+          
       - name: Create release package
         run: |
           mkdir -p release
@@ -62,21 +62,38 @@ jobs:
           tar -czvf release/securepass-${version}-linux-x86_64.tar.gz -C release securepass
           # Create checksum
           cd release && sha256sum securepass-${version}-linux-x86_64.tar.gz > securepass-${version}-linux-x86_64.tar.gz.sha256
-
+          
       - name: Generate changelog
         run: |
-          # Get commits since last release
-          last_release=$(gh release list --limit 1 --json tagName --jq '.[0].tagName' 2>/dev/null || echo "")
-          if [ -n "$last_release" ]; then
-            changelog=$(git log ${last_release}..HEAD --oneline --pretty=format:"* %s (%h)")
-          else
+          # Get the last release tag that actually exists in git
+          last_release=$(git tag --sort=-version:refname | head -n 1 2>/dev/null || echo "")
+          
+          # If no tags exist, get last 10 commits
+          if [ -z "$last_release" ] || ! git rev-parse "$last_release" >/dev/null 2>&1; then
+            echo "No previous release found or tag doesn't exist in git history. Using recent commits."
             changelog=$(git log --oneline --pretty=format:"* %s (%h)" | head -n 10)
+          else
+            # Check if we can create a range
+            if git merge-base --is-ancestor "$last_release" HEAD 2>/dev/null; then
+              changelog=$(git log ${last_release}..HEAD --oneline --pretty=format:"* %s (%h)")
+              if [ -z "$changelog" ]; then
+                changelog="* No new commits since last release"
+              fi
+            else
+              echo "Cannot create commit range. Using recent commits."
+              changelog=$(git log --oneline --pretty=format:"* %s (%h)" | head -n 10)
+            fi
           fi
+          
           echo "$changelog" > release/changelog.txt
-          echo "CHANGELOG<<EOF" >> $GITHUB_ENV
-          echo "$changelog" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-
+          
+          # Use multiline string for GitHub environment
+          {
+            echo "CHANGELOG<<EOF"
+            echo "$changelog"
+            echo "EOF"
+          } >> $GITHUB_ENV
+          
       - name: Create release
         run: |
           gh release create "v${{ env.VERSION }}" \
@@ -86,7 +103,7 @@ jobs:
             --title "SecurePassManager v${{ env.VERSION }}" \
             --notes "${{ env.CHANGELOG }}" \
             --generate-notes
-
+            
       - name: Clean up
         run: |
           rm -rf release
