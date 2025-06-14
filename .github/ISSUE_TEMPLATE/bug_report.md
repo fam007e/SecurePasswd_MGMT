@@ -1,31 +1,33 @@
----
-name: Bug report
-about: Create a report to help us improve
-title: "[BUG] "
-labels: bug
-assignees: ''
+## Bug Description
+A clear and concise description of the bug.
 
----
+## Steps to Reproduce
+1. Step one
+2. Step two
+3. Step three
+4. Bug occurs
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+## Expected Behavior
+What you expected to happen.
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '...'
-3. Scroll down to '...'
-4. See error
+## Actual Behavior
+What actually happened.
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+## Environment
+- **OS:** [e.g., Ubuntu 20.04, macOS 12.0]
+- **SecurePassManager Version:** [e.g., 2024.06.14]
+- **GCC Version:** [e.g., 9.3.0]
+- **OpenSSL Version:** [e.g., 1.1.1f]
+- **liboath Version:** [e.g., 2.6.2]
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+## Additional Context
+- Error messages (if any)
+- Log output
+- Configuration details
+- Screenshots (if applicable)
 
-**Desktop (please complete the following information):**
-- OS: [e.g. Linux Arch]
-- Kernel version [e.g. 6.10.10-arch1-1]
-
-**Additional context**
-Add any other context about the problem here.
+## Security Impact
+- [ ] No security impact
+- [ ] Potential security vulnerability (use private reporting)
+- [ ] Data corruption risk
+- [ ] Availability impact

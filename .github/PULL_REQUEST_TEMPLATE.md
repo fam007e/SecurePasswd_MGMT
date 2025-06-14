@@ -1,23 +1,32 @@
 ## Description
+Brief description of the changes made.
 
-Please include a summary of the changes and the related issue. Please also include relevant motivation and context.
-
-Fixes # (issue)
-
-## Type of change
-
-Please delete options that are not relevant.
-
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
+## Type of Change
+- [ ] Bug fix (non-breaking change that fixes an issue)
+- [ ] New feature (non-breaking change that adds functionality)
 - [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
+- [ ] Security enhancement
 - [ ] Documentation update
+- [ ] Performance improvement
 
-## Checklist:
+## Security Impact
+- [ ] No security impact
+- [ ] Security enhancement
+- [ ] Potential security impact (requires security review)
 
-- [ ] My code follows the style guidelines of this project
-- [ ] I have performed a self-review of my own code
-- [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] I have made corresponding changes to the documentation
-- [ ] My changes generate no new warnings
-- [ ] Any dependent changes have been merged and published in downstream modules
+## Testing Performed
+- [ ] Unit tests added/updated
+- [ ] Integration tests added/updated
+- [ ] Manual testing performed
+- [ ] Security testing performed
+
+## Checklist
+- [ ] Code follows style guidelines
+- [ ] Self-review completed
+- [ ] Code is commented (particularly complex areas)
+- [ ] Documentation updated
+- [ ] No merge conflicts
+- [ ] All checks pass
+
+## Additional Notes
+Any additional information or context about the changes.

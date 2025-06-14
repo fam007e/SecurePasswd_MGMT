@@ -7,19 +7,23 @@ on:
     paths:
       - 'src/**'
       - 'Makefile'
+      - 'lib/**'  # Add this if you have local headers
 
 jobs:
   release:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4  # Updated to v4
 
       - name: Install dependencies
         run: |
-          sudo apt-get update && sudo apt-get upgrade -y
-          sudo apt-get install -y build-essential libssl-dev oathtool liboath0 liboath-dev && sudo apt-get update
+          sudo apt-get update
+          sudo apt-get install -y build-essential libssl-dev liboath-dev liboath0 oathtool
+
+      - name: Install security analysis tools (optional)
+        run: |
+          sudo apt-get install -y cppcheck checksec
 
       - name: Install GitHub CLI
         run: |
@@ -29,12 +33,20 @@ jobs:
         run: |
           echo "${{ secrets.SECPASSWD_TOKEN }}" | gh auth login --with-token
 
-      - name: Build and Release
+      - name: Run security checks (optional)
+        run: |
+          make static-analysis || true  # Don't fail if cppcheck has warnings
+
+      - name: Build release version
         run: |
           make clean
-          make
-          
-      - name: Run
+          make release  # Use release target for optimized build
+
+      - name: Run security analysis on binary
+        run: |
+          make security-check || true  # Don't fail if checksec not available
+
+      - name: Test binary
         run: |
           ./securepass --version
           ./securepass --help
@@ -43,17 +55,37 @@ jobs:
         run: |
           mkdir -p release
           cp securepass release/
-          version=$(./securepass --version | awk '{print $NF}')
-          tar -czvf release/securepass-${version}.tar.gz release/securepass
+          # Get version from the binary
+          version=$(./securepass --version | grep -o '[0-9]\{4\}\.[0-9]\{2\}\.[0-9]\{2\}' || echo "$(date +%Y.%m.%d)")
+          echo "VERSION=${version}" >> $GITHUB_ENV
+          # Create tarball
+          tar -czvf release/securepass-${version}-linux-x86_64.tar.gz -C release securepass
+          # Create checksum
+          cd release && sha256sum securepass-${version}-linux-x86_64.tar.gz > securepass-${version}-linux-x86_64.tar.gz.sha256
+
+      - name: Generate changelog
+        run: |
+          # Get commits since last release
+          last_release=$(gh release list --limit 1 --json tagName --jq '.[0].tagName' 2>/dev/null || echo "")
+          if [ -n "$last_release" ]; then
+            changelog=$(git log ${last_release}..HEAD --oneline --pretty=format:"* %s (%h)")
+          else
+            changelog=$(git log --oneline --pretty=format:"* %s (%h)" | head -n 10)
+          fi
+          echo "$changelog" > release/changelog.txt
+          echo "CHANGELOG<<EOF" >> $GITHUB_ENV
+          echo "$changelog" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
 
       - name: Create release
-        id: create_release
         run: |
-          version=$(./securepass --version | awk '{print $NF}')
-          changelog=$(git log --oneline --pretty=format:"* %s (%h)" | head -n 20)
-          echo "Changelog: $changelog" > release/changelog.txt
-
-          gh release create "v${version}" release/securepass-${version}.tar.gz release/changelog.txt --title "Release v${version}" --notes "$changelog"
+          gh release create "v${{ env.VERSION }}" \
+            release/securepass-${{ env.VERSION }}-linux-x86_64.tar.gz \
+            release/securepass-${{ env.VERSION }}-linux-x86_64.tar.gz.sha256 \
+            release/changelog.txt \
+            --title "SecurePassManager v${{ env.VERSION }}" \
+            --notes "${{ env.CHANGELOG }}" \
+            --generate-notes
 
       - name: Clean up
         run: |

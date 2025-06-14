@@ -3,7 +3,8 @@
 securepass
 
 # Data files
-data/*.csv
+data/*
+!data/*.md
 
 # Libraries
 lib/*
