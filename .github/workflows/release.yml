@@ -94,28 +94,6 @@ jobs:
             echo "$changelog"
             echo "EOF"
           } >> $GITHUB_ENV
-          
-      - name: Update SECURITY.md metadata
-        run: |
-          # Get version from the binary (same as release package step)
-          version=${{ env.VERSION }}
-          # Calculate next review date (3 months from now)
-          NEXT_REVIEW=$(date -d "+3 months" +"%B %d, %Y")
-          # Update SECURITY.md
-          sed -i "s/\*\*Document Version:\*\* .*/\*\*Document Version:\*\* ${version}/" SECURITY.md
-          sed -i "s/\*\*Last Updated:\*\* .*/\*\*Last Updated:\*\* $(date +'%B %d, %Y')/" SECURITY.md
-          sed -i "s/\*\*Next Review:\*\* .*/\*\*Next Review:\*\* ${NEXT_REVIEW}/" SECURITY.md
-      
-      - name: Commit and push SECURITY.md changes
-        run: |
-          git config user.name "GitHub Actions Bot"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add SECURITY.md
-          git commit -m "Automated update of SECURITY.md metadata to v${{ env.VERSION }}" || echo "No changes to commit"
-          git push origin HEAD:refs/heads/update-security-md
-          gh pr create --title "Automated SECURITY.md Update v${{ env.VERSION }}" --body "Automated update of SECURITY.md metadata." --base main --head update-security-md
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
       - name: Create release
         run: |
