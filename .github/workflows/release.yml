@@ -114,7 +114,7 @@ jobs:
           git commit -m "Automated update of SECURITY.md metadata to v${{ env.VERSION }}" || echo "No changes to commit"
           git push origin main
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.SECPASSWD_TOKEN }}
           
       - name: Create release
         run: |
