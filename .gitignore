@@ -17,3 +17,6 @@ lib/*
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# LLM guidance files
+GEMINI.md
