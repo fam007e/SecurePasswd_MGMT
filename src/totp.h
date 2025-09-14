@@ -15,14 +15,14 @@
  * @param secret The base32-encoded TOTP secret
  * @return 1 on success, 0 on failure
  */
-int add_totp_account(const char *account_name, const char *secret);
+int add_totp_account(const char *account_name, const char *secret, const char *master_password);
 
 /**
  * Generate a TOTP code for a given account
  * @param account_name The name of the account
  * @return 1 on success, 0 on failure (displays code on success)
  */
-int generate_totp(const char *account_name);
+int generate_totp(const char *account_name, const char *master_password, char *totp_code_out);
 
 /**
  * List all TOTP accounts
@@ -52,14 +52,7 @@ int validate_base32_secret(const char *secret);
  */
 int generate_totp_code(const char *secret, uint64_t timestamp, char *code);
 
-/**
- * Decode base32 string to binary
- * @param base32_input The base32-encoded string
- * @param binary_output Buffer to store decoded binary data
- * @param output_length Pointer to store the length of decoded data
- * @return 1 on success, 0 on failure
- */
-int base32_decode(const char *base32_input, unsigned char *binary_output, size_t *output_length);
+
 
 /**
  * Get remaining seconds until next TOTP code

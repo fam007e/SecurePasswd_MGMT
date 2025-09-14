@@ -29,67 +29,9 @@ void show_input(void) {
     tcsetattr(STDIN_FILENO, TCSANOW, &old_terminal);
 }
 
-void clear_screen(void) {
+void securepass_clear_screen(void) {
     printf("\033[2J\033[H");
     fflush(stdout);
-}
-
-int generate_random_password(char *password, int length, int include_symbols) {
-    if (!password || length < 4 || length > 255) {
-        return 0;
-    }
-    
-    const char lowercase[] = "abcdefghijklmnopqrstuvwxyz";
-    const char uppercase[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    const char digits[] = "0123456789";
-    const char symbols[] = "!@#$%^&*()_+-=[]{}|;:,.<>?";
-    
-    char charset[256];
-    strcpy(charset, lowercase);
-    strcat(charset, uppercase);
-    strcat(charset, digits);
-    
-    if (include_symbols) {
-        strcat(charset, symbols);
-    }
-    
-    int charset_len = strlen(charset);
-    unsigned char random_bytes[256];
-    
-    if (RAND_bytes(random_bytes, length) != 1) {
-        return 0;
-    }
-    
-    // Ensure at least one character from each category
-    password[0] = lowercase[random_bytes[0] % 26];
-    password[1] = uppercase[random_bytes[1] % 26];
-    password[2] = digits[random_bytes[2] % 10];
-    
-    int start_pos = 3;
-    if (include_symbols && length > 3) {
-        password[3] = symbols[random_bytes[3] % strlen(symbols)];
-        start_pos = 4;
-    }
-    
-    // Fill the rest randomly
-    for (int i = start_pos; i < length; i++) {
-        password[i] = charset[random_bytes[i] % charset_len];
-    }
-    
-    password[length] = '\0';
-    
-    // Shuffle the password
-    for (int i = length - 1; i > 0; i--) {
-        int j = random_bytes[i] % (i + 1);
-        char temp = password[i];
-        password[i] = password[j];
-        password[j] = temp;
-    }
-    
-    // Clear random bytes
-    memset(random_bytes, 0, sizeof(random_bytes));
-    
-    return 1;
 }
 
 int check_password_strength(const char *password) {
@@ -120,15 +62,6 @@ int check_password_strength(const char *password) {
     return (score * 4) / 6;
 }
 
-void secure_memset(void *ptr, size_t size) {
-    if (ptr) {
-        volatile unsigned char *p = ptr;
-        while (size--) {
-            *p++ = 0;
-        }
-    }
-}
-
 int file_exists(const char *filename) {
     if (!filename) return 0;
     
@@ -149,4 +82,43 @@ int get_user_confirmation(const char *prompt) {
     }
     
     return 0;
+}
+
+int securepass_get_input_line(char *buffer, size_t size) {
+    if (fgets(buffer, size, stdin) != NULL) {
+        // Remove trailing newline character if present
+        buffer[strcspn(buffer, "\n")] = '\0';
+        return 1;
+    }
+    return 0;
+}
+
+int securepass_get_hidden_input(char *buffer, size_t size) {
+    hide_input();
+    int result = securepass_get_input_line(buffer, size);
+    show_input();
+    printf("\n"); // Newline after hidden input
+    return result;
+}
+
+// Secure memory clearing function
+void securepass_secure_zero(void *ptr, size_t size) {
+    if (ptr) {
+        volatile unsigned char *p = (volatile unsigned char *)ptr;
+        while (size--) {
+            *p++ = 0;
+        }
+    }
+}
+
+int secure_strcmp(const char *s1, const char *s2) {
+    size_t len1 = strlen(s1);
+    size_t len2 = strlen(s2);
+    int diff = len1 ^ len2;
+
+    for (size_t i = 0; i < len1 && i < len2; i++) {
+        diff |= s1[i] ^ s2[i];
+    }
+
+    return diff == 0;
 }

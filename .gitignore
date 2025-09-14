@@ -1,22 +1,38 @@
-# Compiled files
+# Build artifacts and compiled files
 *.o
+*.so
+*.a
+*.dll
+*.exe
 securepass
+tests/*
 
-# Data files
+# Data files - contains sensitive user data
 data/*
-!data/*.md
+!data/.gitkeep
 
-# Libraries
+# Dependencies and libraries
 lib/*
 !lib/README.md
+build/
+dist/
 
-# IDE files
+# IDE and editor configuration
 .vscode/
 .idea/
+*.swp
+*.swo
 
-# OS generated files
+# OS-generated files
 .DS_Store
 Thumbs.db
 
 # LLM guidance files
 GEMINI.md
+
+# CMake build artifacts
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+compile_commands.json

@@ -8,7 +8,7 @@
  * @param encrypted_password The encrypted password
  * @return 1 on success, 0 on failure
  */
-int store_password(const char *account, const char *username, const char *encrypted_password);
+int store_password(const char *account, const char *username, const char *encrypted_password, const char *master_password);
 
 /**
  * Search for a password entry and display it (decrypted)
@@ -44,5 +44,15 @@ int import_passwords(const char *filename, const char *master_password);
  * @return 1 on success, 0 on failure
  */
 int delete_password(const char *account_name);
+
+/**
+ * Find an encrypted entry by account name
+ * @param account The account name to search for
+ * @param encrypted_username_out Pointer to a char* to store the encrypted username (caller must free)
+ * @param encrypted_password_out Pointer to a char* to store the encrypted password (caller must free)
+ * @return 1 on success, 0 if not found or on failure
+ */
+int find_encrypted_entry(const char *account, char **encrypted_username_out, char **encrypted_password_out);
+
 
 #endif // CSV_HANDLER_H

@@ -2,17 +2,20 @@
 #include <stdlib.h>
 #include <string.h>
 #include <openssl/evp.h>
-#include <openssl/aes.h>
 #include <openssl/rand.h>
 #include <openssl/sha.h>
 #include <openssl/bio.h>
 #include <openssl/buffer.h>
+#include <argon2.h>
 #include "encryption.h"
+#include "securepass_core.h"
+#include "utils.h"
+#include "data_path.h"
 
 #define SALT_SIZE 16
-#define IV_SIZE 16
 #define KEY_SIZE 32
-#define PBKDF2_ITERATIONS 10000
+#define XCHACHA_NONCE_SIZE 24 // For XChaCha20
+#define POLY1305_TAG_SIZE 16
 
 // Base64 encoding function
 static char *base64_encode(const unsigned char *input, int length) {
@@ -64,15 +67,7 @@ static unsigned char *base64_decode(const char *input, int *output_length) {
     return buffer;
 }
 
-// Secure memory clearing function
-static void secure_zero(void *ptr, size_t size) {
-    if (ptr) {
-        volatile unsigned char *p = (volatile unsigned char *)ptr;
-        while (size--) {
-            *p++ = 0;
-        }
-    }
-}
+
 
 int generate_secure_key(unsigned char *key, int key_length) {
     if (!key || key_length <= 0) {
@@ -82,136 +77,176 @@ int generate_secure_key(unsigned char *key, int key_length) {
     return RAND_bytes(key, key_length);
 }
 
-int hash_password_with_salt(const char *password, const char *salt_hex, char *hash_output) {
-    if (!password || !salt_hex || !hash_output) {
+Argon2Params get_default_argon2_params() {
+    Argon2Params params;
+    params.t_cost = 3;      // Iterations
+    params.m_cost = (1 << 12); // 4096 KiB = 4 MiB
+    params.parallelism = 1; // Threads
+    params.salt_len = 16;   // 16 bytes
+    params.hash_len = 32;   // 32 bytes
+    return params;
+}
+
+int argon2_hash_password(const char *password, const Argon2Params *params, char *hash_output) {
+    if (!password || !params || !hash_output) {
         return 0;
     }
-    
-    unsigned char salt[SALT_SIZE];
-    unsigned char hash[KEY_SIZE];
-    
-    // Convert hex salt to bytes
-    for (int i = 0; i < SALT_SIZE; i++) {
-        if (sscanf(salt_hex + (i * 2), "%2hhx", &salt[i]) != 1) {
-            return 0;
-        }
+
+    unsigned char salt[params->salt_len];
+    if (RAND_bytes(salt, params->salt_len) != 1) {
+        return 0; // Failed to generate random salt
     }
-    
-    // Generate hash using PBKDF2
-    if (PKCS5_PBKDF2_HMAC(password, strlen(password), salt, SALT_SIZE, 
-                          PBKDF2_ITERATIONS, EVP_sha256(), KEY_SIZE, hash) != 1) {
+
+    int result = argon2i_hash_encoded(
+        params->t_cost,
+        params->m_cost,
+        params->parallelism,
+        password,
+        strlen(password),
+        salt,
+        params->salt_len,
+        params->hash_len,
+        hash_output,
+        ARGON2_ENCODED_LEN // Max length for encoded hash
+    );
+
+    securepass_secure_zero(salt, sizeof(salt)); // Clear sensitive data
+
+    return (result == ARGON2_OK);
+}
+
+int argon2_verify_password(const char *password, const char *encoded_hash) {
+    if (!password || !encoded_hash) {
         return 0;
     }
-    
-    // Convert hash to hex string
-    for (int i = 0; i < KEY_SIZE; i++) {
-        sprintf(hash_output + (i * 2), "%02x", hash[i]);
-    }
-    hash_output[KEY_SIZE * 2] = '\0';
-    
-    // Clear sensitive data
-    secure_zero(salt, sizeof(salt));
-    secure_zero(hash, sizeof(hash));
-    
-    return 1;
+    int result = argon2_verify(encoded_hash, password, strlen(password), Argon2_i);
+    return (result == ARGON2_OK);
 }
 
 int encrypt_password(const char *plaintext, const char *master_password, char *encrypted_output) {
     if (!plaintext || !master_password || !encrypted_output) {
         return 0;
     }
-    
+
     unsigned char salt[SALT_SIZE];
-    unsigned char iv[IV_SIZE];
+    unsigned char nonce[XCHACHA_NONCE_SIZE];
     unsigned char key[KEY_SIZE];
-    
-    // Generate random salt and IV
-    if (RAND_bytes(salt, SALT_SIZE) != 1 || RAND_bytes(iv, IV_SIZE) != 1) {
+    unsigned char tag[POLY1305_TAG_SIZE];
+
+    // 1. Generate random salt and nonce
+    if (RAND_bytes(salt, SALT_SIZE) != 1 || RAND_bytes(nonce, XCHACHA_NONCE_SIZE) != 1) {
         return 0;
     }
-    
-    // Derive key from master password using PBKDF2
-    if (PKCS5_PBKDF2_HMAC(master_password, strlen(master_password), salt, SALT_SIZE,
-                          PBKDF2_ITERATIONS, EVP_sha256(), KEY_SIZE, key) != 1) {
+
+    // 2. Derive key from master password using Argon2
+    int t_cost = 2;
+    int m_cost = (1 << 10); // 1 MiB
+    int parallelism = 1;
+    if (argon2i_hash_raw(t_cost, m_cost, parallelism, master_password, strlen(master_password), salt, SALT_SIZE, key, KEY_SIZE) != ARGON2_OK) {
+        securepass_secure_zero(key, sizeof(key));
         return 0;
     }
-    
-    // Create encryption context
+
+    // 3. Encrypt with XChaCha20-Poly1305
     EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
     if (!ctx) {
-        secure_zero(key, sizeof(key));
+        securepass_secure_zero(key, sizeof(key));
         return 0;
     }
-    
-    // Initialize encryption
-    if (EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv) != 1) {
-        EVP_CIPHER_CTX_free(ctx);
-        secure_zero(key, sizeof(key));
-        return 0;
-    }
-    
+
     int plaintext_len = strlen(plaintext);
-    unsigned char *ciphertext = malloc(plaintext_len + AES_BLOCK_SIZE);
+    unsigned char *ciphertext = malloc(plaintext_len);
     if (!ciphertext) {
         EVP_CIPHER_CTX_free(ctx);
-        secure_zero(key, sizeof(key));
+        securepass_secure_zero(key, sizeof(key));
         return 0;
     }
-    
-    int len;
-    int ciphertext_len;
-    
-    // Encrypt the plaintext
-    if (EVP_EncryptUpdate(ctx, ciphertext, &len, (unsigned char *)plaintext, plaintext_len) != 1) {
+
+    int len = 0;
+    int ciphertext_len = 0;
+
+    // Initialize encryption
+    if (EVP_EncryptInit_ex(ctx, EVP_chacha20_poly1305(), NULL, NULL, NULL) != 1) {
         free(ciphertext);
         EVP_CIPHER_CTX_free(ctx);
-        secure_zero(key, sizeof(key));
+        securepass_secure_zero(key, sizeof(key));
+        return 0;
+    }
+    // Set nonce length
+    if (EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_AEAD_SET_IVLEN, XCHACHA_NONCE_SIZE, NULL) != 1) {
+        free(ciphertext);
+        EVP_CIPHER_CTX_free(ctx);
+        securepass_secure_zero(key, sizeof(key));
+        return 0;
+    }
+    // Set key and nonce
+    if (EVP_EncryptInit_ex(ctx, NULL, NULL, key, nonce) != 1) {
+        free(ciphertext);
+        EVP_CIPHER_CTX_free(ctx);
+        securepass_secure_zero(key, sizeof(key));
+        return 0;
+    }
+
+    // Encrypt plaintext
+    if (EVP_EncryptUpdate(ctx, ciphertext, &len, (const unsigned char *)plaintext, plaintext_len) != 1) {
+        free(ciphertext);
+        EVP_CIPHER_CTX_free(ctx);
+        securepass_secure_zero(key, sizeof(key));
         return 0;
     }
     ciphertext_len = len;
-    
-    // Finalize encryption
+
+    // Finalize encryption (not much happens here for AEAD, but good practice)
     if (EVP_EncryptFinal_ex(ctx, ciphertext + len, &len) != 1) {
         free(ciphertext);
         EVP_CIPHER_CTX_free(ctx);
-        secure_zero(key, sizeof(key));
+        securepass_secure_zero(key, sizeof(key));
         return 0;
     }
     ciphertext_len += len;
-    
+
+    // Get the authentication tag
+    if (EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_AEAD_GET_TAG, POLY1305_TAG_SIZE, tag) != 1) {
+        free(ciphertext);
+        EVP_CIPHER_CTX_free(ctx);
+        securepass_secure_zero(key, sizeof(key));
+        return 0;
+    }
+
     EVP_CIPHER_CTX_free(ctx);
-    
-    // Combine salt + iv + ciphertext
-    int total_len = SALT_SIZE + IV_SIZE + ciphertext_len;
+
+    // 4. Combine salt + nonce + tag + ciphertext
+    int total_len = SALT_SIZE + XCHACHA_NONCE_SIZE + POLY1305_TAG_SIZE + ciphertext_len;
     unsigned char *combined = malloc(total_len);
     if (!combined) {
         free(ciphertext);
-        secure_zero(key, sizeof(key));
+        securepass_secure_zero(key, sizeof(key));
         return 0;
     }
-    
+
     memcpy(combined, salt, SALT_SIZE);
-    memcpy(combined + SALT_SIZE, iv, IV_SIZE);
-    memcpy(combined + SALT_SIZE + IV_SIZE, ciphertext, ciphertext_len);
-    
-    // Encode to base64
+    memcpy(combined + SALT_SIZE, nonce, XCHACHA_NONCE_SIZE);
+    memcpy(combined + SALT_SIZE + XCHACHA_NONCE_SIZE, tag, POLY1305_TAG_SIZE);
+    memcpy(combined + SALT_SIZE + XCHACHA_NONCE_SIZE + POLY1305_TAG_SIZE, ciphertext, ciphertext_len);
+
+    // 5. Encode to Base64
     char *base64_result = base64_encode(combined, total_len);
     if (!base64_result) {
         free(combined);
         free(ciphertext);
-        secure_zero(key, sizeof(key));
+        securepass_secure_zero(key, sizeof(key));
         return 0;
     }
-    
+
     strcpy(encrypted_output, base64_result);
-    
+
     // Clean up
     free(base64_result);
     free(combined);
-    secure_zero(ciphertext, ciphertext_len);
+    securepass_secure_zero(ciphertext, ciphertext_len);
     free(ciphertext);
-    secure_zero(key, sizeof(key));
-    
+    securepass_secure_zero(key, sizeof(key));
+
     return 1;
 }
 
@@ -219,89 +254,167 @@ int decrypt_password(const char *encrypted_input, const char *master_password, c
     if (!encrypted_input || !master_password || !decrypted_output) {
         return 0;
     }
-    
-    // Decode from base64
+
+    // 1. Decode from Base64
     int decoded_len;
     unsigned char *decoded = base64_decode(encrypted_input, &decoded_len);
-    if (!decoded || decoded_len < SALT_SIZE + IV_SIZE + AES_BLOCK_SIZE) {
+    if (!decoded || decoded_len < SALT_SIZE + XCHACHA_NONCE_SIZE + POLY1305_TAG_SIZE) {
         if (decoded) free(decoded);
         return 0;
     }
-    
-    // Extract salt, IV, and ciphertext
+
+    // 2. Extract components: salt, nonce, tag, ciphertext
     unsigned char *salt = decoded;
-    unsigned char *iv = decoded + SALT_SIZE;
-    unsigned char *ciphertext = decoded + SALT_SIZE + IV_SIZE;
-    int ciphertext_len = decoded_len - SALT_SIZE - IV_SIZE;
-    
-    // Derive key from master password
+    unsigned char *nonce = decoded + SALT_SIZE;
+    unsigned char *tag = decoded + SALT_SIZE + XCHACHA_NONCE_SIZE;
+    unsigned char *ciphertext = decoded + SALT_SIZE + XCHACHA_NONCE_SIZE + POLY1305_TAG_SIZE;
+    int ciphertext_len = decoded_len - (SALT_SIZE + XCHACHA_NONCE_SIZE + POLY1305_TAG_SIZE);
+
+    // 3. Derive key from master password using Argon2
     unsigned char key[KEY_SIZE];
-    if (PKCS5_PBKDF2_HMAC(master_password, strlen(master_password), salt, SALT_SIZE,
-                          PBKDF2_ITERATIONS, EVP_sha256(), KEY_SIZE, key) != 1) {
+    int t_cost = 2;
+    int m_cost = (1 << 10); // 1 MiB
+    int parallelism = 1;
+    if (argon2i_hash_raw(t_cost, m_cost, parallelism, master_password, strlen(master_password), salt, SALT_SIZE, key, KEY_SIZE) != ARGON2_OK) {
         free(decoded);
+        securepass_secure_zero(key, sizeof(key));
         return 0;
     }
-    
-    // Create decryption context
+
+    // 4. Decrypt with XChaCha20-Poly1305
     EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
     if (!ctx) {
         free(decoded);
-        secure_zero(key, sizeof(key));
+        securepass_secure_zero(key, sizeof(key));
         return 0;
     }
-    
-    // Initialize decryption
-    if (EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv) != 1) {
-        EVP_CIPHER_CTX_free(ctx);
-        free(decoded);
-        secure_zero(key, sizeof(key));
-        return 0;
-    }
-    
-    unsigned char *plaintext = malloc(ciphertext_len + AES_BLOCK_SIZE);
+
+    unsigned char *plaintext = malloc(ciphertext_len);
     if (!plaintext) {
         EVP_CIPHER_CTX_free(ctx);
         free(decoded);
-        secure_zero(key, sizeof(key));
+        securepass_secure_zero(key, sizeof(key));
         return 0;
     }
-    
-    int len;
-    int plaintext_len;
-    
-    // Decrypt the ciphertext
+
+    int len = 0;
+    int plaintext_len = 0;
+
+    // Initialize decryption
+    if (EVP_DecryptInit_ex(ctx, EVP_chacha20_poly1305(), NULL, NULL, NULL) != 1) {
+        free(plaintext);
+        EVP_CIPHER_CTX_free(ctx);
+        free(decoded);
+        securepass_secure_zero(key, sizeof(key));
+        return 0;
+    }
+    // Set nonce length
+    if (EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_AEAD_SET_IVLEN, XCHACHA_NONCE_SIZE, NULL) != 1) {
+        free(plaintext);
+        EVP_CIPHER_CTX_free(ctx);
+        free(decoded);
+        securepass_secure_zero(key, sizeof(key));
+        return 0;
+    }
+    // Set key and nonce
+    if (EVP_DecryptInit_ex(ctx, NULL, NULL, key, nonce) != 1) {
+        free(plaintext);
+        EVP_CIPHER_CTX_free(ctx);
+        free(decoded);
+        securepass_secure_zero(key, sizeof(key));
+        return 0;
+    }
+    // Set the authentication tag
+    if (EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_AEAD_SET_TAG, POLY1305_TAG_SIZE, tag) != 1) {
+        free(plaintext);
+        EVP_CIPHER_CTX_free(ctx);
+        free(decoded);
+        securepass_secure_zero(key, sizeof(key));
+        return 0;
+    }
+
+    // Decrypt ciphertext
     if (EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len) != 1) {
         free(plaintext);
         EVP_CIPHER_CTX_free(ctx);
         free(decoded);
-        secure_zero(key, sizeof(key));
+        securepass_secure_zero(key, sizeof(key));
         return 0;
     }
     plaintext_len = len;
-    
-    // Finalize decryption
+
+    // Finalize decryption (verifies tag)
     if (EVP_DecryptFinal_ex(ctx, plaintext + len, &len) != 1) {
+        // Authentication failed
         free(plaintext);
         EVP_CIPHER_CTX_free(ctx);
         free(decoded);
-        secure_zero(key, sizeof(key));
+        securepass_secure_zero(key, sizeof(key));
         return 0;
     }
     plaintext_len += len;
-    
-    // Null terminate and copy result
+
+    // Null-terminate and copy result
     plaintext[plaintext_len] = '\0';
     strcpy(decrypted_output, (char *)plaintext);
-    
+
     // Clean up
     EVP_CIPHER_CTX_free(ctx);
-    secure_zero(plaintext, plaintext_len);
+    securepass_secure_zero(plaintext, plaintext_len);
     free(plaintext);
     free(decoded);
-    secure_zero(key, sizeof(key));
-    
+    securepass_secure_zero(key, sizeof(key));
+
     return 1;
 }
+
+int setup_master_password_argon2(const char *password, const Argon2Params *params) {
+    printf("Setting up master password for first time with Argon2...\n");
+
+    char encoded_hash[ARGON2_ENCODED_LEN];
+    if (!argon2_hash_password(password, params, encoded_hash)) {
+        printf("Error: Failed to hash master password with Argon2.\n");
+        return 0;
+    }
+
+    const char *master_key_file_path = get_master_key_path();
+    FILE *file = fopen(master_key_file_path, "w");
+    if (!file) {
+        printf("Error: Cannot create master password file at %s.\n", master_key_file_path);
+        return 0;
+    }
+
+    fprintf(file, "%s\n", encoded_hash); // Store the encoded hash directly
+    fclose(file);
+
+    printf("Master password set successfully with Argon2!\n");
+    return 1;
+}
+
+int validate_master_password_argon2(const char *input_password) {
+    const char *master_key_file_path = get_master_key_path();
+    FILE *file = fopen(master_key_file_path, "r");
+    if (!file) {
+        // If master.key doesn't exist, it's the first time setup.
+        // Use default Argon2 parameters for setup.
+        Argon2Params default_params = get_default_argon2_params();
+        return setup_master_password_argon2(input_password, &default_params);
+    }
+
+    char stored_encoded_hash[ARGON2_ENCODED_LEN];
+    if (fgets(stored_encoded_hash, sizeof(stored_encoded_hash), file) == NULL) {
+        fclose(file);
+        printf("Error: Corrupted master password file or empty at %s.\n", master_key_file_path);
+        return 0;
+    }
+    // Remove trailing newline if present
+    stored_encoded_hash[strcspn(stored_encoded_hash, "\n")] = '\0';
+
+    fclose(file);
+
+    return argon2_verify_password(input_password, stored_encoded_hash);
+}
+
 
 void cleanup_openssl(void) {
     EVP_cleanup();
