@@ -47,6 +47,11 @@ int encrypt_password(const char *plaintext, const char *master_password, char *e
 int decrypt_password(const char *encrypted_input, const char *master_password, char *decrypted_output);
 
 /**
+ * Decrypt a password using the OLD hardcoded parameters (for migration)
+ */
+int decrypt_password_old(const char *encrypted_input, const char *master_password, char *decrypted_output);
+
+/**
  * Generate a cryptographically secure random key
  * @param key Buffer to store the generated key
  * @param key_length Length of key to generate in bytes

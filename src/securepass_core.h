@@ -30,6 +30,9 @@ int securepass_generate_totp(const char *account, const char *master_password, c
 int securepass_export_csv(const char *master_password, const char *filepath);
 int securepass_import_csv(const char *master_password, const char *filepath);
 
+// --- Migration ---
+int securepass_migrate_data(const char *master_password);
+
 // Utility Functions
 void securepass_secure_zero(void *ptr, size_t size);
 void securepass_clear_screen(void);

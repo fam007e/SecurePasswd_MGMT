@@ -68,6 +68,25 @@ if (RAND_bytes(salt, 16) != 1) {
     exit(1);
 }
 ```
+```
+
+### 🔑 Secure Password Generator
+
+The built-in password generator is designed with cryptographic security in mind:
+
+- **Randomness Source:** Utilizes `RAND_bytes()` from OpenSSL to ensure high-quality, unpredictable random numbers for character selection.
+- **Character Sets:** Supports customizable character sets (lowercase, uppercase, numbers, special characters) to meet various password policy requirements.
+- **Entropy:** Generates passwords with high entropy, making them resistant to brute-force attacks.
+- **Memory Safety:** Generated passwords are treated as sensitive data and are cleared from memory after use.
+
+```c
+// From password_generator.c - secure random character selection
+if (RAND_bytes(&random_byte, 1) != 1) {
+    // Handle error
+}
+// Use random_byte to select character from allowed set
+```
+```
 
 ## 🛡️ Data Protection
 
@@ -175,12 +194,14 @@ void ensure_data_directory(void) {
 
 ### 📊 File Security Matrix
 
-| File | Permissions | Content | Protection Level |
-|------|------------|---------|------------------|
+| File | Permissions (POSIX) | Content | Protection Level |
+|------|---------------------|---------|------------------|
 | `data/` | `0700` (rwx------) | Directory | Owner-only access |
 | `master.key` | `0600` (rw-------) | PBKDF2 hash + salt | High |
 | `passwords.dat` | `0600` (rw-------) | AES-256 encrypted data | Maximum |
 | `totp.dat` | `0600` (rw-------) | AES-256 encrypted secrets | Maximum |
+
+**Note on Windows Permissions:** On Windows, file permissions are managed via Access Control Lists (ACLs) rather than POSIX-style numeric modes. When `SecurePassManager` creates the `data/` directory, it inherits permissions from its parent directory. Users should ensure that the `securepass` data directory and its contents are protected with appropriate ACLs to restrict access to the current user only. This may require manual configuration by the user.
 
 ### 🏗️ File Structure Security
 ```
@@ -196,7 +217,31 @@ data/                           # 0700 permissions
 - **Local Storage Only:** No network operations or cloud synchronization
 - **Access Control:** Unix file permissions restrict access to owner only
 
+### 🌐 Cross-Platform Data Storage and Configuration
+
+`SecurePassManager` is designed to store data locally, adapting to different operating system conventions:
+
+- **Linux/macOS:** Data is stored by default in `~/.config/securepass/`. This path respects the XDG Base Directory Specification.
+- **Windows:** Data is stored by default in `%APPDATA%\securepass\` (e.g., `C:\Users\YourUsername\AppData\Roaming\securepass\`).
+- **Android (via Termux):** When run within the Termux environment, `SecurePassManager` will behave like a Linux application, storing data in `~/.config/securepass/` relative to the Termux home directory.
+
+**Customizing Data Location:**
+Users can override the default data directory by setting the `SECPASS_DATA_DIR` environment variable to their desired path. For example:
+
+```bash
+export SECPASS_DATA_DIR="/path/to/your/secure/directory"
+./securepass
+```
+
+**Security Considerations for Mobile Devices (Termux):**
+While `SecurePassManager` provides strong encryption, storing sensitive data on mobile devices (even within sandboxed environments like Termux) carries inherent risks. Users should:
+- Ensure their device is encrypted.
+- Use strong device unlock credentials.
+- Be aware of potential malware or physical access threats to the device.
+- Regularly back up their `securepass` data directory to a secure, offline location.
+
 ## 🔑 Authentication
+
 
 ### 🔐 Master Password Requirements
 
@@ -644,6 +689,6 @@ No software can guarantee absolute security. Users must:
 
 ---
 
-**Document Version:** 2025.06.14.1-2  
-**Last Updated:** June 21, 2025  
-**Next Review:** September 14, 2025
+**Document Version:** 2025.09.13  
+**Last Updated:** September 13, 2025  
+**Next Review:** December 13, 2025

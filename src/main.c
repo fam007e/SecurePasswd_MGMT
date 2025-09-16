@@ -96,12 +96,26 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    if (!securepass_validate_master_password(master_password)) {
+    int validation_result = securepass_validate_master_password(master_password);
+
+    if (validation_result == 0) {
         fprintf(stderr, "Master password validation failed. Exiting.\n");
         securepass_secure_zero(master_password, sizeof(master_password));
         exit(EXIT_FAILURE);
+    } else if (validation_result == 2) {
+        printf("Data migration is required to upgrade security.\n");
+        printf("This will re-encrypt all your data with stronger parameters.\n");
+        if (securepass_migrate_data(master_password)) {
+            printf("Migration complete! Please restart the application.\n");
+        } else {
+            fprintf(stderr, "Migration failed! Please check the logs.\n");
+            exit(EXIT_FAILURE);
+        }
+        securepass_secure_zero(master_password, sizeof(master_password));
+        exit(EXIT_SUCCESS);
     }
 
+    // If validation_result is 1, we proceed
     interactive_menu(master_password);
 
     securepass_secure_zero(master_password, sizeof(master_password));

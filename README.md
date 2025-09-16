@@ -10,11 +10,12 @@
 
 ## 🔐 Key Security Features
 
-- **Military-Grade Encryption:** AES-256 encryption with PBKDF2 key derivation (10,000 iterations)
-- **Memory Protection:** Sensitive data automatically cleared from memory after use
-- **Hardened Compilation:** Built with comprehensive security flags (stack protection, ASLR, RELRO)
-- **Local Storage Only:** No network connectivity required - your data never leaves your device
-- **Secure File Permissions:** Data directory created with 0700 permissions (owner access only)
+- **End-to-End Encryption:** AES-256 encryption for all sensitive data, including usernames, passwords, and TOTP secrets.
+- **Strong Key Derivation:** PBKDF2 with 10,000 iterations is used to derive the encryption key from your master password.
+- **Secure Password Generator:** A built-in, cryptographically secure password generator to create strong, unique passwords.
+- **Robust Parsing:** Uses a well-tested CSV parsing library to prevent parsing-related vulnerabilities.
+- **Memory Safety:** Sensitive data is explicitly cleared from memory after use.
+- **Secure Storage:** Encrypted data is stored in `.dat` files to prevent accidental exposure.
 
 ## Table of Contents
 - [🔐 Key Security Features](#-key-security-features)
@@ -39,6 +40,11 @@
 - Master password protection with **PBKDF2 key derivation**
 - Automatic data directory creation and management
 
+### 🔢 Cryptographically Secure Password Generator
+- Generate strong, customizable passwords from the command line
+- Control length, character sets (lowercase, uppercase, numbers, special characters)
+- Entropy calculation for password strength assessment
+
 ### 🔐 Two-Factor Authentication (TOTP)
 - Generate **TOTP codes** for 2FA-enabled accounts
 - Add and manage TOTP secrets securely
@@ -59,12 +65,17 @@
 - All data stored locally for **maximum privacy**
 - No network connectivity required
 - Secure file permissions (0700) for data directory
+- **Data Directory:** By default, `SecurePassManager` creates a `data/` directory in the same location as the executable. This directory is secured with `0700` permissions (read, write, execute for owner only).
+- **Sensitive Files:**
+    - `data/master.key`: Stores the PBKDF2 hash and salt of your master password. This file is critical for authentication and decryption.
+    - `data/passwords.dat`: Contains all your encrypted password entries.
+    - `data/totp.dat`: Stores your encrypted TOTP secrets.
+    **IMPORTANT:** Never share these files or store them in insecure locations. Always ensure your `data/` directory is protected.
 
 ## 📋 Requirements
 
 - **GCC compiler** (version 7.5.0 or higher)
 - **OpenSSL library** (version 1.1.1 or higher)
-- **liboath library** (version 2.6.2 or higher)
 - **POSIX-compliant operating system** (Linux, macOS, Unix-like systems)
 
 ### 📦 Installation of Dependencies
@@ -72,39 +83,22 @@
 **Ubuntu/Debian:**
 ```bash
 sudo apt-get update
-sudo apt-get install build-essential libssl-dev oathtool liboath0 liboath-dev
-
-# Optional development tools
-sudo apt-get install cppcheck checksec valgrind clang-format clang-tidy lcov
+sudo apt-get install build-essential libssl-dev liboath-dev
 ```
 
 **macOS (Homebrew):**
 ```bash
 brew install gcc openssl oath-toolkit
-
-# Optional development tools
-brew install cppcheck valgrind llvm lcov
 ```
 
 **Arch Linux:**
 ```bash
 sudo pacman -Syu --needed base-devel openssl oath-toolkit
-
-# Optional development tools  
-sudo pacman -S --needed cppcheck checksec valgrind clang lcov
 ```
 
 **Fedora/RHEL:**
 ```bash
-sudo dnf install gcc gcc-c++ make openssl-devel liboath-devel oathtool
-
-# Optional development tools
-sudo dnf install cppcheck checksec valgrind clang-tools-extra lcov
-```
-
-**Quick Setup (Auto-detect system):**
-```bash
-make dev-setup
+sudo dnf install gcc gcc-c++ make openssl-devel liboath-devel
 ```
 
 ## 🚀 Installation
@@ -115,67 +109,17 @@ make dev-setup
    cd SecurePasswd_MGMT
    ```
 
-2. **Check dependencies:**
+2. **Compile the project:**
    ```bash
-   make check-deps
-   ```
-
-3. **Compile the project:**
-   ```bash
-   make              # Standard secure build (recommended)
-   make debug        # Debug build with symbols
-   make release      # Optimized release build with LTO
+   make
    ```
 
    The compiled binary `securepass` will be created in the project root directory.
 
-4. **Optional - Install system-wide:**
+3. **Optional - Install system-wide:**
    ```bash
-   sudo make install     # Install to /usr/local/bin
-   sudo make uninstall   # Remove from system
+   sudo make install
    ```
-
-## ⚙️ Build Options
-
-| Command | Description | Use Case |
-|---------|-------------|----------|
-| `make` or `make all` | Standard secure build with hardening flags | **Recommended for production use** |
-| `make debug` | Debug build with symbols, no optimization | Development and debugging |
-| `make release` | Maximum optimization with LTO | Performance-critical deployments |
-| `make test` | Run basic functionality tests | Verify build integrity |
-| `make security-check` | Analyze binary security features | Security verification |
-| `make package` | Create distribution package with checksums | Release preparation |
-
-### 🛠️ Development & Quality Assurance
-
-| Command | Description | Requirements |
-|---------|-------------|--------------|
-| `make lint` | Code linting and style checks | cppcheck, clang-tidy |
-| `make format` | Auto-format code | clang-format |
-| `make memcheck` | Memory leak detection | valgrind |
-| `make coverage` | Build with coverage support | gcov, lcov |
-| `make quality` | Run all quality checks | All QA tools |
-
-### 🔒 Security-Focused Compilation
-
-The project automatically compiles with comprehensive security hardening:
-
-```makefile
-# Security Features Enabled by Default:
--fstack-protector-strong    # Stack buffer overflow protection
--D_FORTIFY_SOURCE=2        # Runtime buffer overflow detection  
--pie -fPIE                 # Position Independent Executable (ASLR)
--Wformat -Werror=format-security  # Format string protection
--fstack-clash-protection   # Stack clash attack prevention
--fcf-protection           # Control flow integrity (Intel CET)
--Wl,-z,relro -Wl,-z,now   # Full RELRO linking protection
--Wl,-z,noexecstack        # Non-executable stack
-```
-
-**Verify security features:**
-```bash
-make security-check
-```
 
 ## 📖 Usage
 
@@ -192,13 +136,13 @@ On first run, you'll be prompted to set up a master password. This password will
 
 ```
 SecurePassManager Menu:
-1. Add new password       - Store encrypted password entries
-2. Search for password    - Find and decrypt stored passwords  
-3. Generate TOTP code     - Create time-based one-time passwords
-4. Add new TOTP account   - Store TOTP secrets securely
-5. Export passwords       - Export data to CSV format
-6. Import passwords       - Import data from CSV format
-7. Exit                   - Safely exit the application
+1. Add new password
+2. Search for password
+3. Generate TOTP code
+4. Add new TOTP account
+5. Export passwords
+6. Import passwords
+7. Exit
 ```
 
 ### 🔐 First Time Setup
@@ -207,7 +151,6 @@ When you run SecurePassManager for the first time:
 1. The program creates a `data/` directory with secure permissions (0700)
 2. You'll be prompted to create a master password
 3. The master password is hashed using **PBKDF2** with 10,000 iterations and stored securely
-4. A cryptographically secure salt is generated using OpenSSL's `RAND_bytes()`
 
 ### 📋 Command Line Options
 
@@ -217,176 +160,53 @@ When you run SecurePassManager for the first time:
 Options:
   -h, --help     Show help message and exit
   -v, --version  Show version information and exit
-  help           Show help message and exit
+
+  --generate-password  Generate a cryptographically secure password
+  -l, --length <num>   Specify password length (default: 12, min: 12)
+  -c, --case-variance  Include uppercase characters
+  -n, --numbers        Include numbers
+  -s, --special        Include special characters
 ```
 
 **Examples:**
 ```bash
-./securepass --version    # Show version: YYYY.MM.DD format
-./securepass --help       # Display detailed usage information
+./securepass --version
+./securepass --help
+./securepass --generate-password -l 16 -c -n -s
+./securepass --generate-password
 ```
 
 ## 🛡️ Security
 
-SecurePassManager implements **defense-in-depth** security principles:
-
-### 🔐 Cryptographic Security
-- **Encryption:** AES-256 (Advanced Encryption Standard) for all stored data
-- **Key Derivation:** PBKDF2-SHA256 with 10,000 iterations for secure key derivation
-- **Salt Generation:** Cryptographically secure random salt using OpenSSL `RAND_bytes()`
-- **Random Number Generation:** OpenSSL CSPRNG for all random data
-
-### 🛡️ Memory Protection
-- **Secure Clearing:** Sensitive data wiped from memory using `memset()` after use
-- **Stack Protection:** Compiler-level stack buffer overflow protection
-- **Input Security:** Hidden password input prevents shoulder surfing attacks
-
-### 📁 File System Security
-- **Secure Permissions:** Data directory created with `0700` permissions (owner-only access)
-- **Local Storage:** All operations performed locally without network connectivity
-- **File Integrity:** Corruption detection through failed decryption attempts
-
-### 🔒 Binary Hardening
-- **ASLR:** Position Independent Executable for address space randomization
-- **Stack Canaries:** Detection of stack buffer overflows at runtime
-- **RELRO:** Read-only relocation and immediate binding
-- **Non-executable Stack:** Prevention of code execution on stack
-
 For a comprehensive security analysis, see our **[Security Policy](SECURITY.md)**.
-
-### 🚨 Security Verification
-
-Verify your build's security features:
-```bash
-make security-check
-```
-
-This will show:
-- Enabled compiler security flags
-- Binary security analysis (requires `checksec`)
-- Static code analysis results (requires `cppcheck`)
 
 ## 📁 Project Structure
 
 ```
 SecurePasswd_MGMT/
-├── 📄 CONTRIBUTION.md           # Contribution guidelines
-├── 📁 data/                     # Auto-created directory for encrypted data
-│   ├── 🔐 master.key           # Master password hash and salt
-│   ├── 🔐 passwords.dat        # Encrypted password storage
-│   └── 🔐 totp.dat             # TOTP secrets storage
-├── 📁 lib/                     # External library headers
-│   ├── 📁 liboath/
-│   │   └── 📄 oath.h           # TOTP library header
-│   │   └── 📄 openssl.h        # OpenSSL library header
-│   └── 📄 README.md
-├── 📄 LICENSE                  # MIT License
-├── 📄 Makefile                 # Build system with security features
-├── 📄 README.md                # This file
-├── 📄 SECURITY.md              # Detailed security documentation
-└── 📁 src/                     # Source code
-    ├── 📄 csv_handler.c        # CSV import/export functionality
-    ├── 📄 csv_handler.h
-    ├── 📄 encryption.c         # AES-256 encryption implementation
-    ├── 📄 encryption.h
-    ├── 📄 main.c               # Main program logic and UI
-    ├── 📄 totp.c               # TOTP generation and management
-    ├── 📄 totp.h
-    ├── 📄 utils.c              # Utility functions (input handling, etc.)
-    ├── 📄 utils.h
-    └── 📄 version.h            # Version information
-```
-
-## 💾 Data Storage
-
-| File | Purpose | Security |
-|------|---------|----------|
-| `data/master.key` | Master password hash + salt | PBKDF2-SHA256, 10K iterations |
-| `data/passwords.dat` | Encrypted password entries | AES-256 encryption |
-| `data/totp.dat` | TOTP secrets | AES-256 encryption |
-
-**File Permissions:** All data files created with restricted permissions (owner read/write only)
-
-## 🔄 Backup & Recovery
-
-### Creating Backups
-```bash
-# Export to CSV (encrypted with master password)
-./securepass
-# Choose option 5: Export passwords
-
-# Manual backup of encrypted data
-cp -r data/ backup-$(date +%Y%m%d)/
-```
-
-### Restoring from Backup
-```bash
-# Restore from CSV export
-./securepass  
-# Choose option 6: Import passwords
-
-# Manual restore of encrypted data
-cp -r backup-YYYYMMDD/ data/
+├── .github/                  # GitHub Actions workflows and issue templates
+├── lib/                      # External libraries (e.g., libcsv)
+├── src/                      # Core source code
+│   ├── csv_handler.c         # CSV file reading and writing
+│   ├── csv_parser.c          # CSV parsing logic
+│   ├── data_path.h           # Defines data directory path
+│   ├── encryption.c          # AES-256 encryption/decryption
+│   ├── main.c                # Main application logic and CLI handling
+│   ├── password_generator.c  # Secure password generation
+│   ├── totp.c                # TOTP generation and management
+│   └── utils.c               # Utility functions (e.g., secure input)
+├── tests/                    # Unit tests for various modules
+├── Makefile                  # Build automation
+├── README.md                 # Project overview and usage
+├── CONTRIBUTION.md           # Guidelines for contributing
+├── SECURITY.md               # Detailed security policy
+└── LICENSE                   # Project license
 ```
 
 ## 🤝 Contribution
 
 We welcome contributions to SecurePassManager! Please read our [Contribution Guidelines](CONTRIBUTION.md) for details on our code of conduct and the process for submitting pull requests.
 
-### 🚀 Quick Start for Contributors
-
-```bash
-# Setup development environment
-make dev-setup
-
-# Run quality checks
-make quality
-
-# Submit your changes
-git commit -m "feat: your feature description"
-```
-
 ## 📄 License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
-## ⚠️ Disclaimer
-
-While SecurePassManager is designed with security as a top priority, no system can guarantee absolute security. Users are responsible for:
-
-- 🔑 Maintaining the confidentiality and strength of their master password
-- 💾 Regular backups of their encrypted data  
-- 🧠 Understanding the risks associated with storing sensitive information
-- 🔄 Keeping the software updated with latest security patches
-- 🖥️ Using the software on trusted, secure systems
-
-**Important:** This software is provided "as-is" without warranty. Use at your own risk.
-
-## 🆘 Support
-
-For bug reports, feature requests, or general questions:
-
-- 🔍 Search existing [Issues](https://github.com/fam007e/SecurePasswd_MGMT/issues) on GitHub
-- 🐛 Open a new issue if your question remains unanswered
-- 📖 Check our documentation for common usage patterns
-- 🛡️ For security issues, see our [Security Policy](SECURITY.md)
-
-### 📈 Project Status
-
-- ✅ **Active Development:** Regular updates and security patches
-- 🔒 **Security Focused:** Comprehensive security measures implemented  
-- 🧪 **Well Tested:** Extensive quality assurance and testing
-- 📚 **Well Documented:** Comprehensive documentation and examples
-
-## 🙏 Acknowledgments
-
-- [OpenSSL](https://www.openssl.org/) for cryptographic operations
-- [liboath](http://www.nongnu.org/oath-toolkit/) for TOTP functionality  
-- All contributors who have helped improve this project
-- The security community for responsible disclosure practices
-
----
-
-**🛡️ Thank you for choosing SecurePassManager. Your security is our priority!**
-
-*Made with ❤️ for secure password management*

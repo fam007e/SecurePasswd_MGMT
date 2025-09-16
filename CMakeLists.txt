@@ -8,6 +8,7 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 add_library(securepasscore SHARED
     src/csv_handler.c
     src/csv_parser.c
+    src/data_path.c
     src/encryption.c
     src/password_generator.c
     src/totp.c
@@ -35,6 +36,17 @@ if(ARGON2_INCLUDE_DIR AND ARGON2_LIBRARY)
     target_link_libraries(securepasscore PUBLIC ${ARGON2_LIBRARY})
 else()
     message(FATAL_ERROR "Could not find argon2.h or libargon2. Please install libargon2-dev or argon2-devel.")
+endif()
+
+# Manually find and link libsodium
+find_path(LIBSODIUM_INCLUDE_DIR sodium.h PATHS /usr/include /usr/local/include)
+find_library(LIBSODIUM_LIBRARY sodium)
+
+if(LIBSODIUM_INCLUDE_DIR AND LIBSODIUM_LIBRARY)
+    target_include_directories(securepasscore PUBLIC ${LIBSODIUM_INCLUDE_DIR})
+    target_link_libraries(securepasscore PUBLIC ${LIBSODIUM_LIBRARY})
+else()
+    message(FATAL_ERROR "Could not find sodium.h or libsodium. Please install libsodium-dev or libsodium.")
 endif()
 
 # Manually find and link liboath for TOTP
@@ -72,3 +84,7 @@ if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
         -Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack
     )
 endif()
+
+# Enable testing
+# enable_testing()
+# add_subdirectory(tests)

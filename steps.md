@@ -29,12 +29,15 @@ This document outlines the step-by-step plan to evolve SecurePassManager into a 
     - Update the `master.key` file format to store Argon2 parameters (salt, memory cost, time cost, parallelism).
     - Implement a migration path for existing PBKDF2 `master.key` files to Argon2 (e.g., prompt user to re-enter master password to upgrade).
 
-### Step 1.4: Implement XChaCha20-Poly1305 in C Core
-- **Objective:** Replace AES-256 with XChaCha20-Poly1305 for data encryption/decryption.
+### Step 1.4: Implement XChaCha20-Poly1305 via Libsodium
+- **Objective:** Replace the current encryption with XChaCha20-Poly1305 to enhance security and simplify nonce management.
+- **Rationale:** A review of cryptographic best practices and portability concerns has led to a change in strategy.
+    - **Security:** XChaCha20-Poly1305 uses a 192-bit nonce, which is large enough to be generated randomly without a significant risk of collision. This is a major security advantage over AES-GCM's 96-bit nonce, where a repeated nonce can be catastrophic.
+    - **Portability:** The `XCHACHA20-POLY1305` cipher is only easily accessible in OpenSSL 3.0 and later. Relying on this version would create significant portability issues for older systems. **Libsodium** is a modern, highly-portable, and easy-to-use cryptographic library that provides a stable XChaCha20-Poly1305 implementation across all our target platforms (Linux, macOS, Windows, Android/Termux).
 - **Tasks:**
-    - **Implementation:** Utilize OpenSSL's EVP interface for XChaCha20-Poly1305.
-    - Implement XChaCha20-Poly1305 within `libsecurepasscore` for all data encryption/decryption.
-    - Implement a migration path for existing AES-256 encrypted data (e.g., decrypt with old, re-encrypt with new).
+    - **1. Integrate Libsodium:** Add `libsodium` as a dependency to the project. This will involve updating `CMakeLists.txt` to find the library and headers.
+    - **2. Refactor Encryption Logic:** Modify `src/encryption.c` to replace the OpenSSL EVP calls with `libsodium`'s high-level `crypto_secretbox` API for encryption and decryption. The Argon2 key derivation will still be used to generate the key passed to libsodium.
+    - **3. Preserve Migration Path:** Ensure the old AES-GCM decryption function (`decrypt_password_old`) is kept, as it will be required to implement a migration routine for existing user data.
 
 ## Phase 2: Flutter GUI Development - Setup & FFI Integration
 
