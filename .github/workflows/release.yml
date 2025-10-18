@@ -88,7 +88,7 @@ jobs:
           }
 
           # Install packages one by one to better handle failures
-          $packages = @("libsodium", "argon2", "curl", "openssl", "sqlcipher")
+          $packages = @("libsodium", "argon2", "curl", "openssl", "sqlcipher", "qt6-base")
           foreach ($pkg in $packages) {
             Write-Host "Installing $pkg..."
             .\vcpkg\vcpkg install $pkg --triplet x64-windows
@@ -96,6 +96,19 @@ jobs:
               Write-Host "Warning: Failed to install $pkg, but continuing..."
             }
           }
+
+      - name: Install libcsv from source (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          git clone https://github.com/rgamble/libcsv.git
+          cd libcsv
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_INSTALL_PREFIX="$pwd\..\..\libcsv-install"
+          cmake --build . --config Release
+          cmake --install . --config Release
+        continue-on-error: true
 
       - name: Setup Homebrew
         if: runner.os == 'macOS'
@@ -134,22 +147,10 @@ jobs:
           cd libcsv
           make
           sudo make install
-          # Make sure the library is found by pkg-config
-          sudo mkdir -p /usr/local/lib/pkgconfig
-          cat > libcsv.pc <<EOF
-          prefix=/usr/local
-          exec_prefix=\${prefix}
-          libdir=\${exec_prefix}/lib
-          includedir=\${prefix}/include
 
-          Name: libcsv
-          Description: CSV library
-          Version: 3.0.3
-          Libs: -L\${libdir} -lcsv
-          Cflags: -I\${includedir}
-          EOF
-          sudo mv libcsv.pc /usr/local/lib/pkgconfig/
-        continue-on-error: true
+          # Verify installation
+          ls -la /usr/local/lib/libcsv* || true
+          ls -la /usr/local/include/csv.h || true
 
       - name: Configure CMake (Linux)
         if: runner.os == 'Linux'
@@ -165,12 +166,13 @@ jobs:
       - name: Configure CMake (macOS)
         if: runner.os == 'macOS'
         run: |
-          export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:/opt/homebrew/lib/pkgconfig:$PKG_CONFIG_PATH"
           cmake -B build \
             -DCMAKE_BUILD_TYPE=Release \
             -DCPACK_PACKAGE_VERSION="${{ steps.get_version.outputs.version }}" \
             -DPROJECT_VERSION="${{ steps.get_version.outputs.version }}" \
-            -DCPACK_GENERATOR="${{ matrix.cpack_generator }}"
+            -DCPACK_GENERATOR="${{ matrix.cpack_generator }}" \
+            -DLIBCSV_INCLUDE_DIRS=/usr/local/include \
+            -DLIBCSV_LIBRARIES=/usr/local/lib/libcsv.a
 
       - name: Configure CMake (Windows)
         if: runner.os == 'Windows'
@@ -178,14 +180,25 @@ jobs:
         run: |
           $vcpkgRoot = Join-Path $pwd "vcpkg"
           $version = "${{ steps.get_version.outputs.version }}"
+          $libcsvInstall = Join-Path $pwd "libcsv-install"
 
-          cmake -B build `
-            -DCMAKE_BUILD_TYPE=Release `
-            "-DCPACK_PACKAGE_VERSION=$version" `
-            "-DPROJECT_VERSION=$version" `
-            "-DCPACK_GENERATOR=${{ matrix.cpack_generator }}" `
-            "-DCMAKE_TOOLCHAIN_FILE=$vcpkgRoot\scripts\buildsystems\vcpkg.cmake" `
-            -DVCPKG_TARGET_TRIPLET=x64-windows
+          $cmakeArgs = @(
+            "-B", "build",
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DCPACK_PACKAGE_VERSION=$version",
+            "-DPROJECT_VERSION=$version",
+            "-DCPACK_GENERATOR=${{ matrix.cpack_generator }}",
+            "-DCMAKE_TOOLCHAIN_FILE=$vcpkgRoot\scripts\buildsystems\vcpkg.cmake",
+            "-DVCPKG_TARGET_TRIPLET=x64-windows"
+          )
+
+          # Add libcsv paths if it was built
+          if (Test-Path $libcsvInstall) {
+            $cmakeArgs += "-DLIBCSV_INCLUDE_DIRS=$libcsvInstall\include"
+            $cmakeArgs += "-DLIBCSV_LIBRARIES=$libcsvInstall\lib\csv.lib"
+          }
+
+          & cmake @cmakeArgs
 
       - name: Build
         run: cmake --build build --config Release
