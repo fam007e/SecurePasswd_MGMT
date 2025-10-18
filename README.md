@@ -1,212 +1,154 @@
-# SecurePassManager
+# SecurePasswd_MGMT
 
-[![Version](https://img.shields.io/github/v/release/fam007e/SecurePasswd_MGMT?color=%230567ff&label=Latest%20Release&style=for-the-badge)](https://github.com/fam007e/SecurePasswd_MGMT/releases/latest)
-![License](https://img.shields.io/badge/license-MIT-green.svg?style=for-the-badge)
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg?style=for-the-badge)](https://github.com/fam007e/SecurePasswd_MGMT)
-[![Security](https://img.shields.io/badge/security-hardened-red.svg?style=for-the-badge)](SECURITY.md)
-![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS-lightgrey.svg?style=for-the-badge)
+<p align="center">
+  <img src="gui/icons/app_icon.svg" alt="SecurePasswd_MGMT icon" width="128"/>
+</p>
 
-**SecurePassManager** is a robust, command-line password manager and two-factor authenticator (TOTP) designed with security and ease of use in mind. It provides a secure solution for managing passwords and 2FA tokens locally, ensuring your sensitive data remains protected and easily accessible.
+**SecurePasswd_MGMT** is a modern, cross-platform password manager and two-factor authenticator (TOTP) designed with state-of-the-art security. It provides a secure solution for managing passwords and 2FA tokens locally, with both a fast command-line interface (CLI) and a user-friendly graphical user interface (GUI).
 
-## 🔐 Key Security Features
+## Key Security Features
 
-- **End-to-End Encryption:** AES-256 encryption for all sensitive data, including usernames, passwords, and TOTP secrets.
-- **Strong Key Derivation:** PBKDF2 with 10,000 iterations is used to derive the encryption key from your master password.
+- **End-to-End Encryption:** All sensitive data is encrypted at rest in a SQLCipher encrypted database.
+- **State-of-the-Art Key Derivation:** **Argon2id**, the winner of the Password Hashing Competition, is used to derive the encryption key from your master password, providing maximum resistance against brute-force attacks.
 - **Secure Password Generator:** A built-in, cryptographically secure password generator to create strong, unique passwords.
-- **Robust Parsing:** Uses a well-tested CSV parsing library to prevent parsing-related vulnerabilities.
 - **Memory Safety:** Sensitive data is explicitly cleared from memory after use.
-- **Secure Storage:** Encrypted data is stored in `.dat` files to prevent accidental exposure.
+- **Secure Storage:** All data is stored locally, encrypted, in a secure directory.
 
 ## Table of Contents
-- [🔐 Key Security Features](#-key-security-features)
-- [✨ Features](#-features)
-- [📋 Requirements](#-requirements)
-- [🚀 Installation](#-installation)
-- [📖 Usage](#-usage)
-- [⚙️ Build Options](#️-build-options)
-- [🛡️ Security](#️-security)
-- [📁 Project Structure](#-project-structure)
-- [🤝 Contribution](#-contribution)
-- [📄 License](#-license)
-- [⚠️ Disclaimer](#️-disclaimer)
-- [🆘 Support](#-support)
-- [🙏 Acknowledgments](#-acknowledgments)
+- [Key Security Features](#key-security-features)
+- [Features](#features)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Security](#security)
+- [Project Structure](#project-structure)
+- [Contribution](#contribution)
+- [License](#license)
 
-## ✨ Features
+## Features
 
-### 🔑 Secure Password Management
-- **AES-256 encryption** for all stored data
-- Add, retrieve, and search password entries
-- Master password protection with **PBKDF2 key derivation**
-- Automatic data directory creation and management
+### Command-Line Interface (CLI)
+- **Fast & Efficient:** A lightweight, terminal-based interface for all core functionalities.
+- **Interactive Menu:** Easy-to-use menu for adding, searching, and managing passwords and TOTP secrets.
+- **Command-Line Options:** Generate passwords directly from the command line.
+- **Hidden Password Input:** Protects your master password from shoulder-surfing.
 
-### 🔢 Cryptographically Secure Password Generator
-- Generate strong, customizable passwords from the command line
-- Control length, character sets (lowercase, uppercase, numbers, special characters)
-- Entropy calculation for password strength assessment
+### Graphical User Interface (GUI)
+- **Modern & Intuitive:** A clean, user-friendly interface built with the Qt framework.
+- **Full Feature Set:** Access all features, including password management, TOTP generation, import/export, and password health checks.
+- **Secure Clipboard:** Automatically clears copied passwords and TOTP codes from the clipboard after 30 seconds.
+- **Real-time TOTP:** Displays TOTP codes with a progress bar indicating the time until the next code is generated.
+- **Password Health Check:** Analyzes your passwords for weaknesses (e.g., reuse, short length) and provides recommendations.
 
-### 🔐 Two-Factor Authentication (TOTP)
-- Generate **TOTP codes** for 2FA-enabled accounts
-- Add and manage TOTP secrets securely
-- Real-time TOTP code generation compatible with Google Authenticator
+## Requirements
 
-### 📦 Data Portability
-- **Import and export** password data securely in CSV format
-- Maintain data integrity across different systems
-- Backup and restore functionality
+- **C/C++ Compiler** (GCC, Clang, MSVC)
+- **CMake** (version 3.10 or higher)
+- **Libsodium** library
+- **Argon2** library (`libargon2`)
+- **SQLCipher** library
+- **LibCSV** library
+- **Qt6** Framework (for the GUI)
+- **OpenSSL**
+- **cURL**
 
-### 💻 User-Friendly CLI
-- Intuitive command-line interface with interactive menus
-- **Hidden password input** for enhanced security
-- Clear help and version information
-- Cross-platform compatibility (Linux, macOS)
-
-### 🏠 Local Storage
-- All data stored locally for **maximum privacy**
-- No network connectivity required
-- Secure file permissions (0700) for data directory
-- **Data Directory:** By default, `SecurePassManager` creates a `data/` directory in the same location as the executable. This directory is secured with `0700` permissions (read, write, execute for owner only).
-- **Sensitive Files:**
-    - `data/master.key`: Stores the PBKDF2 hash and salt of your master password. This file is critical for authentication and decryption.
-    - `data/passwords.dat`: Contains all your encrypted password entries.
-    - `data/totp.dat`: Stores your encrypted TOTP secrets.
-    **IMPORTANT:** Never share these files or store them in insecure locations. Always ensure your `data/` directory is protected.
-
-## 📋 Requirements
-
-- **GCC compiler** (version 7.5.0 or higher)
-- **OpenSSL library** (version 1.1.1 or higher)
-- **POSIX-compliant operating system** (Linux, macOS, Unix-like systems)
-
-### 📦 Installation of Dependencies
+### Installation of Dependencies
 
 **Ubuntu/Debian:**
 ```bash
 sudo apt-get update
-sudo apt-get install build-essential libssl-dev liboath-dev
+sudo apt-get install build-essential cmake libsodium-dev libargon2-dev libsqlcipher-dev libcsv-dev qt6-base-dev libssl-dev libcurl4-openssl-dev
 ```
 
 **macOS (Homebrew):**
 ```bash
-brew install gcc openssl oath-toolkit
+brew install cmake libsodium argon2 sqlcipher libcsv qt6 openssl curl
 ```
 
 **Arch Linux:**
 ```bash
-sudo pacman -Syu --needed base-devel openssl oath-toolkit
+sudo pacman -Syu --needed base-devel cmake libsodium argon2 sqlcipher libcsv qt6-base openssl curl
 ```
 
 **Fedora/RHEL:**
 ```bash
-sudo dnf install gcc gcc-c++ make openssl-devel liboath-devel
+sudo dnf install gcc-c++ cmake libsodium-devel argon2-devel sqlcipher-devel libcsv-devel qt6-qtbase-devel openssl-devel libcurl-devel
 ```
 
-## 🚀 Installation
+## Installation
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/fam007e/SecurePasswd_MGMT.git
-   cd SecurePasswd_MGMT
-   ```
+### Pre-built Packages
 
-2. **Compile the project:**
-   ```bash
-   make
-   ```
+Pre-built packages for various platforms are available on the [GitHub Releases](https://github.com/fam007e/SecurePasswd_MGMT/releases) page.
 
-   The compiled binary `securepass` will be created in the project root directory.
+### Build from Source
 
-3. **Optional - Install system-wide:**
-   ```bash
-   sudo make install
-   ```
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/fam007e/SecurePasswd_MGMT.git
+    cd SecurePasswd_MGMT
+    ```
 
-## 📖 Usage
+2.  **Install Dependencies:**
+    Follow the instructions in the "Installation of Dependencies" section above.
 
-### Basic Usage
+3.  **Configure the build:**
+    ```bash
+    mkdir build && cd build
+    cmake ..
+    ```
+    For Windows with MSVC, you might need to specify the generator:
+    ```bash
+    cmake .. -G "Visual Studio 17 2022" -A x64
+    ```
 
-Run the program:
+4.  **Compile the project:**
+    ```bash
+    cmake --build . --config Release
+    ```
+
+    The compiled binaries (`securepasswd_cli` and `securepasswd_gui`) will be created in the `build/bin` (or `build/Release` on Windows) directory.
+
+## Usage
+
+### GUI Application
+To run the graphical interface, execute the `securepasswd_gui` binary:
 ```bash
-./securepass
+./build/gui/securepasswd_gui
 ```
+On the first run, you will be prompted to create a new master password, which will be used to encrypt your vault.
 
-On first run, you'll be prompted to set up a master password. This password will be used to encrypt and decrypt all your stored data.
-
-### 📱 Interactive Menu
-
-```
-SecurePassManager Menu:
-1. Add new password
-2. Search for password
-3. Generate TOTP code
-4. Add new TOTP account
-5. Export passwords
-6. Import passwords
-7. Exit
-```
-
-### 🔐 First Time Setup
-
-When you run SecurePassManager for the first time:
-1. The program creates a `data/` directory with secure permissions (0700)
-2. You'll be prompted to create a master password
-3. The master password is hashed using **PBKDF2** with 10,000 iterations and stored securely
-
-### 📋 Command Line Options
-
+### Command-Line Interface
+To run the command-line interface, execute the `securepasswd_cli` binary:
 ```bash
-./securepass [OPTIONS]
-
-Options:
-  -h, --help     Show help message and exit
-  -v, --version  Show version information and exit
-
-  --generate-password  Generate a cryptographically secure password
-  -l, --length <num>   Specify password length (default: 12, min: 12)
-  -c, --case-variance  Include uppercase characters
-  -n, --numbers        Include numbers
-  -s, --special        Include special characters
+./build/cli/securepasswd_cli
 ```
+The CLI provides an interactive menu for managing your passwords and TOTP secrets.
 
-**Examples:**
-```bash
-./securepass --version
-./securepass --help
-./securepass --generate-password -l 16 -c -n -s
-./securepass --generate-password
-```
+## Security
 
-## 🛡️ Security
+This project was designed with a security-first mindset, incorporating modern, vetted cryptographic primitives. For a detailed breakdown of the security architecture, see our **[Security Policy](SECURITY.md)**.
 
-For a comprehensive security analysis, see our **[Security Policy](SECURITY.md)**.
-
-## 📁 Project Structure
+## Project Structure
 
 ```
 SecurePasswd_MGMT/
-├── .github/                  # GitHub Actions workflows and issue templates
-├── lib/                      # External libraries (e.g., libcsv)
-├── src/                      # Core source code
-│   ├── csv_handler.c         # CSV file reading and writing
-│   ├── csv_parser.c          # CSV parsing logic
-│   ├── data_path.h           # Defines data directory path
-│   ├── encryption.c          # AES-256 encryption/decryption
-│   ├── main.c                # Main application logic and CLI handling
-│   ├── password_generator.c  # Secure password generation
-│   ├── totp.c                # TOTP generation and management
-│   └── utils.c               # Utility functions (e.g., secure input)
-├── tests/                    # Unit tests for various modules
-├── Makefile                  # Build automation
-├── README.md                 # Project overview and usage
-├── CONTRIBUTION.md           # Guidelines for contributing
-├── SECURITY.md               # Detailed security policy
-└── LICENSE                   # Project license
+├── .github/          # GitHub Actions workflows and issue templates
+├── core/             # Core C library (encryption, password management)
+├── cli/              # C command-line interface
+├── gui/              # C++ Qt Graphical User Interface
+├── tests/            # Unit and integration tests
+├── CMakeLists.txt    # Root CMake build script
+├── README.md         # This file
+├── CONTRIBUTION.md   # Guidelines for contributing
+├── SECURITY.md       # Detailed security policy
+└── LICENSE           # Project license
 ```
 
-## 🤝 Contribution
+## Contribution
 
-We welcome contributions to SecurePassManager! Please read our [Contribution Guidelines](CONTRIBUTION.md) for details on our code of conduct and the process for submitting pull requests.
+We welcome contributions! Please read our [Contribution Guidelines](CONTRIBUTION.md) for details on our code of conduct and the process for submitting pull requests.
 
-## 📄 License
+## License
 
 This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.

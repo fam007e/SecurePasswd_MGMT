@@ -1,0 +1,14 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>icons/add.svg</file>
+    <file>icons/app_icon.svg</file>
+    <file>icons/copy_username.svg</file>
+    <file>icons/copy_passwd.svg</file>
+    <file>icons/copy_totp.svg</file>
+    <file>icons/delete.svg</file>
+    <file>icons/edit.svg</file>
+    <file>icons/export.svg</file>
+    <file>icons/health-check.svg</file>
+    <file>icons/import.svg</file>
+</qresource>
+</RCC>

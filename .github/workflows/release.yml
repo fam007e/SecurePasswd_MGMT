@@ -1,110 +1,215 @@
-name: Release SecurePassManager Binary
+name: Release SecurePasswd_MGMT
+
 on:
   push:
-    branches:
-      - main
-    paths:
-      - 'src/**'
-      - 'Makefile'
-      - 'lib/**'  # if there is local header
-      - '.github/workflows/release.yml'
+    tags:
+      - 'v*.*.*'
+
 jobs:
-  release:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            artifact_name: debian-package
+            package_glob: "*.deb"
+            cpack_generator: "DEB"
+          - os: windows-latest
+            artifact_name: windows-installer
+            package_glob: "*.exe"
+            cpack_generator: "NSIS"
+          - os: macos-latest
+            artifact_name: macos-dmg
+            package_glob: "*.dmg"
+            cpack_generator: "DragNDrop"
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
+      
+      - name: Get the version
+        id: get_version
+        run: echo "version=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_OUTPUT
+
+      - name: Create source tarball
+        if: runner.os == 'Linux'
+        run: tar -czvf securepasswd_mgmt-${{ steps.get_version.outputs.version }}.tar.gz --exclude=".git" .
+
+      - name: Upload source tarball
+        if: runner.os == 'Linux'
+        uses: actions/upload-artifact@v3
         with:
-          fetch-depth: 0  # Fetch full history for changelog generation
-          
-      - name: Install dependencies
+          name: source-tarball
+          path: securepasswd_mgmt-${{ steps.get_version.outputs.version }}.tar.gz
+
+      - name: Install dependencies (Linux)
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential libssl-dev liboath-dev liboath0 oathtool
-          
-      - name: Install security analysis tools (optional)
+          sudo apt-get install -y build-essential cmake libsodium-dev libargon2-dev libsqlcipher-dev libcsv-dev qt6-base-dev libssl-dev libcurl4-openssl-dev
+
+      - name: Install dependencies (Windows)
+        if: runner.os == 'Windows'
         run: |
-          sudo apt-get install -y cppcheck checksec
-          
-      - name: Install GitHub CLI
+          git clone https://github.com/Microsoft/vcpkg.git
+          .\vcpkg\bootstrap-vcpkg.bat
+          .\vcpkg\vcpkg install libsodium argon2 curl openssl --triplet x64-windows
+        shell: pwsh
+
+      - name: Install dependencies (macOS)
+        if: runner.os == 'macOS'
         run: |
-          sudo apt-get install -y gh
-          
-      - name: Authenticate GitHub CLI
+          brew install qt@6
+          brew install create-dmg
+          brew install libsodium argon2 sqlcipher libcsv openssl curl
+
+      - name: Configure CMake
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DCPACK_PACKAGE_VERSION=${{ steps.get_version.outputs.version }} -DPROJECT_VERSION=${{ steps.get_version.outputs.version }} -DCPACK_GENERATOR=${{ matrix.cpack_generator }}
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Package
+        working-directory: build
+        run: cpack -G ${{ matrix.cpack_generator }}
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: build/${{ matrix.package_glob }}
+
+  build-arch:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux/archlinux:latest
+    needs: build
+    steps:
+      - name: Get the version
+        id: get_version
+        run: echo "version=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_OUTPUT
+
+      - name: Download source tarball
+        uses: actions/download-artifact@v3
+        with:
+          name: source-tarball
+
+      - name: Install build tools and dependencies
         run: |
-          echo "${{ secrets.SECPASSWD_TOKEN }}" | gh auth login --with-token
-          
-      - name: Run security checks (optional)
+          pacman -Sy --noconfirm
+          pacman -S --noconfirm git base-devel libsodium argon2 sqlcipher libcsv qt6-base openssl curl cmake
+
+      - name: Create PKGBUILD
         run: |
-          make static-analysis || true  # Don't fail if cppcheck has warnings
+          sha256=$(sha256sum securepasswd_mgmt-${{ steps.get_version.outputs.version }}.tar.gz | awk '{print $1}')
+          cat <<EOF > PKGBUILD
+          # Maintainer: fam007e <faisalmoshiur+secpasswdmgmt@gmail.com>
+          pkgname=securepasswd_mgmt
+          pkgver=${{ steps.get_version.outputs.version }}
+          pkgrel=1
+          pkgdesc="A secure, cross-platform password manager with TOTP support."
+          arch=('x86_64')
+          url="https://github.com/fam007e/SecurePasswd_MGMT"
+          license=('MIT')
+          depends=('libsodium' 'argon2' 'sqlcipher' 'qt6-base' 'libcsv' 'openssl' 'curl')
+          makedepends=('cmake' 'gcc')
+          source=("\$pkgname-\$pkgver.tar.gz")
+          sha256sums=("$sha256")
+
+          build() {
+              cd "\$srcdir/\$pkgname-\$pkgver"
+              mkdir build
+              cd build
+              cmake .. -DCMAKE_INSTALL_PREFIX=/usr
+              make
+          }
+
+          package() {
+              cd "\$srcdir/\$pkgname-\$pkgver/build"
+              make DESTDIR="\$pkgdir/" install
+          }
+          EOF
+
+      - name: Build Arch package
+        run: makepkg -s --noconfirm
           
-      - name: Build release version
-        run: |
-          make clean
-          make release  # Use release target for optimized build
-          
-      - name: Run security analysis on binary
-        run: |
-          make security-check || true  # Don't fail if checksec not available
-          
-      - name: Test binary
-        run: |
-          ./securepass --version
-          ./securepass --help
-          
-      - name: Create release package
-        run: |
-          mkdir -p release
-          cp securepass release/
-          # Get version from the binary
-          version=$(./securepass --version | grep -o '[0-9]\{4\}\.[0-9]\.[0-9]\.[0-9]+$' || echo "$(date +%Y.%m.%d)")
-          echo "VERSION=${version}" >> $GITHUB_ENV
-          # Create tarball
-          tar -czvf release/securepass-${version}-linux-x86_64.tar.gz -C release securepass
-          # Create checksum
-          cd release && sha256sum securepass-${version}-linux-x86_64.tar.gz > securepass-${version}-linux-x86_64.tar.gz.sha256
-          
-      - name: Generate changelog
-        run: |
-          # Get the last release tag that actually exists in git
-          last_release=$(git tag --sort=-version:refname | head -n 1 2>/dev/null || echo "")
-          
-          # If no tags exist, get last 10 commits
-          if [ -z "$last_release" ] || ! git rev-parse "$last_release" >/dev/null 2>&1; then
-            echo "No previous release found or tag doesn't exist in git history. Using recent commits."
-            changelog=$(git log --oneline --pretty=format:"* %s (%h)" | head -n 10)
-          else
-            # Check if we can create a range
-            if git merge-base --is-ancestor "$last_release" HEAD 2>/dev/null; then
-              changelog=$(git log ${last_release}..HEAD --oneline --pretty=format:"* %s (%h)")
-              if [ -z "$changelog" ]; then
-                changelog="* No new commits since last release"
-              fi
-            else
-              echo "Cannot create commit range. Using recent commits."
-              changelog=$(git log --oneline --pretty=format:"* %s (%h)" | head -n 10)
-            fi
-          fi
-          
-          echo "$changelog" > release/changelog.txt
-          
-          # Use multiline string for GitHub environment
-          {
-            echo "CHANGELOG<<EOF"
-            echo "$changelog"
-            echo "EOF"
-          } >> $GITHUB_ENV
-        
-      - name: Create release
-        run: |
-          gh release create "v${{ env.VERSION }}" \
-            release/securepass-${{ env.VERSION }}-linux-x86_64.tar.gz \
-            release/securepass-${{ env.VERSION }}-linux-x86_64.tar.gz.sha256 \
-            release/changelog.txt \
-            --title "SecurePassManager v${{ env.VERSION }}" \
-            --notes "${{ env.CHANGELOG }}" \
-            --generate-notes
-            
-      - name: Clean up
-        run: |
-          rm -rf release
+      - name: Upload Arch package
+        uses: actions/upload-artifact@v3
+        with:
+          name: arch-package
+          path: "*.pkg.tar.zst"
+
+  release:
+    needs: [build, build-arch]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the version
+        id: get_version
+        run: echo "version=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_OUTPUT
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+      - name: Upload source tarball
+        uses: actions/upload-release-asset@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/source-tarball/securepasswd_mgmt-${{ steps.get_version.outputs.version }}.tar.gz
+          asset_name: securepasswd_mgmt-${{ steps.get_version.outputs.version }}.tar.gz
+          asset_content_type: application/gzip
+
+      - name: Upload Debian package
+        uses: actions/upload-release-asset@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/debian-package/*.deb
+          asset_name: securepasswd-mgmt-${{ steps.get_version.outputs.version }}-amd64.deb
+          asset_content_type: application/vnd.debian.binary-package
+
+      - name: Upload Arch package
+        uses: actions/upload-release-asset@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/arch-package/*.pkg.tar.zst
+          asset_name: securepasswd-mgmt-${{ steps.get_version.outputs.version }}.pkg.tar.zst
+          asset_content_type: application/zstd
+
+      - name: Upload Windows installer
+        uses: actions/upload-release-asset@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/windows-installer/*.exe
+          asset_name: securepasswd-mgmt-${{ steps.get_version.outputs.version }}-installer.exe
+          asset_content_type: application/vnd.microsoft.portable-executable
+
+      - name: Upload macOS DMG
+        uses: actions/upload-release-asset@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: artifacts/macos-dmg/*.dmg
+          asset_name: securepasswd-mgmt-${{ steps.get_version.outputs.version }}.dmg
+          asset_content_type: application/x-apple-diskimage

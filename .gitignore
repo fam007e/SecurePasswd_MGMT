@@ -6,6 +6,10 @@
 *.exe
 securepass
 
+# Test database files
+test_vault.db
+*.salt
+
 # Data files - contains sensitive user data
 data/*
 !data/.gitkeep
@@ -15,6 +19,9 @@ lib/*
 !lib/README.md
 build/
 dist/
+
+# Python virtual environment
+.venv/
 
 # IDE and editor configuration
 .vscode/
@@ -35,3 +42,10 @@ CMakeFiles/
 cmake_install.cmake
 Makefile
 compile_commands.json
+
+# Packaging artifacts
+.SRCINFO
+*.pkg.tar.zst
+*.deb
+*.dmg
+*.nsi
