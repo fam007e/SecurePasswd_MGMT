@@ -8,7 +8,9 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         include:
@@ -57,36 +59,72 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential cmake libsodium-dev libargon2-dev libsqlcipher-dev libcsv-dev qt6-base-dev libssl-dev libcurl4-openssl-dev
+          sudo apt-get install -y build-essential cmake libsodium-dev libargon2-dev \
+            libsqlcipher-dev libcsv-dev qt6-base-dev libssl-dev libcurl4-openssl-dev \
+            libcmocka-dev
 
-      - name: Cache vcpkg
+      - name: Setup vcpkg cache
         if: runner.os == 'Windows'
         uses: actions/cache@v4
         with:
-          path: vcpkg
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
-          restore-keys: ${{ runner.os }}-vcpkg-
+          path: |
+            vcpkg
+            !vcpkg/buildtrees
+            !vcpkg/packages
+            !vcpkg/downloads
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json', '**/vcpkg-configuration.json') }}-v2
+          restore-keys: |
+            ${{ runner.os }}-vcpkg-
 
       - name: Install dependencies (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
+        timeout-minutes: 60
         run: |
-          if (-not (Test-Path vcpkg)) {
-            git clone https://github.com/Microsoft/vcpkg.git
-            .\vcpkg\bootstrap-vcpkg.bat
+          if (-not (Test-Path vcpkg/.git)) {
+            if (Test-Path vcpkg) { Remove-Item -Recurse -Force vcpkg }
+            git clone --depth 1 https://github.com/Microsoft/vcpkg.git
+            .\vcpkg\bootstrap-vcpkg.bat -disableMetrics
           }
-          .\vcpkg\vcpkg install libsodium argon2 curl openssl --triplet x64-windows
+
+          # Install packages one by one to better handle failures
+          $packages = @("libsodium", "argon2", "curl", "openssl")
+          foreach ($pkg in $packages) {
+            Write-Host "Installing $pkg..."
+            .\vcpkg\vcpkg install $pkg --triplet x64-windows
+            if ($LASTEXITCODE -ne 0) {
+              Write-Host "Warning: Failed to install $pkg, but continuing..."
+            }
+          }
+
+      - name: Setup Homebrew
+        if: runner.os == 'macOS'
+        run: |
+          echo "/opt/homebrew/bin" >> $GITHUB_PATH
+          echo "/opt/homebrew/sbin" >> $GITHUB_PATH
+          # Cleanup any stale locks
+          rm -rf /opt/homebrew/var/homebrew/locks || true
 
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
+        timeout-minutes: 60
         run: |
-          # Update brew first
-          brew update
+          # Skip brew update to save time and avoid cancellations
+          export HOMEBREW_NO_AUTO_UPDATE=1
+          export HOMEBREW_NO_INSTALL_CLEANUP=1
 
-          # Install packages with retry logic
-          packages="qt@6 create-dmg libsodium argon2 sqlcipher openssl curl"
-          for pkg in $packages; do
-            brew list $pkg &>/dev/null || brew install $pkg || echo "Failed to install $pkg, continuing..."
+          # Install packages individually to handle failures gracefully
+          packages=(qt@6 create-dmg libsodium argon2 sqlcipher)
+          for pkg in "${packages[@]}"; do
+            echo "Installing $pkg..."
+            if ! brew list "$pkg" &>/dev/null; then
+              brew install "$pkg" || {
+                echo "Warning: Failed to install $pkg, trying to continue..."
+                sleep 2
+              }
+            else
+              echo "$pkg already installed"
+            fi
           done
 
       - name: Install libcsv from source (macOS)
@@ -98,8 +136,27 @@ jobs:
           sudo make install
         continue-on-error: true
 
-      - name: Configure CMake
-        run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DCPACK_PACKAGE_VERSION=${{ steps.get_version.outputs.version }} -DPROJECT_VERSION=${{ steps.get_version.outputs.version }} -DCPACK_GENERATOR=${{ matrix.cpack_generator }}
+      - name: Configure CMake (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          cmake -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCPACK_PACKAGE_VERSION=${{ steps.get_version.outputs.version }} \
+            -DPROJECT_VERSION=${{ steps.get_version.outputs.version }} \
+            -DCPACK_GENERATOR=${{ matrix.cpack_generator }}
+
+      - name: Configure CMake (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $vcpkgRoot = "$pwd\vcpkg"
+          cmake -B build `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DCPACK_PACKAGE_VERSION=${{ steps.get_version.outputs.version }} `
+            -DPROJECT_VERSION=${{ steps.get_version.outputs.version }} `
+            -DCPACK_GENERATOR=${{ matrix.cpack_generator }} `
+            -DCMAKE_TOOLCHAIN_FILE="$vcpkgRoot\scripts\buildsystems\vcpkg.cmake" `
+            -DVCPKG_TARGET_TRIPLET=x64-windows
 
       - name: Build
         run: cmake --build build --config Release
@@ -132,7 +189,8 @@ jobs:
       - name: Install build tools and dependencies
         run: |
           pacman -Sy --noconfirm
-          pacman -S --noconfirm git base-devel libsodium argon2 sqlcipher qt6-base openssl curl cmake
+          pacman -S --noconfirm git base-devel libsodium argon2 sqlcipher \
+            qt6-base openssl curl cmake sudo fakeroot
 
       - name: Install libcsv from source (Arch)
         run: |
@@ -179,9 +237,12 @@ jobs:
 
       - name: Build Arch package
         run: |
+          # Create a non-root user for makepkg
           useradd -m builder
           chown -R builder:builder .
-          su - builder -c "cd $(pwd) && makepkg -s --noconfirm"
+
+          # Build as the builder user
+          sudo -u builder makepkg -s --noconfirm
 
       - name: Upload Arch package
         uses: actions/upload-artifact@v4
@@ -207,6 +268,11 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
+
+      - name: List artifacts
+        run: |
+          echo "Listing all downloaded artifacts:"
+          find artifacts -type f
 
       - name: Get previous tag
         id: previous_tag
@@ -242,10 +308,18 @@ jobs:
             This release includes the following changes:
 
             ${{ steps.generate_release_body.outputs.body }}
+
+            ## Downloads
+
+            - **Linux (Debian/Ubuntu)**: `securepasswd_mgmt-${{ steps.get_version.outputs.version }}.deb`
+            - **Linux (Arch)**: `securepasswd_mgmt-${{ steps.get_version.outputs.version }}.pkg.tar.zst`
+            - **Windows**: `SecurePasswd_MGMT-${{ steps.get_version.outputs.version }}.exe`
+            - **macOS**: `SecurePasswd_MGMT-${{ steps.get_version.outputs.version }}.dmg`
+            - **Source**: `securepasswd_mgmt-${{ steps.get_version.outputs.version }}.tar.gz`
           draft: false
           prerelease: false
           files: |
-            artifacts/source-tarball/securepasswd_mgmt-${{ steps.get_version.outputs.version }}.tar.gz
+            artifacts/source-tarball/*.tar.gz
             artifacts/debian-package/*.deb
             artifacts/arch-package/*.pkg.tar.zst
             artifacts/windows-installer/*.exe
