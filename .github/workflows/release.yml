@@ -88,7 +88,7 @@ jobs:
           }
 
           # Install packages one by one to better handle failures
-          $packages = @("libsodium", "argon2", "curl", "openssl", "sqlcipher", "qt6-base")
+          $packages = @("libsodium", "argon2", "curl", "openssl", "sqlcipher", "qt")
           foreach ($pkg in $packages) {
             Write-Host "Installing $pkg..."
             .\vcpkg\vcpkg install $pkg --triplet x64-windows
@@ -103,11 +103,9 @@ jobs:
         run: |
           git clone https://github.com/rgamble/libcsv.git
           cd libcsv
-          mkdir build
-          cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX="$pwd\..\..\libcsv-install"
-          cmake --build . --config Release
-          cmake --install . --config Release
+          ./configure
+          make
+          make install PREFIX="$pwd\..\libcsv-install"
         continue-on-error: true
 
       - name: Setup Homebrew
@@ -145,6 +143,7 @@ jobs:
         run: |
           git clone https://github.com/rgamble/libcsv.git
           cd libcsv
+          ./configure
           make
           sudo make install
 
