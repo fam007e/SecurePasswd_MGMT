@@ -38,7 +38,7 @@ jobs:
 
       - name: Upload source tarball
         if: runner.os == 'Linux'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: source-tarball
           path: securepasswd_mgmt-${{ steps.get_version.outputs.version }}.tar.gz
@@ -75,7 +75,7 @@ jobs:
         run: cpack -G ${{ matrix.cpack_generator }}
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
           path: build/${{ matrix.package_glob }}
@@ -135,7 +135,7 @@ jobs:
         run: makepkg -s --noconfirm
           
       - name: Upload Arch package
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: arch-package
           path: "*.pkg.tar.zst"
@@ -149,7 +149,7 @@ jobs:
         run: echo "version=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_OUTPUT
 
       - name: Download all artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: artifacts
 
