@@ -88,7 +88,7 @@ jobs:
           }
 
           # Install packages one by one to better handle failures
-          $packages = @("libsodium", "argon2", "curl", "openssl")
+          $packages = @("libsodium", "argon2", "curl", "openssl", "sqlcipher")
           foreach ($pkg in $packages) {
             Write-Host "Installing $pkg..."
             .\vcpkg\vcpkg install $pkg --triplet x64-windows
@@ -114,7 +114,7 @@ jobs:
           export HOMEBREW_NO_INSTALL_CLEANUP=1
 
           # Install packages individually to handle failures gracefully
-          packages=(qt@6 create-dmg libsodium argon2 sqlcipher)
+          packages=(qt@6 create-dmg libsodium argon2 sqlcipher cmocka)
           for pkg in "${packages[@]}"; do
             echo "Installing $pkg..."
             if ! brew list "$pkg" &>/dev/null; then
@@ -134,28 +134,57 @@ jobs:
           cd libcsv
           make
           sudo make install
+          # Make sure the library is found by pkg-config
+          sudo mkdir -p /usr/local/lib/pkgconfig
+          cat > libcsv.pc <<EOF
+          prefix=/usr/local
+          exec_prefix=\${prefix}
+          libdir=\${exec_prefix}/lib
+          includedir=\${prefix}/include
+
+          Name: libcsv
+          Description: CSV library
+          Version: 3.0.3
+          Libs: -L\${libdir} -lcsv
+          Cflags: -I\${includedir}
+          EOF
+          sudo mv libcsv.pc /usr/local/lib/pkgconfig/
         continue-on-error: true
 
-      - name: Configure CMake (Linux/macOS)
-        if: runner.os != 'Windows'
+      - name: Configure CMake (Linux)
+        if: runner.os == 'Linux'
         run: |
           cmake -B build \
             -DCMAKE_BUILD_TYPE=Release \
-            -DCPACK_PACKAGE_VERSION=${{ steps.get_version.outputs.version }} \
-            -DPROJECT_VERSION=${{ steps.get_version.outputs.version }} \
-            -DCPACK_GENERATOR=${{ matrix.cpack_generator }}
+            -DCPACK_PACKAGE_VERSION="${{ steps.get_version.outputs.version }}" \
+            -DPROJECT_VERSION="${{ steps.get_version.outputs.version }}" \
+            -DCPACK_GENERATOR="${{ matrix.cpack_generator }}" \
+            -DCPACK_PACKAGE_CONTACT="fam007e <faisalmoshiur+secpasswdmgmt@gmail.com>" \
+            -DCPACK_DEBIAN_PACKAGE_MAINTAINER="fam007e <faisalmoshiur+secpasswdmgmt@gmail.com>"
+
+      - name: Configure CMake (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:/opt/homebrew/lib/pkgconfig:$PKG_CONFIG_PATH"
+          cmake -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCPACK_PACKAGE_VERSION="${{ steps.get_version.outputs.version }}" \
+            -DPROJECT_VERSION="${{ steps.get_version.outputs.version }}" \
+            -DCPACK_GENERATOR="${{ matrix.cpack_generator }}"
 
       - name: Configure CMake (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $vcpkgRoot = "$pwd\vcpkg"
+          $vcpkgRoot = Join-Path $pwd "vcpkg"
+          $version = "${{ steps.get_version.outputs.version }}"
+
           cmake -B build `
             -DCMAKE_BUILD_TYPE=Release `
-            -DCPACK_PACKAGE_VERSION=${{ steps.get_version.outputs.version }} `
-            -DPROJECT_VERSION=${{ steps.get_version.outputs.version }} `
-            -DCPACK_GENERATOR=${{ matrix.cpack_generator }} `
-            -DCMAKE_TOOLCHAIN_FILE="$vcpkgRoot\scripts\buildsystems\vcpkg.cmake" `
+            "-DCPACK_PACKAGE_VERSION=$version" `
+            "-DPROJECT_VERSION=$version" `
+            "-DCPACK_GENERATOR=${{ matrix.cpack_generator }}" `
+            "-DCMAKE_TOOLCHAIN_FILE=$vcpkgRoot\scripts\buildsystems\vcpkg.cmake" `
             -DVCPKG_TARGET_TRIPLET=x64-windows
 
       - name: Build
