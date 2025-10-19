@@ -230,10 +230,15 @@ int main(int argc, char *argv[]) {
     
     // This is a simplified way to ensure the directory exists.
     char dirPath[1024];
-    strncpy(dirPath, dbPath, sizeof(dirPath));
-    *strrchr(dirPath, '/') = '\0';
-    char cmd[1024];
-    snprintf(cmd, sizeof(cmd), "mkdir -p %s", dirPath);
+    strncpy(dirPath, dbPath, sizeof(dirPath) - 1);
+    dirPath[sizeof(dirPath) - 1] = '\0'; // Ensure null termination
+    char* last_slash = strrchr(dirPath, '/');
+    if (last_slash != NULL) {
+        *last_slash = '\0';
+    }
+
+    char cmd[2048]; // Increased buffer size
+    snprintf(cmd, sizeof(cmd), "mkdir -p \"%s\"", dirPath); // Quoted path
     if (system(cmd) != 0) {
         fprintf(stderr, "Failed to create directory: %s\n", dirPath);
     }
