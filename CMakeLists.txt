@@ -20,7 +20,11 @@ find_package(OpenSSL REQUIRED)
 find_package(CURL REQUIRED)
 
 add_compile_options(-O2 -fstack-protector-strong -D_FORTIFY_SOURCE=2)
-add_link_options(-Wl,-z,relro,-z,now)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    add_link_options(-Wl,-z,relro,-z,now)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    add_link_options(-Wl,-bind_at_load)
+endif()
 
 add_subdirectory(core)
 add_subdirectory(cli)
