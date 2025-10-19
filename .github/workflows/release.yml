@@ -176,9 +176,9 @@ jobs:
             -DLIBCSV_INCLUDE_DIRS=/usr/local/include \
             -DLIBCSV_LIBRARIES=/usr/local/lib/libcsv.a \
             -DCMAKE_PREFIX_PATH="$(brew --prefix qt@6);$(brew --prefix sqlcipher);$(brew --prefix openssl@3)" \
-            -DCMAKE_INCLUDE_PATH="$(brew --prefix sqlcipher)/include" \
-            -DCMAKE_C_FLAGS="-I$(brew --prefix sqlcipher)/include" \
-            -DCMAKE_CXX_FLAGS="-I$(brew --prefix sqlcipher)/include"
+            -DCMAKE_INCLUDE_PATH="$(brew --prefix sqlcipher)/include;$(brew --prefix openssl@3)/include" \
+            -DCMAKE_C_FLAGS="-I$(brew --prefix sqlcipher)/include -I$(brew --prefix openssl@3)/include" \
+            -DCMAKE_CXX_FLAGS="-I$(brew --prefix sqlcipher)/include -I$(brew --prefix openssl@3)/include"
 
       - name: Debug SQLCipher Installation
         if: runner.os == 'macOS'
