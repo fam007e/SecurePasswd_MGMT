@@ -167,10 +167,24 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           set -e
-          export LDFLAGS="-L$(brew --prefix argon2)/lib -L$(brew --prefix libsodium)/lib -L$(brew --prefix sqlcipher)/lib -L$(brew --prefix openssl@3)/lib"
-          export CPPFLAGS="-I$(brew --prefix argon2)/include -I$(brew --prefix libsodium)/include -I$(brew --prefix sqlcipher)/include -I$(brew --prefix openssl@3)/include"
-          export PKG_CONFIG_PATH="$(brew --prefix argon2)/lib/pkgconfig:$(brew --prefix libsodium)/lib/pkgconfig:$(brew --prefix sqlcipher)/lib/pkgconfig:$(brew --prefix openssl@3)/lib/pkgconfig"
-          
+
+          # -----------------------------------------------------------------
+          # Homebrew paths (these are the same you already export for LDFLAGS)
+          # -----------------------------------------------------------------
+          SQLCIPHER_INC=$(brew --prefix sqlcipher)/include
+          SODIUM_INC=$(brew --prefix libsodium)/include
+          ARGON2_INC=$(brew --prefix argon2)/include
+          OPENSSL_INC=$(brew --prefix openssl@3)/include
+
+          # -----------------------------------------------------------------
+          # Clean any previous build to avoid stale cache entries
+          # -----------------------------------------------------------------
+          rm -rf build
+          mkdir build
+
+          # -----------------------------------------------------------------
+          # Run CMake – note the explicit -D..._INCLUDE_DIRS flags
+          # -----------------------------------------------------------------
           cmake -B build \
             -DCMAKE_BUILD_TYPE=Release \
             -DCPACK_PACKAGE_VERSION="${{ steps.get_version.outputs.version }}" \
@@ -178,6 +192,10 @@ jobs:
             -DCPACK_GENERATOR="${{ matrix.cpack_generator }}" \
             -DLIBCSV_INCLUDE_DIRS=/usr/local/include \
             -DLIBCSV_LIBRARIES=/usr/local/lib/libcsv.a \
+            -DSQLCIPHER_INCLUDE_DIRS="${SQLCIPHER_INC}" \
+            -DSODIUM_INCLUDE_DIRS="${SODIUM_INC}" \
+            -DARGON2_INCLUDE_DIRS="${ARGON2_INC}" \
+            -DOPENSSL_INCLUDE_DIR="${OPENSSL_INC}" \
             -DCMAKE_PREFIX_PATH="$(brew --prefix qt@6);$(brew --prefix sqlcipher);$(brew --prefix openssl@3);$(brew --prefix argon2);$(brew --prefix libsodium)"
 
       - name: Debug Library Installations
@@ -192,6 +210,16 @@ jobs:
           ls -la $(brew --prefix argon2)/include/argon2.h
           pkg-config --cflags --libs libargon2
           grep ARGON2_INCLUDE_DIRS build/CMakeCache.txt || true
+
+      - name: Debug Compiler Flags (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          echo "=== Include directories used by core_lib ==="
+          grep '^INCLUDE' build/CMakeCache.txt || true
+          echo "=== Compiler flags for core_lib ==="
+          cat build/core/CMakeFiles/core_lib.dir/flags.make || true
+          echo "=== Link line for core_lib ==="
+          cat build/core/CMakeFiles/core_lib.dir/link.txt || true
 
       - name: Configure CMake (Windows)
         if: runner.os == 'Windows'
