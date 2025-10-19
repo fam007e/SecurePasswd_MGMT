@@ -167,24 +167,18 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           set -e
-
-          # -----------------------------------------------------------------
-          # Homebrew paths (these are the same you already export for LDFLAGS)
-          # -----------------------------------------------------------------
+          # Homebrew paths
           SQLCIPHER_INC=$(brew --prefix sqlcipher)/include
           SODIUM_INC=$(brew --prefix libsodium)/include
           ARGON2_INC=$(brew --prefix argon2)/include
           OPENSSL_INC=$(brew --prefix openssl@3)/include
+          ARGON2_LIB=$(brew --prefix argon2)/lib/libargon2.a
 
-          # -----------------------------------------------------------------
-          # Clean any previous build to avoid stale cache entries
-          # -----------------------------------------------------------------
+          # Clean build directory
           rm -rf build
           mkdir build
 
-          # -----------------------------------------------------------------
-          # Run CMake – note the explicit -D..._INCLUDE_DIRS flags
-          # -----------------------------------------------------------------
+          # Run CMake
           cmake -B build \
             -DCMAKE_BUILD_TYPE=Release \
             -DCPACK_PACKAGE_VERSION="${{ steps.get_version.outputs.version }}" \
@@ -196,20 +190,29 @@ jobs:
             -DSODIUM_INCLUDE_DIRS="${SODIUM_INC}" \
             -DARGON2_INCLUDE_DIRS="${ARGON2_INC}" \
             -DOPENSSL_INCLUDE_DIR="${OPENSSL_INC}" \
+            -DARGON2_LIBRARIES="${ARGON2_LIB}" \
             -DCMAKE_PREFIX_PATH="$(brew --prefix qt@6);$(brew --prefix sqlcipher);$(brew --prefix openssl@3);$(brew --prefix argon2);$(brew --prefix libsodium)"
 
-      - name: Debug Library Installations
+      - name: Debug Library Installations (macOS)
         if: runner.os == 'macOS'
         run: |
           echo "--- Debugging SQLCipher ---"
           ls -la $(brew --prefix sqlcipher)/include/sqlcipher/sqlite3.h
+          ls -la $(brew --prefix sqlcipher)/lib/libsqlcipher*
           pkg-config --cflags --libs sqlcipher
           grep SQLCIPHER_INCLUDE_DIRS build/CMakeCache.txt || true
           
           echo "--- Debugging Argon2 ---"
           ls -la $(brew --prefix argon2)/include/argon2.h
+          ls -la $(brew --prefix argon2)/lib/libargon2*
           pkg-config --cflags --libs libargon2
           grep ARGON2_INCLUDE_DIRS build/CMakeCache.txt || true
+          
+          echo "--- Debugging libsodium ---"
+          ls -la $(brew --prefix libsodium)/include/sodium.h
+          ls -la $(brew --prefix libsodium)/lib/libsodium*
+          pkg-config --cflags --libs libsodium
+          grep SODIUM_INCLUDE_DIRS build/CMakeCache.txt || true
 
       - name: Debug Compiler Flags (macOS)
         if: runner.os == 'macOS'
@@ -220,6 +223,10 @@ jobs:
           cat build/core/CMakeFiles/core_lib.dir/flags.make || true
           echo "=== Link line for core_lib ==="
           cat build/core/CMakeFiles/core_lib.dir/link.txt || true
+          echo "=== Compiler flags for securepasswd_cli ==="
+          cat build/cli/CMakeFiles/securepasswd_cli.dir/flags.make || true
+          echo "=== Link line for securepasswd_cli ==="
+          cat build/cli/CMakeFiles/securepasswd_cli.dir/link.txt || true
 
       - name: Configure CMake (Windows)
         if: runner.os == 'Windows'
