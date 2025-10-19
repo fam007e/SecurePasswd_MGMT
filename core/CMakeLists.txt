@@ -5,7 +5,7 @@ target_include_directories(core_lib PUBLIC
     ${LIBSODIUM_INCLUDE_DIRS}
     ${ARGON2_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
-    ${OPENSSL_INCLUDE_DIRS}
+    ${OPENSSL_INCLUDE_DIR}
     ${SQLCIPHER_INCLUDE_DIRS}
 )
 
