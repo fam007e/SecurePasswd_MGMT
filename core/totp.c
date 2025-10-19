@@ -1,6 +1,15 @@
 #include <openssl/hmac.h>
 #include <openssl/evp.h>
+
+#if defined(__linux__)
 #include <endian.h>
+#elif defined(__APPLE__)
+#include <libkern/OSByteOrder.h>
+#define htobe64(x) OSSwapHostToBigInt64(x)
+#define be64toh(x) OSSwapBigToHostInt64(x)
+#define be32toh(x) OSSwapBigToHostInt32(x)
+#endif
+
 #include <string.h>
 #include <time.h>
 #include <stdio.h>
