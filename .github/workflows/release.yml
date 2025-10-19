@@ -175,18 +175,23 @@ jobs:
             -DCPACK_GENERATOR="${{ matrix.cpack_generator }}" \
             -DLIBCSV_INCLUDE_DIRS=/usr/local/include \
             -DLIBCSV_LIBRARIES=/usr/local/lib/libcsv.a \
-            -DCMAKE_PREFIX_PATH="$(brew --prefix qt@6);$(brew --prefix sqlcipher);$(brew --prefix openssl@3)" \
-            -DCMAKE_INCLUDE_PATH="$(brew --prefix sqlcipher)/include;$(brew --prefix openssl@3)/include" \
-            -DCMAKE_C_FLAGS="-I$(brew --prefix sqlcipher)/include -I$(brew --prefix openssl@3)/include" \
-            -DCMAKE_CXX_FLAGS="-I$(brew --prefix sqlcipher)/include -I$(brew --prefix openssl@3)/include"
+            -DCMAKE_PREFIX_PATH="$(brew --prefix qt@6);$(brew --prefix sqlcipher);$(brew --prefix openssl@3);$(brew --prefix argon2);$(brew --prefix libsodium)" \
+            -DCMAKE_INCLUDE_PATH="$(brew --prefix sqlcipher)/include;$(brew --prefix openssl@3)/include;$(brew --prefix argon2)/include;$(brew --prefix libsodium)/include" \
+            -DCMAKE_C_FLAGS="-I$(brew --prefix sqlcipher)/include -I$(brew --prefix openssl@3)/include -I$(brew --prefix argon2)/include -I$(brew --prefix libsodium)/include" \
+            -DCMAKE_CXX_FLAGS="-I$(brew --prefix sqlcipher)/include -I$(brew --prefix openssl@3)/include -I$(brew --prefix argon2)/include -I$(brew --prefix libsodium)/include"
 
-      - name: Debug SQLCipher Installation
+      - name: Debug Library Installations
         if: runner.os == 'macOS'
         run: |
+          echo "--- Debugging SQLCipher ---"
           ls -la $(brew --prefix sqlcipher)/include/sqlcipher/sqlite3.h
           pkg-config --cflags --libs sqlcipher
-          echo "SQLCIPHER_INCLUDE_DIRS from CMake:"
           grep SQLCIPHER_INCLUDE_DIRS build/CMakeCache.txt || true
+          
+          echo "--- Debugging Argon2 ---"
+          ls -la $(brew --prefix argon2)/include/argon2.h
+          pkg-config --cflags --libs libargon2
+          grep ARGON2_INCLUDE_DIRS build/CMakeCache.txt || true
 
       - name: Configure CMake (Windows)
         if: runner.os == 'Windows'
