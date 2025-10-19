@@ -167,7 +167,7 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           set -e
-          export PKG_CONFIG_PATH="$(brew --prefix sqlcipher)/lib/pkgconfig:$(brew --prefix openssl@3)/lib/pkgconfig"
+          export PKG_CONFIG_PATH="$(brew --prefix argon2)/lib/pkgconfig:$(brew --prefix libsodium)/lib/pkgconfig:$(brew --prefix sqlcipher)/lib/pkgconfig:$(brew --prefix openssl@3)/lib/pkgconfig"
           cmake -B build \
             -DCMAKE_BUILD_TYPE=Release \
             -DCPACK_PACKAGE_VERSION="${{ steps.get_version.outputs.version }}" \
