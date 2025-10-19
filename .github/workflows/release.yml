@@ -120,6 +120,7 @@ jobs:
         if: runner.os == 'macOS'
         timeout-minutes: 60
         run: |
+          set -e
           # Skip brew update to save time and avoid cancellations
           export HOMEBREW_NO_AUTO_UPDATE=1
           export HOMEBREW_NO_INSTALL_CLEANUP=1
@@ -162,29 +163,31 @@ jobs:
             -DCPACK_PACKAGE_CONTACT="fam007e <faisalmoshiur+secpasswdmgmt@gmail.com>" \
             -DCPACK_DEBIAN_PACKAGE_MAINTAINER="fam007e <faisalmoshiur+secpasswdmgmt@gmail.com>"
 
-            - name: Configure CMake (macOS)
-              if: runner.os == 'macOS'
-              run: |
-                export PKG_CONFIG_PATH="$(brew --prefix sqlcipher)/lib/pkgconfig:$(brew --prefix openssl@3)/lib/pkgconfig"
-                cmake -B build \
-                  -DCMAKE_BUILD_TYPE=Release \
-                  -DCPACK_PACKAGE_VERSION="${{ steps.get_version.outputs.version }}" \
-                  -DPROJECT_VERSION="${{ steps.get_version.outputs.version }}" \
-                  -DCPACK_GENERATOR="${{ matrix.cpack_generator }}" \
-                  -DLIBCSV_INCLUDE_DIRS=/usr/local/include \
-                  -DLIBCSV_LIBRARIES=/usr/local/lib/libcsv.a \
-                  -DCMAKE_PREFIX_PATH="$(brew --prefix qt@6);$(brew --prefix sqlcipher);$(brew --prefix openssl@3)" \
-                  -DCMAKE_INCLUDE_PATH="$(brew --prefix sqlcipher)/include" \
-                  -DCMAKE_C_FLAGS="-I$(brew --prefix sqlcipher)/include" \
-                  -DCMAKE_CXX_FLAGS="-I$(brew --prefix sqlcipher)/include"
-      
-            - name: Debug SQLCipher Installation
-              if: runner.os == 'macOS'
-              run: |
-                ls -la $(brew --prefix sqlcipher)/include/sqlcipher/sqlite3.h
-                pkg-config --cflags --libs sqlcipher
-                echo "SQLCIPHER_INCLUDE_DIRS from CMake:"
-                grep SQLCIPHER_INCLUDE_DIRS build/CMakeCache.txt || true
+      - name: Configure CMake (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          set -e
+          export PKG_CONFIG_PATH="$(brew --prefix sqlcipher)/lib/pkgconfig:$(brew --prefix openssl@3)/lib/pkgconfig"
+          cmake -B build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCPACK_PACKAGE_VERSION="${{ steps.get_version.outputs.version }}" \
+            -DPROJECT_VERSION="${{ steps.get_version.outputs.version }}" \
+            -DCPACK_GENERATOR="${{ matrix.cpack_generator }}" \
+            -DLIBCSV_INCLUDE_DIRS=/usr/local/include \
+            -DLIBCSV_LIBRARIES=/usr/local/lib/libcsv.a \
+            -DCMAKE_PREFIX_PATH="$(brew --prefix qt@6);$(brew --prefix sqlcipher);$(brew --prefix openssl@3)" \
+            -DCMAKE_INCLUDE_PATH="$(brew --prefix sqlcipher)/include" \
+            -DCMAKE_C_FLAGS="-I$(brew --prefix sqlcipher)/include" \
+            -DCMAKE_CXX_FLAGS="-I$(brew --prefix sqlcipher)/include"
+
+      - name: Debug SQLCipher Installation
+        if: runner.os == 'macOS'
+        run: |
+          ls -la $(brew --prefix sqlcipher)/include/sqlcipher/sqlite3.h
+          pkg-config --cflags --libs sqlcipher
+          echo "SQLCIPHER_INCLUDE_DIRS from CMake:"
+          grep SQLCIPHER_INCLUDE_DIRS build/CMakeCache.txt || true
+
       - name: Configure CMake (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
