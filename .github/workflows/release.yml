@@ -63,18 +63,16 @@ jobs:
             libsqlcipher-dev libcsv-dev qt6-base-dev libssl-dev libcurl4-openssl-dev \
             libcmocka-dev
 
-      - name: Setup vcpkg cache
-        if: runner.os == 'Windows'
+      - name: Cache vcpkg
         uses: actions/cache@v4
+        if: runner.os == 'Windows'
         with:
           path: |
-            vcpkg
-            !vcpkg/buildtrees
-            !vcpkg/packages
-            !vcpkg/downloads
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json', '**/vcpkg-configuration.json') }}-v2
-          restore-keys: |
-            ${{ runner.os }}-vcpkg-
+            ${{ github.workspace }}/vcpkg
+            !${{ github.workspace }}/vcpkg/buildtrees
+            !${{ github.workspace }}/vcpkg/packages
+            !${{ github.workspace }}/vcpkg/downloads
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}
 
       - name: Install dependencies (Windows)
         if: runner.os == 'Windows'
@@ -198,51 +196,6 @@ jobs:
             -DSQLCIPHER_LIBRARIES="${SQLCIPHER_LIB}" \
             -DLIBSODIUM_LIBRARIES="${SODIUM_LIB}" \
             -DCMAKE_PREFIX_PATH="$(brew --prefix qt@6);$(brew --prefix sqlcipher);$(brew --prefix openssl@3);$(brew --prefix argon2);$(brew --prefix libsodium);$(brew --prefix cmocka)"
-
-      - name: Debug Library Installations (macOS)
-        if: runner.os == 'macOS'
-        run: |
-          echo "--- Debugging SQLCipher ---"
-          ls -la $(brew --prefix sqlcipher)/include/sqlcipher/sqlite3.h
-          ls -la $(brew --prefix sqlcipher)/lib/libsqlcipher*
-          pkg-config --cflags --libs sqlcipher
-          grep SQLCIPHER_INCLUDE_DIRS build/CMakeCache.txt || true
-
-          echo "--- Debugging Argon2 ---"
-          ls -la $(brew --prefix argon2)/include/argon2.h
-          ls -la $(brew --prefix argon2)/lib/libargon2*
-          pkg-config --cflags --libs libargon2
-          grep ARGON2_INCLUDE_DIRS build/CMakeCache.txt || true
-
-          echo "--- Debugging libsodium ---"
-          ls -la $(brew --prefix libsodium)/include/sodium.h
-          ls -la $(brew --prefix libsodium)/lib/libsodium*
-          pkg-config --cflags --libs libsodium
-          grep LIBSODIUM_INCLUDE_DIRS build/CMakeCache.txt || true
-
-          echo "--- Debugging CMocka ---"
-          ls -la $(brew --prefix cmocka)/include/cmocka.h
-          ls -la $(brew --prefix cmocka)/lib/libcmocka*
-          pkg-config --cflags --libs cmocka
-          grep CMOCKA build/CMakeCache.txt || true
-
-      - name: Debug Compiler Flags (macOS)
-        if: runner.os == 'macOS'
-        run: |
-          echo "=== Include directories used by core_lib ==="
-          grep '^INCLUDE' build/CMakeCache.txt || true
-          echo "=== Compiler flags for core_lib ==="
-          cat build/core/CMakeFiles/core_lib.dir/flags.make || true
-          echo "=== Link line for core_lib ==="
-          cat build/core/CMakeFiles/core_lib.dir/link.txt || true
-          echo "=== Compiler flags for securepasswd_cli ==="
-          cat build/cli/CMakeFiles/securepasswd_cli.dir/flags.make || true
-          echo "=== Link line for securepasswd_cli ==="
-          cat build/cli/CMakeFiles/securepasswd_cli.dir/link.txt || true
-          echo "=== Compiler flags for cmocka_tests ==="
-          cat build/tests/CMakeFiles/cmocka_tests.dir/flags.make || true
-          echo "=== Link line for cmocka_tests ==="
-          cat build/tests/CMakeFiles/cmocka_tests.dir/link.txt || true
 
       - name: Configure CMake (Windows)
         if: runner.os == 'Windows'
@@ -380,11 +333,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: artifacts
-
-      - name: List artifacts
-        run: |
-          echo "Listing all downloaded artifacts:"
-          find artifacts -type f
 
       - name: Get previous tag
         id: previous_tag
