@@ -67,7 +67,8 @@ jobs:
         if: runner.os == 'Windows'
         uses: lukka/run-vcpkg@v11
         with:
-          vcpkgGitCommitId: '5f4da324383433c35a9338b87c759910ed99a949'
+          appendedCacheKey: ${{ hashFiles('**/vcpkg.json') }}
+          doNotCache: false
 
       - name: Install dependencies (Windows)
         if: runner.os == 'Windows'
