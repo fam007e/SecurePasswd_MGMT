@@ -172,7 +172,10 @@ jobs:
           SODIUM_INC=$(brew --prefix libsodium)/include
           ARGON2_INC=$(brew --prefix argon2)/include
           OPENSSL_INC=$(brew --prefix openssl@3)/include
+          
           ARGON2_LIB=$(brew --prefix argon2)/lib/libargon2.a
+          SQLCIPHER_LIB=$(brew --prefix sqlcipher)/lib/libsqlcipher.a
+          SODIUM_LIB=$(brew --prefix libsodium)/lib/libsodium.a
 
           # Clean build directory
           rm -rf build
@@ -191,6 +194,8 @@ jobs:
             -DARGON2_INCLUDE_DIRS="${ARGON2_INC}" \
             -DOPENSSL_INCLUDE_DIR="${OPENSSL_INC}" \
             -DARGON2_LIBRARIES="${ARGON2_LIB}" \
+            -DSQLCIPHER_LIBRARIES="${SQLCIPHER_LIB}" \
+            -DSODIUM_LIBRARIES="${SODIUM_LIB}" \
             -DCMAKE_PREFIX_PATH="$(brew --prefix qt@6);$(brew --prefix sqlcipher);$(brew --prefix openssl@3);$(brew --prefix argon2);$(brew --prefix libsodium)"
 
       - name: Debug Library Installations (macOS)
