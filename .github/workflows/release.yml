@@ -190,12 +190,12 @@ jobs:
             -DLIBCSV_INCLUDE_DIRS=/usr/local/include \
             -DLIBCSV_LIBRARIES=/usr/local/lib/libcsv.a \
             -DSQLCIPHER_INCLUDE_DIRS="${SQLCIPHER_INC}" \
-            -DSODIUM_INCLUDE_DIRS="${SODIUM_INC}" \
+            -DLIBSODIUM_INCLUDE_DIRS="${SODIUM_INC}" \
             -DARGON2_INCLUDE_DIRS="${ARGON2_INC}" \
             -DOPENSSL_INCLUDE_DIR="${OPENSSL_INC}" \
             -DARGON2_LIBRARIES="${ARGON2_LIB}" \
             -DSQLCIPHER_LIBRARIES="${SQLCIPHER_LIB}" \
-            -DSODIUM_LIBRARIES="${SODIUM_LIB}" \
+            -DLIBSODIUM_LIBRARIES="${SODIUM_LIB}" \
             -DCMAKE_PREFIX_PATH="$(brew --prefix qt@6);$(brew --prefix sqlcipher);$(brew --prefix openssl@3);$(brew --prefix argon2);$(brew --prefix libsodium)"
 
       - name: Debug Library Installations (macOS)
@@ -217,7 +217,7 @@ jobs:
           ls -la $(brew --prefix libsodium)/include/sodium.h
           ls -la $(brew --prefix libsodium)/lib/libsodium*
           pkg-config --cflags --libs libsodium
-          grep SODIUM_INCLUDE_DIRS build/CMakeCache.txt || true
+          grep LIBSODIUM_INCLUDE_DIRS build/CMakeCache.txt || true
 
       - name: Debug Compiler Flags (macOS)
         if: runner.os == 'macOS'
