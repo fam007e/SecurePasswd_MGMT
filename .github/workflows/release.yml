@@ -63,37 +63,27 @@ jobs:
             libsqlcipher-dev libcsv-dev qt6-base-dev libssl-dev libcurl4-openssl-dev \
             libcmocka-dev
 
-      - name: Cache vcpkg
-        uses: actions/cache@v4
+      - name: Setup vcpkg
         if: runner.os == 'Windows'
+        uses: lukka/run-vcpkg@v11
         with:
-          path: |
-            ${{ github.workspace }}/vcpkg
-            !${{ github.workspace }}/vcpkg/buildtrees
-            !${{ github.workspace }}/vcpkg/packages
-            !${{ github.workspace }}/vcpkg/downloads
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('**/vcpkg.json') }}
+          vcpkgGitCommitId: '5f4da324383433c35a9338b87c759910ed99a949'
 
       - name: Install dependencies (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
-        timeout-minutes: 60
         run: |
-          if (-not (Test-Path vcpkg/.git)) {
-            if (Test-Path vcpkg) { Remove-Item -Recurse -Force vcpkg }
-            git clone --depth 1 https://github.com/Microsoft/vcpkg.git
-            .\vcpkg\bootstrap-vcpkg.bat -disableMetrics
-          }
-
-          # Install packages one by one to better handle failures
           $packages = @("libsodium", "argon2", "curl", "openssl", "sqlcipher", "qtbase")
           foreach ($pkg in $packages) {
             Write-Host "Installing $pkg..."
-            .\vcpkg\vcpkg install $pkg --triplet x64-windows
+            vcpkg install $pkg --triplet x64-windows
             if ($LASTEXITCODE -ne 0) {
               Write-Host "Warning: Failed to install $pkg, but continuing..."
             }
           }
+        env:
+          VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+
 
       - name: Install libcsv from source (Windows)
         if: runner.os == 'Windows'
