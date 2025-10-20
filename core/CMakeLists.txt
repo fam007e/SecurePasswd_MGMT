@@ -16,5 +16,4 @@ target_link_libraries(core_lib PUBLIC
     ${OPENSSL_LIBRARIES}
     ${SQLCIPHER_LIBRARIES}
 )
-target_link_libraries(core_lib PRIVATE sqlcipher)
 target_compile_definitions(core_lib PRIVATE SQLITE_HAS_CODEC)
