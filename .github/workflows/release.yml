@@ -220,6 +220,12 @@ jobs:
           pkg-config --cflags --libs libsodium
           grep LIBSODIUM_INCLUDE_DIRS build/CMakeCache.txt || true
 
+          echo "--- Debugging CMocka ---"
+          ls -la $(brew --prefix cmocka)/include/cmocka.h
+          ls -la $(brew --prefix cmocka)/lib/libcmocka*
+          pkg-config --cflags --libs cmocka
+          grep CMOCKA build/CMakeCache.txt || true
+
       - name: Debug Compiler Flags (macOS)
         if: runner.os == 'macOS'
         run: |
@@ -233,6 +239,10 @@ jobs:
           cat build/cli/CMakeFiles/securepasswd_cli.dir/flags.make || true
           echo "=== Link line for securepasswd_cli ==="
           cat build/cli/CMakeFiles/securepasswd_cli.dir/link.txt || true
+          echo "=== Compiler flags for cmocka_tests ==="
+          cat build/tests/CMakeFiles/cmocka_tests.dir/flags.make || true
+          echo "=== Link line for cmocka_tests ==="
+          cat build/tests/CMakeFiles/cmocka_tests.dir/link.txt || true
 
       - name: Configure CMake (Windows)
         if: runner.os == 'Windows'
