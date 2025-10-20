@@ -173,9 +173,9 @@ jobs:
           ARGON2_INC=$(brew --prefix argon2)/include
           OPENSSL_INC=$(brew --prefix openssl@3)/include
           
-          ARGON2_LIB=$(brew --prefix argon2)/lib/libargon2.a
-          SQLCIPHER_LIB=$(brew --prefix sqlcipher)/lib/libsqlcipher.a
-          SODIUM_LIB=$(brew --prefix libsodium)/lib/libsodium.a
+          ARGON2_LIB=$(brew --prefix argon2)/lib/libargon2.dylib
+          SQLCIPHER_LIB=$(brew --prefix sqlcipher)/lib/libsqlcipher.dylib
+          SODIUM_LIB=$(brew --prefix libsodium)/lib/libsodium.dylib
 
           # Clean build directory
           rm -rf build
