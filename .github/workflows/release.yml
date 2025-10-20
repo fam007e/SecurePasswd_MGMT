@@ -68,6 +68,9 @@ jobs:
         uses: lukka/run-vcpkg@v11
         with:
           runVcpkgInstall: true
+        env:
+          VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/${{ github.repository_owner }},readwrite"
+          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
       - name: Install libcsv from source (Windows)
