@@ -1,0 +1,13 @@
+{
+  "name": "securepasswd-mgmt",
+  "version-string": "1.0.0",
+  "dependencies": [
+    "libsodium",
+    "argon2",
+    "curl",
+    "openssl",
+    "sqlcipher",
+    "qtbase"
+  ],
+  "builtin-baseline": "f4fc135de213885b8d072203d324976e4aa1f171"
+}

@@ -63,27 +63,11 @@ jobs:
             libsqlcipher-dev libcsv-dev qt6-base-dev libssl-dev libcurl4-openssl-dev \
             libcmocka-dev
 
-      - name: Setup vcpkg
+      - name: Setup vcpkg and install dependencies
         if: runner.os == 'Windows'
         uses: lukka/run-vcpkg@v11
         with:
-          appendedCacheKey: ${{ hashFiles('**/vcpkg.json') }}
-          doNotCache: false
-
-      - name: Install dependencies (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          $packages = @("libsodium", "argon2", "curl", "openssl", "sqlcipher", "qtbase")
-          foreach ($pkg in $packages) {
-            Write-Host "Installing $pkg..."
-            vcpkg install $pkg --triplet x64-windows
-            if ($LASTEXITCODE -ne 0) {
-              Write-Host "Warning: Failed to install $pkg, but continuing..."
-            }
-          }
-        env:
-          VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+          runVcpkgInstall: true
 
 
       - name: Install libcsv from source (Windows)
