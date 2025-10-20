@@ -172,7 +172,8 @@ jobs:
           SODIUM_INC=$(brew --prefix libsodium)/include
           ARGON2_INC=$(brew --prefix argon2)/include
           OPENSSL_INC=$(brew --prefix openssl@3)/include
-          
+          CMOCKA_INC=$(brew --prefix cmocka)/include
+
           ARGON2_LIB=$(brew --prefix argon2)/lib/libargon2.dylib
           SQLCIPHER_LIB=$(brew --prefix sqlcipher)/lib/libsqlcipher.dylib
           SODIUM_LIB=$(brew --prefix libsodium)/lib/libsodium.dylib
@@ -206,13 +207,13 @@ jobs:
           ls -la $(brew --prefix sqlcipher)/lib/libsqlcipher*
           pkg-config --cflags --libs sqlcipher
           grep SQLCIPHER_INCLUDE_DIRS build/CMakeCache.txt || true
-          
+
           echo "--- Debugging Argon2 ---"
           ls -la $(brew --prefix argon2)/include/argon2.h
           ls -la $(brew --prefix argon2)/lib/libargon2*
           pkg-config --cflags --libs libargon2
           grep ARGON2_INCLUDE_DIRS build/CMakeCache.txt || true
-          
+
           echo "--- Debugging libsodium ---"
           ls -la $(brew --prefix libsodium)/include/sodium.h
           ls -la $(brew --prefix libsodium)/lib/libsodium*
