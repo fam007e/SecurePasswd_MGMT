@@ -197,7 +197,7 @@ jobs:
             -DARGON2_LIBRARIES="${ARGON2_LIB}" \
             -DSQLCIPHER_LIBRARIES="${SQLCIPHER_LIB}" \
             -DLIBSODIUM_LIBRARIES="${SODIUM_LIB}" \
-            -DCMAKE_PREFIX_PATH="$(brew --prefix qt@6);$(brew --prefix sqlcipher);$(brew --prefix openssl@3);$(brew --prefix argon2);$(brew --prefix libsodium)"
+            -DCMAKE_PREFIX_PATH="$(brew --prefix qt@6);$(brew --prefix sqlcipher);$(brew --prefix openssl@3);$(brew --prefix argon2);$(brew --prefix libsodium);$(brew --prefix cmocka)"
 
       - name: Debug Library Installations (macOS)
         if: runner.os == 'macOS'
