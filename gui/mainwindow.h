@@ -34,10 +34,13 @@ private slots:
     void onImport();
     void onExport();
     void onHealthCheck();
+    void onToggleTheme();
 
 private:
     void setupUI();
     void refreshEntryList();
+    void loadTheme(const QString& theme);
+    void updateThemeIcon();
 
 
     QListWidget *listWidget;
@@ -53,6 +56,8 @@ private:
     QAction *importAction;
     QAction *exportAction;
     QAction *healthCheckAction;
+    QAction *themeAction;
+    QString currentTheme;
     QVector<GUIPasswordEntry> entries;
 
     // TOTP Display

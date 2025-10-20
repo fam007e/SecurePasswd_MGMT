@@ -21,6 +21,8 @@ extern "C" {
 #include <QHBoxLayout>
 #include <QListWidget>
 #include <QMenuBar>
+#include <QSettings>
+#include <QStyleFactory>
 #include <QMessageBox>
 #include <QStandardPaths>
 #include <QStatusBar>
@@ -70,6 +72,10 @@ MainWindow::MainWindow(const QString& password, QWidget *parent) : QMainWindow(p
 
     setupUI();
     refreshEntryList();
+
+    QSettings settings("SecurePasswd_MGMT", "SecurePasswd_MGMT");
+    currentTheme = settings.value("theme", "light").toString();
+    loadTheme(currentTheme);
 }
 
 MainWindow::~MainWindow() {
@@ -314,6 +320,12 @@ void MainWindow::setupUI() {
     copyTotpAction = new QAction(QIcon(":/icons/copy_totp.svg"), "Copy TOTP", this);
     toolBar->addAction(copyTotpAction);
 
+    toolBar->addSeparator();
+
+    themeAction = new QAction(this);
+    toolBar->addAction(themeAction);
+
+
     // List widget
     listWidget = new QListWidget(this);
     mainLayout->addWidget(listWidget);
@@ -338,6 +350,7 @@ void MainWindow::setupUI() {
     connect(copyPasswordAction, &QAction::triggered, this, &MainWindow::onCopyPassword);
     connect(copyTotpAction, &QAction::triggered, this, &MainWindow::onCopyTotp);
     connect(listWidget, &QListWidget::currentRowChanged, this, &MainWindow::onCurrentRowChanged);
+    connect(themeAction, &QAction::triggered, this, &MainWindow::onToggleTheme);
 
     // TOTP timer
     totpTimer = new QTimer(this);
@@ -347,4 +360,34 @@ void MainWindow::setupUI() {
 void MainWindow::onHealthCheck() {
     HealthCheckDialog dialog(m_entries, this);
     dialog.exec();
+}
+
+void MainWindow::onToggleTheme() {
+    if (currentTheme == "light") {
+        currentTheme = "dark";
+    } else {
+        currentTheme = "light";
+    }
+    QSettings settings("SecurePasswd_MGMT", "SecurePasswd_MGMT");
+    settings.setValue("theme", currentTheme);
+    loadTheme(currentTheme);
+}
+
+void MainWindow::loadTheme(const QString& theme) {
+    QFile file(QString(":/%1.qss").arg(theme));
+    if (file.open(QFile::ReadOnly | QFile::Text)) {
+        qApp->setStyleSheet(file.readAll());
+        file.close();
+    }
+    updateThemeIcon();
+}
+
+void MainWindow::updateThemeIcon() {
+    if (currentTheme == "light") {
+        themeAction->setIcon(QIcon(":/icons/darkmode.svg"));
+        themeAction->setText("Dark Theme");
+    } else {
+        themeAction->setIcon(QIcon(":/icons/lightmode.svg"));
+        themeAction->setText("Light Theme");
+    }
 }

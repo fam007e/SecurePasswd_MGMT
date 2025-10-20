@@ -1,0 +1,79 @@
+
+/* Nord Dark Theme */
+QMainWindow {
+    background-color: #2E3440;
+    color: #D8DEE9;
+}
+QListWidget {
+    background-color: #3B4252;
+    border: 1px solid #4C566A;
+    color: #D8DEE9;
+}
+QListWidget::item:selected {
+    background-color: #4C566A;
+}
+QListWidget::item:hover {
+    background-color: #434C5E;
+}
+QToolBar {
+    background-color: #3B4252;
+    border: none;
+}
+QToolBar QToolButton {
+    color: #D8DEE9;
+}
+QToolBar QToolButton:hover {
+    background-color: #4C566A;
+}
+QStatusBar {
+    background-color: #3B4252;
+    color: #D8DEE9;
+}
+QLabel {
+    color: #D8DEE9;
+}
+QProgressBar {
+    border: 1px solid #4C566A;
+    background-color: #3B4252;
+    color: #D8DEE9;
+    text-align: center;
+}
+QProgressBar::chunk {
+    background-color: #88C0D0;
+}
+QMenuBar {
+    background-color: #3B4252;
+    color: #D8DEE9;
+}
+QMenuBar::item:selected {
+    background-color: #4C566A;
+}
+QMenu {
+    background-color: #3B4252;
+    color: #D8DEE9;
+    border: 1px solid #4C566A;
+}
+QMenu::item:selected {
+    background-color: #4C566A;
+}
+QPushButton {
+    background-color: #4C566A;
+    color: #D8DEE9;
+    border: 1px solid #4C566A;
+    padding: 5px;
+}
+QPushButton:hover {
+    background-color: #5E81AC;
+}
+QPushButton:pressed {
+    background-color: #81A1C1;
+}
+QLineEdit {
+    background-color: #3B4252;
+    color: #D8DEE9;
+    border: 1px solid #4C566A;
+    padding: 5px;
+}
+QDialog {
+    background-color: #2E3440;
+}

@@ -13,6 +13,13 @@ set(ICONS
     icons/export.svg
     icons/health-check.svg
     icons/import.svg
+    icons/darkmode.svg
+    icons/lightmode.svg
+)
+
+set(THEMES
+    dark.qss
+    light.qss
 )
 
 qt_add_executable(securepasswd_gui
@@ -40,3 +47,4 @@ install(TARGETS securepasswd_gui
 )
 
 install(FILES ${ICONS} DESTINATION bin/icons)
+install(FILES ${THEMES} DESTINATION bin)
