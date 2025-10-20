@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 120
+    timeout-minutes: 360
     strategy:
       fail-fast: false
       matrix:
@@ -65,12 +65,15 @@ jobs:
 
       - name: Setup vcpkg and install dependencies
         if: runner.os == 'Windows'
+        id: run-vcpkg
         uses: lukka/run-vcpkg@v11
         with:
           runVcpkgInstall: true
+          appendedCacheKey: ${{ hashFiles('vcpkg.json') }}
         env:
           VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/${{ github.repository_owner }},readwrite"
           NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED: "false"
 
 
       - name: Install libcsv from source (Windows)
