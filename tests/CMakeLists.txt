@@ -15,18 +15,22 @@ add_executable(core_tests test_core.c)
 target_include_directories(core_tests PRIVATE ../)
 target_link_libraries(core_tests PRIVATE core_lib)
 
+# Add library directories before creating executables (for non-Windows)
+if(NOT WIN32 AND CMOCKA_LIBRARY_DIRS)
+    link_directories(${CMOCKA_LIBRARY_DIRS})
+endif()
+
 # CMocka tests
 add_executable(cmocka_tests test_cmocka.c)
 target_include_directories(cmocka_tests PRIVATE ../)
 
 if(NOT WIN32)
     target_include_directories(cmocka_tests PRIVATE ${CMOCKA_INCLUDE_DIRS})
-    link_directories(${CMOCKA_LIBRARY_DIRS})
 endif()
 
-target_link_libraries(cmocka_tests PRIVATE
-    core_lib
-    password_generator_lib
+target_link_libraries(cmocka_tests PRIVATE 
+    core_lib 
+    password_generator_lib 
     ${CMOCKA_LIBRARIES}
 )
 
