@@ -82,17 +82,30 @@ jobs:
           NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED: "false"
 
-      - name: Install libcsv from source (Windows)
+      - name: Build libcsv from source (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
+          # libcsv doesn't have CMake support, build manually
           git clone https://github.com/rgamble/libcsv.git
           cd libcsv
-          mkdir build
-          cd build
-          cmake .. -DCMAKE_INSTALL_PREFIX="${{ github.workspace }}\libcsv-install"
-          cmake --build . --config Release
-          cmake --install . --config Release
+
+          # Create installation directory
+          $installDir = "${{ github.workspace }}\libcsv-install"
+          New-Item -ItemType Directory -Force -Path "$installDir\include"
+          New-Item -ItemType Directory -Force -Path "$installDir\lib"
+
+          # Compile csv.c directly
+          cl.exe /c /O2 /MD /DLIBCSV_EXPORTS csv.c
+
+          # Create static library
+          lib.exe /OUT:csv.lib csv.obj
+
+          # Copy files to install location
+          Copy-Item csv.h "$installDir\include\"
+          Copy-Item csv.lib "$installDir\lib\"
+
+          Write-Host "libcsv built and installed to $installDir"
         continue-on-error: true
 
       - name: Setup Homebrew

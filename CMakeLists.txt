@@ -8,7 +8,7 @@ set(CMAKE_C_STANDARD 11)
 if(WIN32)
     # vcpkg on Windows uses unofficial- prefix for some packages
     find_package(unofficial-sodium CONFIG REQUIRED)
-    find_package(Argon2 CONFIG REQUIRED)
+    find_package(argon2 CONFIG REQUIRED)  # lowercase!
     find_package(unofficial-sqlcipher CONFIG REQUIRED)
     find_package(getopt-win32 CONFIG REQUIRED)
 
@@ -30,8 +30,16 @@ endif()
 # Find libcsv
 find_path(LIBCSV_INCLUDE_DIRS NAMES csv.h)
 find_library(LIBCSV_LIBRARIES NAMES csv)
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(LIBCSV DEFAULT_MSG LIBCSV_LIBRARIES LIBCSV_INCLUDE_DIRS)
+
+if(LIBCSV_INCLUDE_DIRS AND LIBCSV_LIBRARIES)
+    set(LIBCSV_FOUND TRUE)
+    message(STATUS "Found libcsv: ${LIBCSV_LIBRARIES}")
+    include(FindPackageHandleStandardArgs)
+    find_package_handle_standard_args(LIBCSV DEFAULT_MSG LIBCSV_LIBRARIES LIBCSV_INCLUDE_DIRS)
+else()
+    message(WARNING "libcsv not found - will attempt to build from source or may fail")
+    set(LIBCSV_FOUND FALSE)
+endif()
 
 # Find Qt6
 find_package(Qt6 COMPONENTS Widgets REQUIRED)
