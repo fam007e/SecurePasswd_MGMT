@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(SecurePassManager VERSION 1.0.0 LANGUAGES C CXX)
-
-set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
+project(SecurePasswd_MGMT VERSION 1.0.0 LANGUAGES C CXX)
 set(CMAKE_C_STANDARD 11)
 
 # Handle vcpkg vs system packages
@@ -11,7 +9,6 @@ if(WIN32)
     find_package(unofficial-argon2 CONFIG REQUIRED)
     find_package(unofficial-sqlcipher CONFIG REQUIRED)
     find_package(getopt-win32 CONFIG REQUIRED)
-
     # Set variables to match pkg-config naming convention for cross-platform compatibility
     set(LIBSODIUM_LIBRARIES unofficial-sodium::sodium)
     set(LIBSODIUM_INCLUDE_DIRS "")  # Handled by target
@@ -30,7 +27,6 @@ endif()
 # Find libcsv
 find_path(LIBCSV_INCLUDE_DIRS NAMES csv.h)
 find_library(LIBCSV_LIBRARIES NAMES csv)
-
 if(LIBCSV_INCLUDE_DIRS AND LIBCSV_LIBRARIES)
     set(LIBCSV_FOUND TRUE)
     message(STATUS "Found libcsv: ${LIBCSV_LIBRARIES}")
@@ -52,7 +48,6 @@ find_package(CURL REQUIRED)
 if(NOT MSVC)
     add_compile_options(-O2 -fstack-protector-strong -D_FORTIFY_SOURCE=2)
 endif()
-
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_link_options(-Wl,-z,relro,-z,now)
 endif()
@@ -64,8 +59,9 @@ add_subdirectory(gui)
 add_subdirectory(tests)
 
 # CPack configuration
-include(CPack)
+set(CPACK_PACKAGE_NAME "SecurePasswd_MGMT")
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
+set(CPACK_PACKAGE_FILE_NAME "SecurePasswd_MGMT-${CPACK_PACKAGE_VERSION}")
 set(CPACK_GENERATOR "DEB;RPM;NSIS")
 set(CPACK_PACKAGE_CONTACT "fam007e <faisalmoshiur+secpasswdmgmt@gmail.com>")
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "fam007e")
@@ -77,3 +73,5 @@ set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")
 set(CPACK_NSIS_CREATE_ICONS "ON")
 set(CPACK_NSIS_MUI_ICON "${CMAKE_CURRENT_SOURCE_DIR}/gui/icons/app_icon.ico")
 set(CPACK_NSIS_MUI_UNIICON "${CMAKE_CURRENT_SOURCE_DIR}/gui/icons/app_icon.ico")
+
+include(CPack)
