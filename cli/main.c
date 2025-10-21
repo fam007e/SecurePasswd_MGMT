@@ -4,8 +4,41 @@
 #include <stdbool.h>
 #include <getopt.h>
 #include <sodium.h>
+
+#ifndef _MSC_VER
 #include <unistd.h> // For getpass
 #include <termios.h> // For hiding input
+#else
+#include <conio.h> // For _getch
+#include <windows.h> // For console functions
+
+// Windows-specific getpass implementation
+char *getpass(const char *prompt) {
+    static char password[128]; // Buffer for password
+    char *p = password;
+    int c;
+
+    HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
+    DWORD mode = 0;
+    GetConsoleMode(hStdin, &mode);
+    SetConsoleMode(hStdin, mode & (~ENABLE_ECHO_INPUT)); // Disable echo
+
+    printf("%s", prompt);
+    fflush(stdout);
+
+    while ((c = _getch()) != '\r' && c != '\n' && (p - password < sizeof(password) - 1)) {
+        *p++ = (char)c;
+    }
+    *p = '\0';
+
+    SetConsoleMode(hStdin, mode); // Restore echo
+    printf("\n");
+
+    return password;
+}
+
+#endif
+
 #include <csv.h>
 
 #include "key_derivation.h"

@@ -8,6 +8,11 @@
 #define htobe64(x) OSSwapHostToBigInt64(x)
 #define be64toh(x) OSSwapBigToHostInt64(x)
 #define be32toh(x) OSSwapBigToHostInt32(x)
+#elif defined(_MSC_VER)
+#include <intrin.h>
+#define htobe64(x) _byteswap_uint64(x)
+#define be64toh(x) _byteswap_uint64(x)
+#define be32toh(x) _byteswap_ulong(x)
 #endif
 
 #include <string.h>

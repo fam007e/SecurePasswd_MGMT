@@ -33,6 +33,7 @@ private slots:
     void updateTotpDisplay();
     void onImport();
     void onExport();
+    void onDelete();
     void onHealthCheck();
     void onToggleTheme();
 
@@ -53,6 +54,7 @@ private:
     QAction *copyUsernameAction;
     QAction *copyPasswordAction;
     QAction *copyTotpAction;
+    QAction *deleteAction;
     QAction *importAction;
     QAction *exportAction;
     QAction *healthCheckAction;

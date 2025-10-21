@@ -311,6 +311,9 @@ void MainWindow::setupUI() {
     editAction = new QAction(QIcon(":/icons/edit.svg"), "Edit", this);
     toolBar->addAction(editAction);
 
+    deleteAction = new QAction(QIcon(":/icons/delete.svg"), "Delete", this);
+    toolBar->addAction(deleteAction);
+
     copyUsernameAction = new QAction(QIcon(":/icons/copy_username.svg"), "Copy Username", this);
     toolBar->addAction(copyUsernameAction);
 
@@ -346,6 +349,7 @@ void MainWindow::setupUI() {
     // Connections
     connect(addAction, &QAction::triggered, this, &MainWindow::onAdd);
     connect(editAction, &QAction::triggered, this, &MainWindow::onEdit);
+    connect(deleteAction, &QAction::triggered, this, &MainWindow::onDelete);
     connect(copyUsernameAction, &QAction::triggered, this, &MainWindow::onCopyUsername);
     connect(copyPasswordAction, &QAction::triggered, this, &MainWindow::onCopyPassword);
     connect(copyTotpAction, &QAction::triggered, this, &MainWindow::onCopyTotp);
@@ -360,6 +364,31 @@ void MainWindow::setupUI() {
 void MainWindow::onHealthCheck() {
     HealthCheckDialog dialog(m_entries, this);
     dialog.exec();
+}
+
+void MainWindow::onDelete() {
+    int currentRow = listWidget->currentRow();
+    if (currentRow < 0 || currentRow >= m_entries.size()) {
+        QMessageBox::warning(this, "No Selection", "Please select an entry to delete.");
+        return;
+    }
+
+    QListWidgetItem *item = listWidget->item(currentRow);
+    int entry_id = item->data(Qt::UserRole).toInt();
+
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Confirm Delete", "Are you sure you want to delete this entry?",
+                                  QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::No) {
+        return;
+    }
+
+    if (database_delete_entry(entry_id) != 0) {
+        QMessageBox::critical(this, "Database Error", "Failed to delete entry from the database.");
+    } else {
+        refreshEntryList();
+        statusBar()->showMessage("Entry deleted successfully.", 3000);
+    }
 }
 
 void MainWindow::onToggleTheme() {

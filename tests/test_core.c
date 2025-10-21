@@ -1,7 +1,12 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
+#ifndef _MSC_VER
 #include <unistd.h> // For unlink
+#else
+#include <io.h> // For _unlink
+#define unlink _unlink
+#endif
 
 #include "core/key_derivation.h"
 #include "core/database.h"

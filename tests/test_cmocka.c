@@ -1,7 +1,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "core/pwned_check.h"
+#ifndef _MSC_VER
 #include <unistd.h>
+#else
+#include <io.h> // For _access
+#define access _access
+#endif
 #include <string.h>
 #include "core/key_derivation.h"
 #include <stdarg.h>
