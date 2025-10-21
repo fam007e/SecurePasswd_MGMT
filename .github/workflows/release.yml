@@ -160,16 +160,26 @@ jobs:
               echo "$pkg already installed"
             fi
           done
-
+      
       - name: Install libcsv from source (macOS)
         if: runner.os == 'macOS'
         run: |
+          set -e
+          # Clone libcsv
           git clone https://github.com/rgamble/libcsv.git
           cd libcsv
-          ./configure
-          make
-          sudo make install
-
+      
+          # Compile csv.c directly
+          gcc -c -O2 -DLIBCSV_EXPORTS csv.c -o csv.o
+      
+          # Create static library
+          ar rcs libcsv.a csv.o
+      
+          # Install files
+          sudo mkdir -p /usr/local/include /usr/local/lib
+          sudo cp csv.h /usr/local/include/
+          sudo cp libcsv.a /usr/local/lib/
+      
           # Verify installation
           ls -la /usr/local/lib/libcsv* || true
           ls -la /usr/local/include/csv.h || true
