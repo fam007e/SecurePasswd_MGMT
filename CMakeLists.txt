@@ -8,14 +8,14 @@ set(CMAKE_C_STANDARD 11)
 if(WIN32)
     # vcpkg on Windows uses unofficial- prefix for some packages
     find_package(unofficial-sodium CONFIG REQUIRED)
-    find_package(argon2 CONFIG REQUIRED)  # lowercase!
+    find_package(unofficial-argon2 CONFIG REQUIRED)
     find_package(unofficial-sqlcipher CONFIG REQUIRED)
     find_package(getopt-win32 CONFIG REQUIRED)
 
     # Set variables to match pkg-config naming convention for cross-platform compatibility
     set(LIBSODIUM_LIBRARIES unofficial-sodium::sodium)
     set(LIBSODIUM_INCLUDE_DIRS "")  # Handled by target
-    set(ARGON2_LIBRARIES argon2::argon2)
+    set(ARGON2_LIBRARIES unofficial-argon2::argon2)
     set(ARGON2_INCLUDE_DIRS "")  # Handled by target
     set(SQLCIPHER_LIBRARIES unofficial-sqlcipher::sqlcipher)
     set(SQLCIPHER_INCLUDE_DIRS "")  # Handled by target

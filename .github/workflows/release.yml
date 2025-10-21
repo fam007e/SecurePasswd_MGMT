@@ -86,7 +86,29 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          # libcsv doesn't have CMake support, build manually
+          # Find Visual Studio installation path using vswhere
+          $vsPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.Component.MSBuild -property installationPath
+          if (-not $vsPath) {
+            Write-Error "Visual Studio not found"
+            exit 1
+          }
+
+          # Set up the Visual Studio development environment
+          $vsDevCmd = Join-Path $vsPath "Common7\Tools\VsDevCmd.bat"
+          if (-not (Test-Path $vsDevCmd)) {
+            Write-Error "VsDevCmd.bat not found"
+            exit 1
+          }
+
+          # Initialize the environment
+          cmd.exe /c "call `"$vsDevCmd`" && set > %temp%\vcvars.txt"
+          Get-Content "$env:TEMP\vcvars.txt" | ForEach-Object {
+            if ($_ -match "^(.*?)=(.*)$") {
+              Set-Item -Path "env:$($matches[1])" -Value $matches[2]
+            }
+          }
+
+          # Clone and build libcsv
           git clone https://github.com/rgamble/libcsv.git
           cd libcsv
 
