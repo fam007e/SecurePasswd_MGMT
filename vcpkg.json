@@ -10,7 +10,7 @@
     "qtbase",
     "cmocka",
     "libcsv",
-    "getopt-for-windows"
+    "getopt-win32"
   ],
-  "builtin-baseline": "f4fc135de213885b8d072203d324976e4aa1f171"
+  "builtin-baseline": "71538f2694db93da4668782d094768ba74c45991"
 }
