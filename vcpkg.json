@@ -7,7 +7,9 @@
     "curl",
     "openssl",
     "sqlcipher",
-    "qtbase"
+    "qtbase",
+    "cmocka",
+    "libcsv"
   ],
   "builtin-baseline": "f4fc135de213885b8d072203d324976e4aa1f171"
 }
