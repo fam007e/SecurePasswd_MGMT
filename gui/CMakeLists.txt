@@ -36,11 +36,24 @@ qt_add_executable(securepasswd_gui
     icons.qrc
 )
 
+# Include directories
+target_include_directories(securepasswd_gui PRIVATE
+    ${CMAKE_SOURCE_DIR}/cli
+)
 
-target_include_directories(securepasswd_gui PRIVATE ${CMAKE_SOURCE_DIR}/cli ${LIBCSV_INCLUDE_DIRS})
+# Only add LIBCSV_INCLUDE_DIRS if it's not empty (to avoid warnings)
+if(LIBCSV_INCLUDE_DIRS)
+    target_include_directories(securepasswd_gui PRIVATE ${LIBCSV_INCLUDE_DIRS})
+endif()
 
-target_link_libraries(securepasswd_gui PRIVATE Qt6::Widgets core_lib ${LIBCSV_LIBRARIES})
+# Link libraries
+target_link_libraries(securepasswd_gui PRIVATE
+    Qt6::Widgets
+    core_lib
+    ${LIBCSV_LIBRARIES}
+)
 
+# Installation rules
 install(TARGETS securepasswd_gui
     RUNTIME DESTINATION bin
     BUNDLE DESTINATION .
@@ -48,3 +61,13 @@ install(TARGETS securepasswd_gui
 
 install(FILES ${ICONS} DESTINATION bin/icons)
 install(FILES ${THEMES} DESTINATION bin)
+
+# Windows-specific: Copy DLLs to output directory
+if(WIN32)
+    # This helps with running the executable directly from the build directory
+    add_custom_command(TARGET securepasswd_gui POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE:Qt6::Widgets>
+        $<TARGET_FILE_DIR:securepasswd_gui>
+    )
+endif()

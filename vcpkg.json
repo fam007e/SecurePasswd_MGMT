@@ -7,10 +7,12 @@
     "curl",
     "openssl",
     "sqlcipher",
-    "qtbase",
     "cmocka",
-    "libcsv",
-    "getopt-win32"
+    "getopt-win32",
+    {
+      "name": "qtbase",
+      "default-features": false
+    }
   ],
   "builtin-baseline": "faf665cf8aca288b636d9de887f5cdfa3cff1a9e"
 }

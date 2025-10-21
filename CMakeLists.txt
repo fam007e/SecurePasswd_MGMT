@@ -1,38 +1,55 @@
 cmake_minimum_required(VERSION 3.10)
 project(SecurePassManager VERSION 1.0.0 LANGUAGES C CXX)
-set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
 
+set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
 set(CMAKE_C_STANDARD 11)
 
-find_package(PkgConfig REQUIRED)
-
-if(MSVC)
-    find_package(libsodium CONFIG REQUIRED)
+# Handle vcpkg vs system packages
+if(WIN32)
+    # vcpkg on Windows uses unofficial- prefix for some packages
+    find_package(unofficial-sodium CONFIG REQUIRED)
     find_package(Argon2 CONFIG REQUIRED)
-    find_package(sqlcipher CONFIG REQUIRED)
+    find_package(unofficial-sqlcipher CONFIG REQUIRED)
     find_package(getopt-win32 CONFIG REQUIRED)
+
+    # Set variables to match pkg-config naming convention for cross-platform compatibility
+    set(LIBSODIUM_LIBRARIES unofficial-sodium::sodium)
+    set(LIBSODIUM_INCLUDE_DIRS "")  # Handled by target
+    set(ARGON2_LIBRARIES argon2::argon2)
+    set(ARGON2_INCLUDE_DIRS "")  # Handled by target
+    set(SQLCIPHER_LIBRARIES unofficial-sqlcipher::sqlcipher)
+    set(SQLCIPHER_INCLUDE_DIRS "")  # Handled by target
 else()
+    # Linux/macOS use pkg-config
+    find_package(PkgConfig REQUIRED)
     pkg_check_modules(LIBSODIUM REQUIRED libsodium)
     pkg_check_modules(ARGON2 REQUIRED libargon2)
     pkg_check_modules(SQLCIPHER REQUIRED sqlcipher)
 endif()
 
+# Find libcsv
 find_path(LIBCSV_INCLUDE_DIRS NAMES csv.h)
 find_library(LIBCSV_LIBRARIES NAMES csv)
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(LIBCSV DEFAULT_MSG LIBCSV_LIBRARIES LIBCSV_INCLUDE_DIRS)
 
+# Find Qt6
 find_package(Qt6 COMPONENTS Widgets REQUIRED)
+
+# Find OpenSSL and CURL
 find_package(OpenSSL REQUIRED)
 find_package(CURL REQUIRED)
 
+# Security flags
 if(NOT MSVC)
     add_compile_options(-O2 -fstack-protector-strong -D_FORTIFY_SOURCE=2)
 endif()
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_link_options(-Wl,-z,relro,-z,now)
 endif()
 
+# Add subdirectories
 add_subdirectory(core)
 add_subdirectory(cli)
 add_subdirectory(gui)
