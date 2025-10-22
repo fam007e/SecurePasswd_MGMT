@@ -7,14 +7,30 @@ if(WIN32)
     # vcpkg on Windows uses unofficial- prefix for some packages
     find_package(unofficial-sodium CONFIG REQUIRED)
     find_package(unofficial-argon2 CONFIG REQUIRED)
-    find_package(unofficial-sqlcipher CONFIG REQUIRED)
+    
+    # SQLCipher from vcpkg uses sqlcipher (not unofficial-sqlcipher)
+    find_package(sqlcipher CONFIG REQUIRED)
+    
     find_package(getopt-win32 CONFIG REQUIRED)
+    
+    # Try to find libcsv from vcpkg
+    find_package(libcsv CONFIG)
+    if(libcsv_FOUND)
+        set(LIBCSV_LIBRARIES libcsv::csv)
+        set(LIBCSV_INCLUDE_DIRS "")  # Handled by target
+        set(LIBCSV_FOUND TRUE)
+    else()
+        # Fallback to manual search if not found via vcpkg
+        find_path(LIBCSV_INCLUDE_DIRS NAMES csv.h)
+        find_library(LIBCSV_LIBRARIES NAMES csv)
+    endif()
+    
     # Set variables to match pkg-config naming convention for cross-platform compatibility
     set(LIBSODIUM_LIBRARIES unofficial-sodium::sodium)
     set(LIBSODIUM_INCLUDE_DIRS "")  # Handled by target
     set(ARGON2_LIBRARIES unofficial-argon2::argon2)
     set(ARGON2_INCLUDE_DIRS "")  # Handled by target
-    set(SQLCIPHER_LIBRARIES unofficial-sqlcipher::sqlcipher)
+    set(SQLCIPHER_LIBRARIES sqlcipher::sqlcipher)
     set(SQLCIPHER_INCLUDE_DIRS "")  # Handled by target
 else()
     # Linux/macOS use pkg-config
@@ -22,18 +38,20 @@ else()
     pkg_check_modules(LIBSODIUM REQUIRED libsodium)
     pkg_check_modules(ARGON2 REQUIRED libargon2)
     pkg_check_modules(SQLCIPHER REQUIRED sqlcipher)
+    
+    # Find libcsv
+    find_path(LIBCSV_INCLUDE_DIRS NAMES csv.h)
+    find_library(LIBCSV_LIBRARIES NAMES csv)
 endif()
 
-# Find libcsv
-find_path(LIBCSV_INCLUDE_DIRS NAMES csv.h)
-find_library(LIBCSV_LIBRARIES NAMES csv)
+# Check if libcsv was found
 if(LIBCSV_INCLUDE_DIRS AND LIBCSV_LIBRARIES)
     set(LIBCSV_FOUND TRUE)
     message(STATUS "Found libcsv: ${LIBCSV_LIBRARIES}")
     include(FindPackageHandleStandardArgs)
     find_package_handle_standard_args(LIBCSV DEFAULT_MSG LIBCSV_LIBRARIES LIBCSV_INCLUDE_DIRS)
 else()
-    message(WARNING "libcsv not found - will attempt to build from source or may fail")
+    message(WARNING "libcsv not found - build may fail")
     set(LIBCSV_FOUND FALSE)
 endif()
 
@@ -74,4 +92,5 @@ set(CPACK_NSIS_CREATE_ICONS "ON")
 set(CPACK_NSIS_MUI_ICON "${CMAKE_CURRENT_SOURCE_DIR}/gui/icons/app_icon.ico")
 set(CPACK_NSIS_MUI_UNIICON "${CMAKE_CURRENT_SOURCE_DIR}/gui/icons/app_icon.ico")
 
+# Include CPack AFTER all CPACK_* variables are set
 include(CPack)

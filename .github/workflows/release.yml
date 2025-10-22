@@ -81,18 +81,6 @@ jobs:
           NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED: "false"
 
-
-      - name: Install libcsv from source (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          git clone https://github.com/rgamble/libcsv.git
-          cd libcsv
-          ./configure
-          make
-          make install PREFIX="$pwd\..\libcsv-install"
-        continue-on-error: true
-
       - name: Setup Homebrew
         if: runner.os == 'macOS'
         run: |
@@ -190,25 +178,14 @@ jobs:
         run: |
           $vcpkgRoot = Join-Path $pwd "vcpkg"
           $version = "${{ steps.get_version.outputs.version }}"
-          $libcsvInstall = Join-Path $pwd "libcsv-install"
 
-          $cmakeArgs = @(
-            "-B", "build",
-            "-DCMAKE_BUILD_TYPE=Release",
-            "-DCPACK_PACKAGE_VERSION=$version",
-            "-DPROJECT_VERSION=$version",
-            "-DCPACK_GENERATOR=${{ matrix.cpack_generator }}",
-            "-DCMAKE_TOOLCHAIN_FILE=$vcpkgRoot\scripts\buildsystems\vcpkg.cmake",
-            "-DVCPKG_TARGET_TRIPLET=x64-windows"
-          )
-
-          # Add libcsv paths if it was built
-          if (Test-Path $libcsvInstall) {
-            $cmakeArgs += "-DLIBCSV_INCLUDE_DIRS=$libcsvInstall\include"
-            $cmakeArgs += "-DLIBCSV_LIBRARIES=$libcsvInstall\lib\csv.lib"
-          }
-
-          & cmake @cmakeArgs
+          cmake -B build `
+            -DCMAKE_BUILD_TYPE=Release `
+            -DCPACK_PACKAGE_VERSION="$version" `
+            -DPROJECT_VERSION="$version" `
+            -DCPACK_GENERATOR="${{ matrix.cpack_generator }}" `
+            -DCMAKE_TOOLCHAIN_FILE="$vcpkgRoot\scripts\buildsystems\vcpkg.cmake" `
+            -DVCPKG_TARGET_TRIPLET=x64-windows
 
       - name: Build
         run: cmake --build build --config Release
