@@ -209,9 +209,38 @@ jobs:
 
       - name: Package
         working-directory: build
+        id: package
         run: cpack -G ${{ matrix.cpack_generator }}
+        continue-on-error: true
+
+      - name: Display NSIS log on failure (Windows)
+        if: runner.os == 'Windows' && steps.package.outcome == 'failure'
+        shell: pwsh
+        run: |
+          Write-Host "=== NSIS Output Log ==="
+          if (Test-Path "build/_CPack_Packages/win64/NSIS/NSISOutput.log") {
+            Get-Content "build/_CPack_Packages/win64/NSIS/NSISOutput.log"
+          } else {
+            Write-Host "NSISOutput.log not found"
+            Write-Host "`n=== Available files in _CPack_Packages ==="
+            if (Test-Path "build/_CPack_Packages") {
+              Get-ChildItem "build/_CPack_Packages" -Recurse | Select-Object FullName
+            }
+          }
+          
+          Write-Host "`n=== Checking build output directory ==="
+          if (Test-Path "build/Release") {
+            Get-ChildItem "build/Release" -Recurse | Select-Object FullName
+          }
+          
+          Write-Host "`n=== Checking for executables ==="
+          Get-ChildItem "build" -Recurse -Filter "*.exe" | Select-Object FullName
+          
+          # Re-throw the error to fail the job
+          exit 1
 
       - name: Upload artifact
+        if: steps.package.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
