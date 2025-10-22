@@ -90,7 +90,7 @@ jobs:
           $vsPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" `
             -latest -products * -requires Microsoft.Component.MSBuild `
             -property installationPath
-
+          
           if (-not $vsPath) {
             Write-Error "Visual Studio not found"
             exit 1
@@ -114,15 +114,15 @@ jobs:
           New-Item -ItemType Directory -Force -Path "$installDir\include" | Out-Null
           New-Item -ItemType Directory -Force -Path "$installDir\lib" | Out-Null
 
-          # Compile csv.c
-          cl.exe /c /O2 /MD /DLIBCSV_EXPORTS csv.c
+          # Compile libcsv.c (not csv.c)
+          cl.exe /c /O2 /MD /DLIBCSV_EXPORTS libcsv.c
           if ($LASTEXITCODE -ne 0) {
-            Write-Error "Failed to compile csv.c"
+            Write-Error "Failed to compile libcsv.c"
             exit 1
           }
 
           # Create static library
-          lib.exe /OUT:csv.lib csv.obj
+          lib.exe /OUT:csv.lib libcsv.obj
           if ($LASTEXITCODE -ne 0) {
             Write-Error "Failed to create csv.lib"
             exit 1
@@ -176,16 +176,10 @@ jobs:
           git clone https://github.com/rgamble/libcsv.git
           cd libcsv
 
-          # Compile csv.c
-          gcc -c -O2 -fPIC -DLIBCSV_EXPORTS csv.c -o csv.o
-
-          # Create static library
-          ar rcs libcsv.a csv.o
-
-          # Install files
-          sudo mkdir -p /usr/local/include /usr/local/lib
-          sudo cp csv.h /usr/local/include/
-          sudo cp libcsv.a /usr/local/lib/
+          # Use autotools to build
+          ./configure --prefix=/usr/local
+          make
+          sudo make install
 
           # Verify installation
           if [ ! -f /usr/local/lib/libcsv.a ] || [ ! -f /usr/local/include/csv.h ]; then
@@ -215,7 +209,7 @@ jobs:
 
           # Get Homebrew prefix (handles both Intel and Apple Silicon)
           BREW_PREFIX=$(brew --prefix)
-
+          
           # Set up library paths
           export SQLCIPHER_INC="${BREW_PREFIX}/opt/sqlcipher/include"
           export SODIUM_INC="${BREW_PREFIX}/opt/libsodium/include"
