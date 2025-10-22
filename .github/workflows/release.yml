@@ -68,7 +68,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: '${{ github.workspace }}/vcpkg/installed'
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}-v3  # Updated key to invalidate cache
 
       - name: Setup vcpkg and install dependencies
         if: runner.os == 'Windows'
@@ -80,6 +80,26 @@ jobs:
           VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/${{ github.repository_owner }},readwrite"
           NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED: "false"
+
+      - name: List vcpkg installed packages
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Write-Host "Listing installed vcpkg packages:"
+          & "${{ github.workspace }}/vcpkg/vcpkg.exe" list
+
+      - name: Debug vcpkg installed directory
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Write-Host "Listing contents of vcpkg/installed/x64-windows"
+          dir "${{ github.workspace }}/vcpkg/installed/x64-windows" -Recurse
+          Write-Host "Checking for getopt-win32 CMake config files"
+          dir "${{ github.workspace }}/vcpkg/installed/x64-windows/share/getopt-win32" -Recurse
+          Write-Host "Checking for libcsv CMake config files and libraries"
+          dir "${{ github.workspace }}/vcpkg/installed/x64-windows/share/libcsv" -Recurse
+          dir "${{ github.workspace }}/vcpkg/installed/x64-windows/lib" -Include "*csv*" -Recurse
+          dir "${{ github.workspace }}/vcpkg/installed/x64-windows/include" -Include "*csv*" -Recurse
 
       - name: Setup Homebrew
         if: runner.os == 'macOS'
@@ -178,14 +198,14 @@ jobs:
         run: |
           $vcpkgRoot = Join-Path $pwd "vcpkg"
           $version = "${{ steps.get_version.outputs.version }}"
-
           cmake -B build `
             -DCMAKE_BUILD_TYPE=Release `
             -DCPACK_PACKAGE_VERSION="$version" `
             -DPROJECT_VERSION="$version" `
             -DCPACK_GENERATOR="${{ matrix.cpack_generator }}" `
             -DCMAKE_TOOLCHAIN_FILE="$vcpkgRoot\scripts\buildsystems\vcpkg.cmake" `
-            -DVCPKG_TARGET_TRIPLET=x64-windows
+            -DVCPKG_TARGET_TRIPLET=x64-windows `
+            -DCMAKE_PREFIX_PATH="$vcpkgRoot/installed/x64-windows"
 
       - name: Build
         run: cmake --build build --config Release
