@@ -12,6 +12,18 @@
 #include <conio.h> // For _getch
 #include <windows.h> // For console functions
 
+// Windows-specific strndup implementation
+static char* strndup(const char* s, size_t n) {
+    size_t len = strnlen(s, n);
+    char* result = (char*)malloc(len + 1);
+    if (result) {
+        memcpy(result, s, len);
+        result[len] = '\0';
+    }
+    return result;
+}
+
+
 // Windows-specific getpass implementation
 char *getpass(const char *prompt) {
     static char password[128]; // Buffer for password

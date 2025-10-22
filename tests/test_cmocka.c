@@ -6,6 +6,7 @@
 #else
 #include <io.h> // For _access
 #define access _access
+#define F_OK 0
 #endif
 #include <string.h>
 #include "core/key_derivation.h"
