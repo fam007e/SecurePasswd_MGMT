@@ -3,7 +3,7 @@ name: Release SecurePasswd_MGMT
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - "v*.*.*"
 
 jobs:
   build:
@@ -67,19 +67,28 @@ jobs:
         if: runner.os == 'Windows'
         uses: actions/cache@v4
         with:
-          path: '${{ github.workspace }}/vcpkg/installed'
-          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}-v3  # Updated key to invalidate cache
+          path: |
+            ${{ github.workspace }}/vcpkg
+            !${{ github.workspace }}/vcpkg/buildtrees
+            !${{ github.workspace }}/vcpkg/packages
+            !${{ github.workspace }}/vcpkg/downloads
+          key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}-v4
 
-      - name: Setup vcpkg and install dependencies
+      - name: Setup vcpkg
         if: runner.os == 'Windows'
-        uses: lukka/run-vcpkg@v11
-        with:
-          vcpkgDirectory: '${{ github.workspace }}/vcpkg'
-          runVcpkgInstall: true
-        env:
-          VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/${{ github.repository_owner }},readwrite"
-          NUGET_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NUGET_CREDENTIALPROVIDER_SESSIONTOKENCACHE_ENABLED: "false"
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "${{ github.workspace }}/vcpkg")) {
+            git clone https://github.com/microsoft/vcpkg.git "${{ github.workspace }}/vcpkg"
+            & "${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat" -disableMetrics
+          }
+
+      - name: Install vcpkg dependencies
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $vcpkgRoot = "${{ github.workspace }}/vcpkg"
+          & "$vcpkgRoot/vcpkg.exe" install --triplet x64-windows --clean-after-build
 
       - name: List vcpkg installed packages
         if: runner.os == 'Windows'
@@ -92,14 +101,41 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          Write-Host "Listing contents of vcpkg/installed/x64-windows"
-          dir "${{ github.workspace }}/vcpkg/installed/x64-windows" -Recurse
-          Write-Host "Checking for getopt-win32 CMake config files"
-          dir "${{ github.workspace }}/vcpkg/installed/x64-windows/share/getopt-win32" -Recurse
-          Write-Host "Checking for libcsv CMake config files and libraries"
-          dir "${{ github.workspace }}/vcpkg/installed/x64-windows/share/libcsv" -Recurse
-          dir "${{ github.workspace }}/vcpkg/installed/x64-windows/lib" -Include "*csv*" -Recurse
-          dir "${{ github.workspace }}/vcpkg/installed/x64-windows/include" -Include "*csv*" -Recurse
+          Write-Host "=== Listing contents of vcpkg/installed/x64-windows ==="
+          if (Test-Path "${{ github.workspace }}/vcpkg/installed/x64-windows") {
+            dir "${{ github.workspace }}/vcpkg/installed/x64-windows" -Name
+          } else {
+            Write-Host "ERROR: vcpkg/installed/x64-windows does not exist!"
+          }
+
+          Write-Host "`n=== Checking for getopt-win32 ==="
+          if (Test-Path "${{ github.workspace }}/vcpkg/installed/x64-windows/share/getopt-win32") {
+            dir "${{ github.workspace }}/vcpkg/installed/x64-windows/share/getopt-win32" -Recurse -Name
+          } else {
+            Write-Host "WARNING: getopt-win32 not found in share directory"
+          }
+
+          Write-Host "`n=== Checking for libcsv ==="
+          if (Test-Path "${{ github.workspace }}/vcpkg/installed/x64-windows/share/libcsv") {
+            dir "${{ github.workspace }}/vcpkg/installed/x64-windows/share/libcsv" -Recurse -Name
+          } else {
+            Write-Host "WARNING: libcsv not found in share directory"
+          }
+
+          Write-Host "`n=== Checking lib directory for csv libraries ==="
+          if (Test-Path "${{ github.workspace }}/vcpkg/installed/x64-windows/lib") {
+            Get-ChildItem "${{ github.workspace }}/vcpkg/installed/x64-windows/lib" -Filter "*csv*" -Recurse -Name
+          }
+
+          Write-Host "`n=== Checking include directory for csv headers ==="
+          if (Test-Path "${{ github.workspace }}/vcpkg/installed/x64-windows/include") {
+            Get-ChildItem "${{ github.workspace }}/vcpkg/installed/x64-windows/include" -Filter "*csv*" -Recurse -Name
+          }
+
+          Write-Host "`n=== Checking for getopt headers ==="
+          if (Test-Path "${{ github.workspace }}/vcpkg/installed/x64-windows/include") {
+            Get-ChildItem "${{ github.workspace }}/vcpkg/installed/x64-windows/include" -Filter "*getopt*" -Recurse -Name
+          }
 
       - name: Setup Homebrew
         if: runner.os == 'macOS'
@@ -196,8 +232,14 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $vcpkgRoot = Join-Path $pwd "vcpkg"
+          $vcpkgRoot = "${{ github.workspace }}/vcpkg"
           $version = "${{ steps.get_version.outputs.version }}"
+
+          Write-Host "=== CMake Configuration ==="
+          Write-Host "vcpkg root: $vcpkgRoot"
+          Write-Host "vcpkg toolchain: $vcpkgRoot\scripts\buildsystems\vcpkg.cmake"
+          Write-Host "Version: $version"
+
           cmake -B build `
             -DCMAKE_BUILD_TYPE=Release `
             -DCPACK_PACKAGE_VERSION="$version" `
@@ -205,7 +247,9 @@ jobs:
             -DCPACK_GENERATOR="${{ matrix.cpack_generator }}" `
             -DCMAKE_TOOLCHAIN_FILE="$vcpkgRoot\scripts\buildsystems\vcpkg.cmake" `
             -DVCPKG_TARGET_TRIPLET=x64-windows `
-            -DCMAKE_PREFIX_PATH="$vcpkgRoot/installed/x64-windows"
+            -DCMAKE_PREFIX_PATH="$vcpkgRoot/installed/x64-windows" `
+            -DVCPKG_INSTALLED_DIR="$vcpkgRoot/installed" `
+            --trace-source=CMakeLists.txt
 
       - name: Build
         run: cmake --build build --config Release
