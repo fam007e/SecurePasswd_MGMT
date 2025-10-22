@@ -204,31 +204,6 @@ jobs:
             -DCMAKE_TOOLCHAIN_FILE="$vcpkgRoot\scripts\buildsystems\vcpkg.cmake" `
             -DVCPKG_TARGET_TRIPLET=x64-windows
 
-      - name: Verify CMake configuration (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          Write-Host "=== Verifying package detection after CMake configure ==="
-          if (Test-Path "${{ github.workspace }}/vcpkg/installed/x64-windows") {
-            Write-Host "✓ vcpkg installed directory exists"
-
-            Write-Host "`nChecking for getopt:"
-            if (Test-Path "${{ github.workspace }}/vcpkg/installed/x64-windows/include/getopt.h") {
-              Write-Host "✓ getopt.h found"
-            }
-            if (Test-Path "${{ github.workspace }}/vcpkg/installed/x64-windows/lib/getopt.lib") {
-              Write-Host "✓ getopt.lib found"
-            }
-
-            Write-Host "`nChecking for libcsv:"
-            if (Test-Path "${{ github.workspace }}/vcpkg/installed/x64-windows/include/csv.h") {
-              Write-Host "✓ csv.h found"
-            }
-            Get-ChildItem "${{ github.workspace }}/vcpkg/installed/x64-windows/lib" -Filter "*csv*" | ForEach-Object { Write-Host "✓ Found: $($_.Name)" }
-          } else {
-            Write-Host "⚠ vcpkg installed directory does not exist yet"
-          }
-
       - name: Build
         run: cmake --build build --config Release
 
