@@ -28,7 +28,7 @@ if(WIN32)
     # Set variables to match pkg-config naming convention for cross-platform compatibility
     set(LIBSODIUM_LIBRARIES unofficial-sodium::sodium)
     set(LIBSODIUM_INCLUDE_DIRS "")  # Handled by target
-    set(ARGON2_LIBRARIES unofficial-argon2::argon2)
+    set(ARGON2_LIBRARIES unofficial::argon2::libargon2)
     set(ARGON2_INCLUDE_DIRS "")  # Handled by target
     set(SQLCIPHER_LIBRARIES sqlcipher::sqlcipher)
     set(SQLCIPHER_INCLUDE_DIRS "")  # Handled by target

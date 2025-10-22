@@ -13,7 +13,7 @@
     {
       "name": "qtbase",
       "default-features": false,
-      "features": ["widgets"]
+      "features": ["widgets", "concurrent"]
     }
   ],
   "builtin-baseline": "faf665cf8aca288b636d9de887f5cdfa3cff1a9e"
