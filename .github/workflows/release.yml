@@ -90,6 +90,14 @@ jobs:
           $vcpkgRoot = "${{ github.workspace }}/vcpkg"
           & "$vcpkgRoot/vcpkg.exe" install --triplet x64-windows --clean-after-build
 
+      - name: Install NSIS
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          choco install nsis -y
+          # Refresh environment to pick up NSIS in PATH
+          $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
       - name: Setup Homebrew
         if: runner.os == 'macOS'
         run: |
