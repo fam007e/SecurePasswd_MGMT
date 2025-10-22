@@ -90,53 +90,6 @@ jobs:
           $vcpkgRoot = "${{ github.workspace }}/vcpkg"
           & "$vcpkgRoot/vcpkg.exe" install --triplet x64-windows --clean-after-build
 
-      - name: List vcpkg installed packages
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          Write-Host "Listing installed vcpkg packages:"
-          & "${{ github.workspace }}/vcpkg/vcpkg.exe" list
-
-      - name: Debug vcpkg installed directory
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          Write-Host "=== Listing contents of vcpkg/installed/x64-windows ==="
-          if (Test-Path "${{ github.workspace }}/vcpkg/installed/x64-windows") {
-            dir "${{ github.workspace }}/vcpkg/installed/x64-windows" -Name
-          } else {
-            Write-Host "ERROR: vcpkg/installed/x64-windows does not exist!"
-          }
-
-          Write-Host "`n=== Checking for getopt-win32 ==="
-          if (Test-Path "${{ github.workspace }}/vcpkg/installed/x64-windows/share/getopt-win32") {
-            dir "${{ github.workspace }}/vcpkg/installed/x64-windows/share/getopt-win32" -Recurse -Name
-          } else {
-            Write-Host "WARNING: getopt-win32 not found in share directory"
-          }
-
-          Write-Host "`n=== Checking for libcsv ==="
-          if (Test-Path "${{ github.workspace }}/vcpkg/installed/x64-windows/share/libcsv") {
-            dir "${{ github.workspace }}/vcpkg/installed/x64-windows/share/libcsv" -Recurse -Name
-          } else {
-            Write-Host "WARNING: libcsv not found in share directory"
-          }
-
-          Write-Host "`n=== Checking lib directory for csv libraries ==="
-          if (Test-Path "${{ github.workspace }}/vcpkg/installed/x64-windows/lib") {
-            Get-ChildItem "${{ github.workspace }}/vcpkg/installed/x64-windows/lib" -Filter "*csv*" -Recurse -Name
-          }
-
-          Write-Host "`n=== Checking include directory for csv headers ==="
-          if (Test-Path "${{ github.workspace }}/vcpkg/installed/x64-windows/include") {
-            Get-ChildItem "${{ github.workspace }}/vcpkg/installed/x64-windows/include" -Filter "*csv*" -Recurse -Name
-          }
-
-          Write-Host "`n=== Checking for getopt headers ==="
-          if (Test-Path "${{ github.workspace }}/vcpkg/installed/x64-windows/include") {
-            Get-ChildItem "${{ github.workspace }}/vcpkg/installed/x64-windows/include" -Filter "*getopt*" -Recurse -Name
-          }
-
       - name: Setup Homebrew
         if: runner.os == 'macOS'
         run: |
@@ -235,21 +188,38 @@ jobs:
           $vcpkgRoot = "${{ github.workspace }}/vcpkg"
           $version = "${{ steps.get_version.outputs.version }}"
 
-          Write-Host "=== CMake Configuration ==="
-          Write-Host "vcpkg root: $vcpkgRoot"
-          Write-Host "vcpkg toolchain: $vcpkgRoot\scripts\buildsystems\vcpkg.cmake"
-          Write-Host "Version: $version"
-
           cmake -B build `
             -DCMAKE_BUILD_TYPE=Release `
             -DCPACK_PACKAGE_VERSION="$version" `
             -DPROJECT_VERSION="$version" `
             -DCPACK_GENERATOR="${{ matrix.cpack_generator }}" `
             -DCMAKE_TOOLCHAIN_FILE="$vcpkgRoot\scripts\buildsystems\vcpkg.cmake" `
-            -DVCPKG_TARGET_TRIPLET=x64-windows `
-            -DCMAKE_PREFIX_PATH="$vcpkgRoot/installed/x64-windows" `
-            -DVCPKG_INSTALLED_DIR="$vcpkgRoot/installed" `
-            --trace-source=CMakeLists.txt
+            -DVCPKG_TARGET_TRIPLET=x64-windows
+
+      - name: Verify CMake configuration (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Write-Host "=== Verifying package detection after CMake configure ==="
+          if (Test-Path "${{ github.workspace }}/vcpkg/installed/x64-windows") {
+            Write-Host "✓ vcpkg installed directory exists"
+
+            Write-Host "`nChecking for getopt:"
+            if (Test-Path "${{ github.workspace }}/vcpkg/installed/x64-windows/include/getopt.h") {
+              Write-Host "✓ getopt.h found"
+            }
+            if (Test-Path "${{ github.workspace }}/vcpkg/installed/x64-windows/lib/getopt.lib") {
+              Write-Host "✓ getopt.lib found"
+            }
+
+            Write-Host "`nChecking for libcsv:"
+            if (Test-Path "${{ github.workspace }}/vcpkg/installed/x64-windows/include/csv.h") {
+              Write-Host "✓ csv.h found"
+            }
+            Get-ChildItem "${{ github.workspace }}/vcpkg/installed/x64-windows/lib" -Filter "*csv*" | ForEach-Object { Write-Host "✓ Found: $($_.Name)" }
+          } else {
+            Write-Host "⚠ vcpkg installed directory does not exist yet"
+          }
 
       - name: Build
         run: cmake --build build --config Release

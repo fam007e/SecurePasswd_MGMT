@@ -22,5 +22,5 @@ target_link_libraries(securepasswd_cli PRIVATE
 
 # Windows-specific: link getopt
 if(WIN32)
-    target_link_libraries(securepasswd_cli PRIVATE getopt-win32::getopt-win32)
+    target_link_libraries(securepasswd_cli PRIVATE ${GETOPT_LIBRARY})
 endif()

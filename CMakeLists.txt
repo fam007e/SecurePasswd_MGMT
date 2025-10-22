@@ -7,24 +7,24 @@ if(WIN32)
     # vcpkg on Windows uses unofficial- prefix for some packages
     find_package(unofficial-sodium CONFIG REQUIRED)
     find_package(unofficial-argon2 CONFIG REQUIRED)
-    
+
     # SQLCipher from vcpkg uses sqlcipher (not unofficial-sqlcipher)
     find_package(sqlcipher CONFIG REQUIRED)
-    
-    find_package(getopt-win32 CONFIG REQUIRED)
-    
-    # Try to find libcsv from vcpkg
-    find_package(libcsv CONFIG)
-    if(libcsv_FOUND)
-        set(LIBCSV_LIBRARIES libcsv::csv)
-        set(LIBCSV_INCLUDE_DIRS "")  # Handled by target
-        set(LIBCSV_FOUND TRUE)
+
+    # getopt-win32 doesn't provide CMake config files, use manual search
+    find_path(GETOPT_INCLUDE_DIR NAMES getopt.h)
+    find_library(GETOPT_LIBRARY NAMES getopt)
+    if(GETOPT_INCLUDE_DIR AND GETOPT_LIBRARY)
+        message(STATUS "Found getopt-win32: ${GETOPT_LIBRARY}")
+        include_directories(${GETOPT_INCLUDE_DIR})
     else()
-        # Fallback to manual search if not found via vcpkg
-        find_path(LIBCSV_INCLUDE_DIRS NAMES csv.h)
-        find_library(LIBCSV_LIBRARIES NAMES csv)
+        message(FATAL_ERROR "getopt-win32 not found")
     endif()
-    
+
+    # libcsv doesn't provide CMake config files in vcpkg, use manual search
+    find_path(LIBCSV_INCLUDE_DIRS NAMES csv.h)
+    find_library(LIBCSV_LIBRARIES NAMES csv libcsv)
+
     # Set variables to match pkg-config naming convention for cross-platform compatibility
     set(LIBSODIUM_LIBRARIES unofficial-sodium::sodium)
     set(LIBSODIUM_INCLUDE_DIRS "")  # Handled by target
@@ -38,7 +38,7 @@ else()
     pkg_check_modules(LIBSODIUM REQUIRED libsodium)
     pkg_check_modules(ARGON2 REQUIRED libargon2)
     pkg_check_modules(SQLCIPHER REQUIRED sqlcipher)
-    
+
     # Find libcsv
     find_path(LIBCSV_INCLUDE_DIRS NAMES csv.h)
     find_library(LIBCSV_LIBRARIES NAMES csv)
