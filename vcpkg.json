@@ -12,7 +12,8 @@
     "getopt-win32",
     {
       "name": "qtbase",
-      "default-features": false
+      "default-features": false,
+      "features": ["widgets"]
     }
   ],
   "builtin-baseline": "faf665cf8aca288b636d9de887f5cdfa3cff1a9e"
