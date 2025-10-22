@@ -271,6 +271,8 @@ jobs:
         run: |
           git clone https://github.com/rgamble/libcsv.git
           cd libcsv
+          # Prevent regeneration of build files by touching them
+          touch aclocal.m4 Makefile.in configure
           ./configure
           make
           make check
