@@ -19,12 +19,20 @@ int main(int argc, char *argv[]) {
         }
 
         // Key is derived, now we can show the main window
-        MainWindow window(password);
-        window.show();
+        MainWindow *window = new MainWindow(password);
+        
+        // Check if database was opened successfully
+        if (!window->isDatabaseOpen()) {
+            // Database failed to open, error already shown and quit scheduled
+            delete window;
+            return app.exec();
+        }
+        
+        // Set window to delete on close to avoid manual deletion
+        window->setAttribute(Qt::WA_DeleteOnClose);
+        window->show();
 
-        int result = app.exec();
-
-        return result;
+        return app.exec();
 
     } else {
         // User cancelled the dialog

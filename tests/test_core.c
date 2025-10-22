@@ -53,9 +53,17 @@ void test_database_lifecycle() {
     assert(count == 0);
     printf("  [PASSED] database_delete_entry\n");
 
+    // 6. Test deleting non-existent entry (should fail)
+    assert(database_delete_entry(9999) != 0);
+    printf("  [PASSED] database_delete_entry fails for non-existent entry\n");
+
+    // 7. Test deleting already-deleted entry (should fail)
+    assert(database_delete_entry(new_id) != 0);
+    printf("  [PASSED] database_delete_entry fails for already-deleted entry\n");
+
     database_close();
 
-    // 6. Test opening with wrong key
+    // 8. Test opening with wrong key
     assert(database_open(TEST_DB, "wrong_password") != 0);
     printf("  [PASSED] database_open with incorrect key fails\n");
 

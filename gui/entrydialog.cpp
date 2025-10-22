@@ -38,7 +38,7 @@ EntryDialog::EntryDialog(QWidget *parent)
     formLayout->addWidget(buttonBox);
 
     connect(generateButton, &QPushButton::clicked, this, &EntryDialog::onGenerateClicked);
-    connect(buttonBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
+    connect(buttonBox, &QDialogButtonBox::accepted, this, &EntryDialog::onAccepted);
     connect(buttonBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
 }
 
@@ -55,6 +55,29 @@ void EntryDialog::onGenerateClicked()
             free(password);
         }
     }
+}
+
+void EntryDialog::onAccepted()
+{
+    // Validate required fields
+    if (serviceEdit->text().trimmed().isEmpty()) {
+        QMessageBox::warning(this, "Validation Error", "Service name is required.");
+        return;
+    }
+
+    if (usernameEdit->text().trimmed().isEmpty()) {
+        QMessageBox::warning(this, "Validation Error", "Username is required.");
+        return;
+    }
+
+    // At least password or TOTP must be provided
+    if (passwordEdit->text().isEmpty() && totpSecretEdit->text().trimmed().isEmpty()) {
+        QMessageBox::warning(this, "Validation Error", "At least a password or TOTP secret must be provided.");
+        return;
+    }
+
+    // Validation passed
+    accept();
 }
 
 QString EntryDialog::getService() const

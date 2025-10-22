@@ -9,7 +9,6 @@ endif()
 project(SecurePasswd_MGMT VERSION ${PROJECT_VERSION} LANGUAGES C CXX)
 set(CMAKE_C_STANDARD 11)
 
-
 # Handle vcpkg vs system packages
 if(WIN32)
     # vcpkg on Windows uses unofficial- prefix for some packages
@@ -93,7 +92,6 @@ set(CPACK_PACKAGE_CONTACT "fam007e <faisalmoshiur+secpasswdmgmt@gmail.com>")
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "fam007e")
 set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
 set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
-
 set(CPACK_RPM_PACKAGE_GROUP "Utilities")
 set(CPACK_NSIS_PACKAGE_NAME "${PROJECT_NAME} ${CPACK_PACKAGE_VERSION}")
 set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")

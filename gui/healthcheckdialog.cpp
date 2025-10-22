@@ -56,11 +56,11 @@ void HealthCheckDialog::runLocalChecks()
         }
     }
 
-    // Check for weak passwords
+    // Check for weak passwords (less than 16 characters for high security)
     for (const auto &entry : m_entries) {
         const QString &password = entry.password;
-        if (password.length() > 0 && password.length() < 12) {
-            addIssue("Weak Passwords", entry.service, "Password is too short (less than 12 characters).");
+        if (password.length() > 0 && password.length() < 16) {
+            addIssue("Short Passwords", entry.service, QString("Password is only %1 characters (recommended: 16+ for high security).").arg(password.length()));
         }
 
         bool hasUpper = false, hasLower = false, hasNumber = false, hasSpecial = false;
@@ -72,7 +72,12 @@ void HealthCheckDialog::runLocalChecks()
         }
 
         if (password.length() > 0 && (!hasUpper || !hasLower || !hasNumber || !hasSpecial)) {
-            addIssue("Low Entropy", entry.service, "Does not contain all character types (upper, lower, number, special).");
+            QStringList missing;
+            if (!hasUpper) missing << "uppercase";
+            if (!hasLower) missing << "lowercase";
+            if (!hasNumber) missing << "numbers";
+            if (!hasSpecial) missing << "symbols";
+            addIssue("Low Entropy", entry.service, QString("Missing: %1").arg(missing.join(", ")));
         }
     }
     treeWidget->expandAll();

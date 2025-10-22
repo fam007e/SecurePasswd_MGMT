@@ -427,19 +427,95 @@ void cli_health_check() {
         return;
     }
 
-    printf("\n--- Weak Passwords (less than 12 characters) ---\n");
-    bool weak_found = false;
+    // Check for short passwords (less than 16 characters for high security)
+    printf("\n--- Short Passwords (less than 16 characters) ---\n");
+    bool short_found = false;
     for (int i = 0; i < count; i++) {
-        if (strlen(entries[i].password) < 12) {
-            printf("  [ID %d] %s - %s\n", entries[i].id, entries[i].service, entries[i].username);
-            weak_found = true;
+        size_t len = strlen(entries[i].password);
+        if (len < 16) {
+            printf("  [ID %d] %s - %s: Password is only %zu characters (recommended: 16+)\n", 
+                   entries[i].id, entries[i].service, entries[i].username, len);
+            short_found = true;
         }
     }
-    if (!weak_found) {
-        printf("No weak passwords found.\n");
+    if (!short_found) {
+        printf("No short passwords found.\n");
     }
 
-    // TODO: Implement reused password check.
+    // Check for low entropy passwords (missing character types)
+    printf("\n--- Low Entropy Passwords (missing character types) ---\n");
+    bool low_entropy_found = false;
+    for (int i = 0; i < count; i++) {
+        const char *pwd = entries[i].password;
+        bool has_upper = false, has_lower = false, has_digit = false, has_special = false;
+        
+        for (size_t j = 0; j < strlen(pwd); j++) {
+            if (pwd[j] >= 'A' && pwd[j] <= 'Z') has_upper = true;
+            else if (pwd[j] >= 'a' && pwd[j] <= 'z') has_lower = true;
+            else if (pwd[j] >= '0' && pwd[j] <= '9') has_digit = true;
+            else has_special = true;
+        }
+        
+        if (!has_upper || !has_lower || !has_digit || !has_special) {
+            printf("  [ID %d] %s - %s: Missing ", entries[i].id, entries[i].service, entries[i].username);
+            bool first = true;
+            if (!has_upper) { printf("uppercase"); first = false; }
+            if (!has_lower) { printf("%slowercase", first ? "" : ", "); first = false; }
+            if (!has_digit) { printf("%snumbers", first ? "" : ", "); first = false; }
+            if (!has_special) { printf("%ssymbols", first ? "" : ", "); }
+            printf("\n");
+            low_entropy_found = true;
+        }
+    }
+    if (!low_entropy_found) {
+        printf("All passwords have good character variety.\n");
+    }
+
+    // Check for reused passwords
+    printf("\n--- Reused Passwords ---\n");
+    bool reused_found = false;
+    for (int i = 0; i < count; i++) {
+        int reuse_count = 0;
+        int reused_ids[256];  // Store IDs of entries with same password
+        
+        for (int j = 0; j < count; j++) {
+            if (i != j && strcmp(entries[i].password, entries[j].password) == 0) {
+                if (reuse_count == 0) {
+                    reused_ids[reuse_count++] = entries[i].id;
+                }
+                reused_ids[reuse_count++] = entries[j].id;
+            }
+        }
+        
+        if (reuse_count > 0) {
+            // Only print once per unique password (check if this is the first occurrence)
+            bool is_first = true;
+            for (int k = 0; k < i; k++) {
+                if (strcmp(entries[i].password, entries[k].password) == 0) {
+                    is_first = false;
+                    break;
+                }
+            }
+            
+            if (is_first) {
+                printf("  Password reused across %d services: ", reuse_count);
+                for (int k = 0; k < reuse_count; k++) {
+                    for (int m = 0; m < count; m++) {
+                        if (entries[m].id == reused_ids[k]) {
+                            printf("[ID %d] %s", reused_ids[k], entries[m].service);
+                            if (k < reuse_count - 1) printf(", ");
+                            break;
+                        }
+                    }
+                }
+                printf("\n");
+                reused_found = true;
+            }
+        }
+    }
+    if (!reused_found) {
+        printf("No reused passwords found.\n");
+    }
 
     printf("\n--- Pwned Passwords (checking via HIBP API) ---\n");
     bool pwned_found = false;

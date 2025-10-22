@@ -271,9 +271,14 @@ jobs:
         run: |
           git clone https://github.com/rgamble/libcsv.git
           cd libcsv
+          ./configure
           make
+          make check
           make install
-        continue-on-error: true
+          # Update library cache and verify installation
+          ldconfig
+          ls -la /usr/local/lib/libcsv* || true
+          ls -la /usr/local/include/csv.h || true
 
       - name: Extract source tarball
         run: |
@@ -291,7 +296,7 @@ jobs:
           arch=('x86_64')
           url="https://github.com/fam007e/SecurePasswd_MGMT"
           license=('MIT')
-          depends=('libsodium' 'argon2' 'sqlcipher' 'qt6-base' 'libcsv' 'openssl' 'curl')
+          depends=('libsodium' 'argon2' 'sqlcipher' 'qt6-base' 'openssl' 'curl')
           makedepends=('cmake' 'gcc')
           source=("\$pkgname-\$pkgver.tar.gz")
           sha256sums=("$sha256")
@@ -300,13 +305,21 @@ jobs:
               cd "\$srcdir/SecurePasswd_MGMT"
               mkdir -p build
               cd build
-              cmake .. -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_BUILD_TYPE=Release
+              cmake .. \\
+                -DCMAKE_INSTALL_PREFIX=/usr \\
+                -DCMAKE_BUILD_TYPE=Release \\
+                -DPROJECT_VERSION=${{ steps.get_version.outputs.version }} \\
+                -DLIBCSV_INCLUDE_DIRS=/usr/local/include \\
+                -DLIBCSV_LIBRARIES=/usr/local/lib/libcsv.a
               make
           }
 
           package() {
               cd "\$srcdir/SecurePasswd_MGMT/build"
               make DESTDIR="\$pkgdir/" install
+              # Bundle libcsv since it is not in official Arch repositories
+              install -Dm644 /usr/local/lib/libcsv.a "\$pkgdir/usr/lib/libcsv.a"
+              install -Dm644 /usr/local/include/csv.h "\$pkgdir/usr/include/csv.h"
           }
           EOF
 
@@ -314,6 +327,11 @@ jobs:
         run: |
           # Create a non-root user for makepkg
           useradd -m builder
+          
+          # Configure sudo to allow builder user to run pacman without password prompt
+          echo "builder ALL=(ALL) NOPASSWD: /usr/bin/pacman" >> /etc/sudoers
+          
+          # Give ownership to builder user
           chown -R builder:builder .
 
           # Build as the builder user

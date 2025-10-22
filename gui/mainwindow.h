@@ -22,6 +22,8 @@ class MainWindow : public QMainWindow {
 public:
     explicit MainWindow(const QString& password, QWidget *parent = nullptr);
     ~MainWindow();
+    
+    bool isDatabaseOpen() const { return m_databaseOpen; }
 
 private slots:
     void onAdd();
@@ -66,6 +68,8 @@ private:
     QLabel *totpLabel;
     QProgressBar *totpProgressBar;
     QTimer *totpTimer;
+    
+    bool m_databaseOpen;
 };
 
 #endif // MAINWINDOW_H

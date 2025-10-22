@@ -5,6 +5,7 @@
 #include <QLineEdit>
 #include <QDialogButtonBox>
 #include <QFormLayout>
+#include <QMessageBox>
 
 #include "passwordentry.h"
 
@@ -26,6 +27,7 @@ public:
 
 private slots:
     void onGenerateClicked();
+    void onAccepted();
 
 private:
     QLineEdit *serviceEdit;

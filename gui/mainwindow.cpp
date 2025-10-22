@@ -57,7 +57,7 @@ void import_row_cb(int c, void *data) {
     fields->clear();
 }
 
-MainWindow::MainWindow(const QString& password, QWidget *parent) : QMainWindow(parent) {
+MainWindow::MainWindow(const QString& password, QWidget *parent) : QMainWindow(parent), m_databaseOpen(false) {
     QString configPath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
     QString dbDirPath = configPath + "/SecurePasswd_MGMT";
     QDir dir(dbDirPath);
@@ -67,9 +67,12 @@ MainWindow::MainWindow(const QString& password, QWidget *parent) : QMainWindow(p
     QString dbPath = dbDirPath + "/vault.db";
 
     if (database_open(dbPath.toUtf8().constData(), password.toUtf8().constData()) != 0) {
-        QMessageBox::critical(this, "Database Error", "Failed to open database. Check master password or file permissions.");
+        QMessageBox::critical(nullptr, "Database Error", "Failed to open database. Check master password or file permissions.\n\nThe application will now exit.");
+        QTimer::singleShot(0, qApp, &QApplication::quit);
+        return;
     }
 
+    m_databaseOpen = true;
     setupUI();
     refreshEntryList();
 
@@ -325,6 +328,17 @@ void MainWindow::setupUI() {
 
     toolBar->addSeparator();
 
+    importAction = new QAction(QIcon(":/icons/import.svg"), "Import", this);
+    toolBar->addAction(importAction);
+
+    exportAction = new QAction(QIcon(":/icons/export.svg"), "Export", this);
+    toolBar->addAction(exportAction);
+
+    healthCheckAction = new QAction(QIcon(":/icons/health-check.svg"), "Health Check", this);
+    toolBar->addAction(healthCheckAction);
+
+    toolBar->addSeparator();
+
     themeAction = new QAction(this);
     toolBar->addAction(themeAction);
 
@@ -353,6 +367,9 @@ void MainWindow::setupUI() {
     connect(copyUsernameAction, &QAction::triggered, this, &MainWindow::onCopyUsername);
     connect(copyPasswordAction, &QAction::triggered, this, &MainWindow::onCopyPassword);
     connect(copyTotpAction, &QAction::triggered, this, &MainWindow::onCopyTotp);
+    connect(importAction, &QAction::triggered, this, &MainWindow::onImport);
+    connect(exportAction, &QAction::triggered, this, &MainWindow::onExport);
+    connect(healthCheckAction, &QAction::triggered, this, &MainWindow::onHealthCheck);
     connect(listWidget, &QListWidget::currentRowChanged, this, &MainWindow::onCurrentRowChanged);
     connect(themeAction, &QAction::triggered, this, &MainWindow::onToggleTheme);
 

@@ -6,6 +6,7 @@
 - [Data Protection](#data-protection)
 - [Memory Management](#memory-management)
 - [File System Security](#file-system-security)
+- [Password Strength Validation](#password-strength-validation)
 - [Reporting Security Vulnerabilities](#reporting-security-vulnerabilities)
 
 ## Security Overview
@@ -71,6 +72,33 @@ The project uses **CMake**, a modern and cross-platform build system generator. 
 
 - **Dependency Management:** CMake's `find_package` and `pkg_check_modules` are used to locate required libraries like Libsodium, Argon2, and SQLCipher, ensuring they are present before building.
 - **Compiler Flags:** Security hardening flags (e.g., `-fstack-protector-strong`, `-D_FORTIFY_SOURCE=2`, `-Wl,-z,relro`) are explicitly set in the `CMakeLists.txt` for production builds.
+
+## Password Strength Validation
+
+### Health Check Requirements
+
+The password health check enforces modern security standards to ensure high-entropy passwords:
+
+**Minimum Requirements:**
+- **Length:** 16 characters minimum (exceeds NIST SP 800-63B recommendations)
+- **Complexity:** All four character types required:
+  - Uppercase letters (A-Z)
+  - Lowercase letters (a-z)
+  - Numbers (0-9)
+  - Special symbols (!@#$%^&*(), etc.)
+
+**Security Validations:**
+- **Uniqueness Check:** Detects password reuse across services to prevent lateral attacks
+- **Breach Database Check:** Integration with Have I Been Pwned (HIBP) API to identify compromised passwords
+- **Entropy Calculation:** 16-character passwords with all character types provide approximately 98.7 bits of entropy, exceeding the NIST 80-bit minimum
+
+### Compliance
+
+Password validation aligns with:
+- NIST SP 800-63B (Digital Identity Guidelines)
+- OWASP Password Storage Cheat Sheet
+- CIS Controls v8 (Password Policy Requirements)
+- ISO 27001 (Information Security Management)
 
 ## Reporting Security Vulnerabilities
 

@@ -187,7 +187,14 @@ int database_delete_entry(int id) {
         return -1;
     }
 
+    // Check if any rows were actually deleted
+    int changes = sqlite3_changes(db);
     sqlite3_finalize(stmt);
+    
+    if (changes == 0) {
+        return -1; // Entry with this ID does not exist
+    }
+    
     return 0;
 }
 
