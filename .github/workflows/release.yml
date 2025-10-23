@@ -193,9 +193,10 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
-          $qt_path = (Get-Command windeployqt).Source
-          $qt_bin_path = Split-Path -Parent $qt_path
-          echo "$qt_bin_path" | Out-File -FilePath $env:GITHUB_PATH -Append
+          $vcpkgRoot = "${{ github.workspace }}/vcpkg"
+          $qt_tools_path = "$vcpkgRoot/installed/x64-windows/tools/qtbase/bin"
+          echo "Adding $qt_tools_path to PATH"
+          echo "$qt_tools_path" | Out-File -FilePath $env:GITHUB_PATH -Append
 
       - name: Configure CMake (Windows)
         if: runner.os == 'Windows'
