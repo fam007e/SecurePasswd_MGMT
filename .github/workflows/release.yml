@@ -32,6 +32,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install newer CMake (Windows)
+        if: runner.os == 'Windows'
+        uses: kitware/cmake-action@v2
+        with:
+          cmake-version: '3.28.3'
+
       - name: Get the version
         id: get_version
         shell: bash
@@ -54,6 +60,8 @@ jobs:
         with:
           name: source-tarball
           path: securepasswd_mgmt-${{ steps.get_version.outputs.version }}.tar.gz
+
+
 
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'

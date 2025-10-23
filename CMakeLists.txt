@@ -106,7 +106,7 @@ set(CPACK_NSIS_PACKAGE_NAME "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION}")
 set(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_NAME}")
 set(CPACK_NSIS_START_MENU_LINKS "bin/securepasswd_gui.exe" "${CPACK_PACKAGE_NAME}")
 if(WIN32)
-    set(CPACK_NSIS_CREATE_ICONS_EXTRA "CreateShortCut '\"$INSTDIR\\uninstall.exe\"' '\"$SMPROGRAMS\\$STARTMENU_FOLDER\\Uninstall.lnk\"'")
+    set(CPACK_NSIS_CREATE_ICONS_EXTRA "CreateShortCut '\"$INSTDIR\\\\uninstall.exe\"' '\"$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\Uninstall.lnk\"'")
 endif()
 
 # Include CPack AFTER all CPACK_* variables are set
