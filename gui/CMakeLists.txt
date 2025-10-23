@@ -63,5 +63,5 @@ install(FILES ${ICONS} DESTINATION bin/icons)
 install(FILES ${THEMES} DESTINATION bin)
 
 if(WIN32)
-    deploy_windows_dependencies(securepasswd_gui)
+    deploy_windows_dependencies(securepasswd_gui USES_QT)
 endif()
