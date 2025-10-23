@@ -6,10 +6,23 @@ function(deploy_windows_dependencies target)
         return()
     endif()
 
+    # Find windeployqt executable from the vcpkg installation
+    get_filename_component(VCPKG_SCRIPT_DIR "${CMAKE_TOOLCHAIN_FILE}" DIRECTORY)
+    get_filename_component(VCPKG_ROOT "${VCPKG_SCRIPT_DIR}/../.." REALPATH)
+
+    find_program(
+        WINDEPLOYQT_EXECUTABLE windeployqt
+        HINTS "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/tools/qtbase/bin"
+        NO_DEFAULT_PATH
+    )
+
+    if(NOT WINDEPLOYQT_EXECUTABLE)
+        message(FATAL_ERROR "Failed to find windeployqt.exe. Searched in: ${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/tools/qtbase/bin")
+    endif()
+
     # Use windeployqt to deploy Qt dependencies
     add_custom_command(TARGET ${target} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E echo "Running windeployqt..."
-        COMMAND windeployqt --release --dir "$<TARGET_FILE_DIR:${target}>" "$<TARGET_FILE:${target}>"
+        COMMAND "${WINDEPLOYQT_EXECUTABLE}" --release --dir "$<TARGET_FILE_DIR:${target}>" "$<TARGET_FILE:${target}>"
         COMMENT "Deploying Qt dependencies for ${target}"
     )
 
