@@ -265,7 +265,7 @@ jobs:
         run: |
           pacman -Sy --noconfirm
           pacman -S --noconfirm git base-devel libsodium argon2 sqlcipher \
-            qt6-base openssl curl cmake sudo fakeroot
+            qt6-base openssl curl cmake sudo fakeroot cmocka
 
       - name: Install libcsv from source (Arch)
         run: |
