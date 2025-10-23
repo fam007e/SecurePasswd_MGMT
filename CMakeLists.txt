@@ -69,6 +69,10 @@ find_package(Qt6 COMPONENTS Widgets REQUIRED)
 find_package(OpenSSL REQUIRED)
 find_package(CURL REQUIRED)
 
+# Add custom cmake modules
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(WinDeploy)
+
 # Security flags
 if(NOT MSVC)
     add_compile_options(-O2 -fstack-protector-strong -D_FORTIFY_SOURCE=2)
@@ -82,9 +86,6 @@ add_subdirectory(core)
 add_subdirectory(cli)
 add_subdirectory(gui)
 add_subdirectory(tests)
-
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
-include(WinDeploy)
 
 # CPack configuration
 set(CPACK_PACKAGE_NAME "SecurePasswd_MGMT")
