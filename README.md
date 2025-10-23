@@ -75,6 +75,26 @@ sudo pacman -Syu --needed base-devel cmake libsodium argon2 sqlcipher libcsv qt6
 sudo dnf install gcc-c++ cmake libsodium-devel argon2-devel sqlcipher-devel libcsv-devel qt6-qtbase-devel openssl-devel libcurl-devel
 ```
 
+**Windows (vcpkg):**
+
+On Windows, this project uses `vcpkg` to manage dependencies. The setup is handled automatically when building with the provided Visual Studio solution, but if you are building manually, you will need to set up vcpkg first.
+
+1.  **Clone vcpkg:**
+    ```bash
+    git clone https://github.com/microsoft/vcpkg.git
+    ./vcpkg/bootstrap-vcpkg.bat
+    ```
+
+2.  **Install dependencies:**
+    ```bash
+    ./vcpkg/vcpkg install --triplet x64-windows
+    ```
+
+    When you run CMake, you must point it to the vcpkg toolchain file:
+    ```bash
+    cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_TOOLCHAIN_FILE=path/to/your/vcpkg/scripts/buildsystems/vcpkg.cmake
+    ```
+
 ## Installation
 
 ### Pre-built Packages
@@ -112,16 +132,18 @@ Pre-built packages for various platforms are available on the [GitHub Releases](
 ## Usage
 
 ### GUI Application
-To run the graphical interface, execute the `securepasswd_gui` binary:
+To run the graphical interface, execute the `securepasswd_gui` binary from within your build directory:
 ```bash
-./build/gui/securepasswd_gui
+# From the project root directory
+./build/bin/securepasswd_gui
 ```
 On the first run, you will be prompted to create a new master password, which will be used to encrypt your vault.
 
 ### Command-Line Interface
 To run the command-line interface, execute the `securepasswd_cli` binary:
 ```bash
-./build/cli/securepasswd_cli
+# From the project root directory
+./build/bin/securepasswd_cli
 ```
 The CLI provides an interactive menu for managing your passwords and TOTP secrets.
 
@@ -134,6 +156,7 @@ This project was designed with a security-first mindset, incorporating modern, v
 ```
 SecurePasswd_MGMT/
 ├── .github/          # GitHub Actions workflows and issue templates
+├── cmake/            # CMake helper scripts (e.g., for Windows deployment)
 ├── core/             # Core C library (encryption, password management)
 ├── cli/              # C command-line interface
 ├── gui/              # C++ Qt Graphical User Interface

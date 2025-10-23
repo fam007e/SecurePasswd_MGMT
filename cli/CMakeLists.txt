@@ -24,3 +24,9 @@ target_link_libraries(securepasswd_cli PRIVATE
 if(WIN32)
     target_link_libraries(securepasswd_cli PRIVATE ${GETOPT_LIBRARY})
 endif()
+
+install(TARGETS securepasswd_cli DESTINATION bin)
+
+if(WIN32)
+    deploy_windows_dependencies(securepasswd_cli)
+endif()

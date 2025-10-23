@@ -62,12 +62,6 @@ install(TARGETS securepasswd_gui
 install(FILES ${ICONS} DESTINATION bin/icons)
 install(FILES ${THEMES} DESTINATION bin)
 
-# Windows-specific: Copy DLLs to output directory
 if(WIN32)
-    # This helps with running the executable directly from the build directory
-    add_custom_command(TARGET securepasswd_gui POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        $<TARGET_FILE:Qt6::Widgets>
-        $<TARGET_FILE_DIR:securepasswd_gui>
-    )
+    deploy_windows_dependencies(securepasswd_gui)
 endif()

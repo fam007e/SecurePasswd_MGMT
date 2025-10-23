@@ -83,6 +83,9 @@ add_subdirectory(cli)
 add_subdirectory(gui)
 add_subdirectory(tests)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(WinDeploy)
+
 # CPack configuration
 set(CPACK_PACKAGE_NAME "SecurePasswd_MGMT")
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
@@ -97,6 +100,11 @@ set(CPACK_NSIS_PACKAGE_NAME "${PROJECT_NAME} ${CPACK_PACKAGE_VERSION}")
 set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")
 set(CPACK_NSIS_MUI_ICON "${CMAKE_CURRENT_SOURCE_DIR}/gui/icons/app_icon.ico")
 set(CPACK_NSIS_MUI_UNIICON "${CMAKE_CURRENT_SOURCE_DIR}/gui/icons/app_icon.ico")
+
+set(CPACK_NSIS_PACKAGE_NAME "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION}")
+set(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_NAME}")
+set(CPACK_NSIS_START_MENU_LINKS "bin/securepasswd_gui.exe" "${CPACK_PACKAGE_NAME}")
+set(CPACK_NSIS_CREATE_ICONS_EXTRA "CreateShortCut '\"$INSTDIR\\uninstall.exe\"' '\"$SMPROGRAMS\\$STARTMENU_FOLDER\\Uninstall.lnk\"'")
 
 # Include CPack AFTER all CPACK_* variables are set
 include(CPack)

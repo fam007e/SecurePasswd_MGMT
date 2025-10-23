@@ -189,6 +189,14 @@ jobs:
             -DLIBSODIUM_LIBRARIES="${SODIUM_LIB}" \
             -DCMAKE_PREFIX_PATH="$(brew --prefix qt@6);$(brew --prefix sqlcipher);$(brew --prefix openssl@3);$(brew --prefix argon2);$(brew --prefix libsodium);$(brew --prefix cmocka)"
 
+      - name: Add windeployqt to PATH
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $qt_path = (Get-Command windeployqt).Source
+          $qt_bin_path = Split-Path -Parent $qt_path
+          echo "$qt_bin_path" | Out-File -FilePath $env:GITHUB_PATH -Append
+
       - name: Configure CMake (Windows)
         if: runner.os == 'Windows'
         shell: pwsh

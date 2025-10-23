@@ -14,11 +14,15 @@ What you expected to happen.
 What actually happened.
 
 ## Environment
-- **OS:** [e.g., Ubuntu 20.04, macOS 12.0]
-- **SecurePassManager Version:** [e.g., 2024.06.14]
-- **GCC Version:** [e.g., 9.3.0]
-- **OpenSSL Version:** [e.g., 1.1.1f]
-- **liboath Version:** [e.g., 2.6.2]
+- **OS:** [e.g., Ubuntu 20.04, macOS 12.0, Windows 11]
+- **SecurePasswd_MGMT Version:** [e.g., v1.0.0]
+- **Compiler:** [e.g., GCC 11.2, Clang 13, MSVC 2022]
+- **Qt Version:** [e.g., 6.2.4]
+- **Libsodium Version:** [e.g., 1.0.18]
+- **Argon2 Version:** [e.g., 20190702]
+- **SQLCipher Version:** [e.g., 4.5.0]
+- **OpenSSL Version:** [e.g., 3.0.2]
+- **cURL Version:** [e.g., 7.81.0]
 
 ## Additional Context
 - Error messages (if any)
