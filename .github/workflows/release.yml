@@ -298,7 +298,7 @@ jobs:
           arch=('x86_64')
           url="https://github.com/fam007e/SecurePasswd_MGMT"
           license=('MIT')
-          depends=('libsodium' 'argon2' 'sqlcipher' 'qt6-base' 'openssl' 'curl')
+          depends=('libsodium' 'argon2' 'sqlcipher' 'qt6-base' 'openssl' 'curl' 'cmocka')
           makedepends=('cmake' 'gcc')
           source=("\$pkgname-\$pkgver.tar.gz")
           sha256sums=("$sha256")
