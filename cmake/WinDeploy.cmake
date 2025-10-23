@@ -1,6 +1,4 @@
-
 # cmake/WinDeploy.cmake
-
 function(deploy_windows_dependencies target)
     # Optional flag to run windeployqt
     set(options USES_QT)
@@ -17,55 +15,48 @@ function(deploy_windows_dependencies target)
 
         find_program(
             WINDEPLOYQT_EXECUTABLE windeployqt
-            HINTS "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/tools/qtbase/bin"
+            HINTS "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/tools/Qt6/bin"
+                  "${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/tools/qtbase/bin"
             NO_DEFAULT_PATH
         )
 
         if(NOT WINDEPLOYQT_EXECUTABLE)
-            message(FATAL_ERROR "Failed to find windeployqt.exe. Searched in: ${VCPKG_ROOT}/installed/${VCPKG_TARGET_TRIPLET}/tools/qtbase/bin")
+            message(WARNING "Failed to find windeployqt.exe. Qt DLLs may not be deployed.")
+        else()
+            message(STATUS "Found windeployqt: ${WINDEPLOYQT_EXECUTABLE}")
+            # Use windeployqt to deploy Qt dependencies
+            add_custom_command(TARGET ${target} POST_BUILD
+                COMMAND "${WINDEPLOYQT_EXECUTABLE}"
+                    --release
+                    --no-translations
+                    --no-system-d3d-compiler
+                    --no-opengl-sw
+                    "$<TARGET_FILE:${target}>"
+                COMMENT "Deploying Qt dependencies for ${target}"
+            )
         endif()
-
-        # Use windeployqt to deploy Qt dependencies
-        add_custom_command(TARGET ${target} POST_BUILD
-            COMMAND "${WINDEPLOYQT_EXECUTABLE}" --release --dir "$<TARGET_FILE_DIR:${target}>" "$<TARGET_FILE:${target}>"
-            COMMENT "Deploying Qt dependencies for ${target}"
-        )
     endif()
 
-    # List of vcpkg dependencies to deploy
-    set(VCPKG_DEPS
-        unofficial-sodium
-        unofficial-argon2
-        sqlcipher
-        OpenSSL
-        CURL
+    # Deploy vcpkg DLLs - use TARGET_RUNTIME_DLLS for automatic dependency discovery
+    add_custom_command(TARGET ${target} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "Copying vcpkg runtime dependencies..."
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "$<TARGET_RUNTIME_DLLS:${target}>"
+            "$<TARGET_FILE_DIR:${target}>"
+        COMMAND_EXPAND_LISTS
+        COMMENT "Deploying vcpkg dependencies for ${target}"
     )
 
-    foreach(dep ${VCPKG_DEPS})
-        if(TARGET ${dep}::${dep})
-            set(DEP_LIBRARY_PATH "$<TARGET_FILE:${dep}::${dep}>")
-        elseif(TARGET ${dep})
-            set(DEP_LIBRARY_PATH "$<TARGET_FILE:${dep}>")
-        else()
-            # Handle unofficial prefixes and other naming variations
-            if(TARGET unofficial-${dep}::${dep})
-                set(DEP_LIBRARY_PATH "$<TARGET_FILE:unofficial-${dep}::${dep}>")
-            elseif(TARGET unofficial::${dep}::lib${dep})
-                 set(DEP_LIBRARY_PATH "$<TARGET_FILE:unofficial::${dep}::lib${dep}>")
-            else()
-                message(WARNING "Could not find target for dependency: ${dep}")
-                continue()
-            endif()
-        endif()
+    # Install all DLLs from the build directory to CPack destination
+    install(
+        DIRECTORY "$<TARGET_FILE_DIR:${target}>/"
+        DESTINATION bin
+        FILES_MATCHING PATTERN "*.dll"
+    )
 
-        add_custom_command(TARGET ${target} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                "${DEP_LIBRARY_PATH}"
-                "$<TARGET_FILE_DIR:${target}>"
-            COMMENT "Deploying ${dep} for ${target}"
-        )
-    endforeach()
-
-    # Also install the DLLs to the CPack installation directory
-    install(DIRECTORY "$<TARGET_FILE_DIR:${target}>/" DESTINATION bin FILES_MATCHING PATTERN "*.dll")
+    # Also explicitly install the target executable itself
+    install(TARGETS ${target}
+        RUNTIME DESTINATION bin
+        COMPONENT Runtime
+    )
 endfunction()

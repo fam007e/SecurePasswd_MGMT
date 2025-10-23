@@ -1,10 +1,8 @@
 name: Release SecurePasswd_MGMT
-
 on:
   push:
     tags:
       - "v*.*.*"
-
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -20,29 +18,20 @@ jobs:
             cpack_generator: "DEB"
           - os: windows-latest
             artifact_name: windows-installer
-            package_glob: "*.exe"
+            package_glob: "SecurePasswd_MGMT-*.exe"
             cpack_generator: "NSIS"
           - os: macos-latest
             artifact_name: macos-dmg
             package_glob: "*.dmg"
             cpack_generator: "DragNDrop"
-
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Install newer CMake (Windows)
-        if: runner.os == 'Windows'
-        uses: kitware/cmake-action@v2
-        with:
-          cmake-version: '3.28.3'
-
       - name: Get the version
         id: get_version
         shell: bash
         run: echo "version=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_OUTPUT
-
       - name: Create source tarball
         if: runner.os == 'Linux'
         run: |
@@ -53,16 +42,12 @@ jobs:
             --exclude="*.tar.gz" \
             SecurePasswd_MGMT/
           mv securepasswd_mgmt-${{ steps.get_version.outputs.version }}.tar.gz SecurePasswd_MGMT/
-
       - name: Upload source tarball
         if: runner.os == 'Linux'
         uses: actions/upload-artifact@v4
         with:
           name: source-tarball
           path: securepasswd_mgmt-${{ steps.get_version.outputs.version }}.tar.gz
-
-
-
       - name: Install dependencies (Linux)
         if: runner.os == 'Linux'
         run: |
@@ -70,7 +55,6 @@ jobs:
           sudo apt-get install -y build-essential cmake libsodium-dev libargon2-dev \
             libsqlcipher-dev libcsv-dev qt6-base-dev libssl-dev libcurl4-openssl-dev \
             libcmocka-dev
-
       - name: Cache vcpkg
         if: runner.os == 'Windows'
         uses: actions/cache@v4
@@ -81,7 +65,6 @@ jobs:
             !${{ github.workspace }}/vcpkg/packages
             !${{ github.workspace }}/vcpkg/downloads
           key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}-v4
-
       - name: Setup vcpkg
         if: runner.os == 'Windows'
         shell: pwsh
@@ -90,14 +73,12 @@ jobs:
             git clone https://github.com/microsoft/vcpkg.git "${{ github.workspace }}/vcpkg"
             & "${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat" -disableMetrics
           }
-
       - name: Install vcpkg dependencies
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           $vcpkgRoot = "${{ github.workspace }}/vcpkg"
           & "$vcpkgRoot/vcpkg.exe" install --triplet x64-windows --clean-after-build
-
       - name: Install NSIS
         if: runner.os == 'Windows'
         shell: pwsh
@@ -105,7 +86,6 @@ jobs:
           choco install nsis -y
           # Refresh environment to pick up NSIS in PATH
           $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-
       - name: Setup Homebrew
         if: runner.os == 'macOS'
         run: |
@@ -113,7 +93,6 @@ jobs:
           echo "/opt/homebrew/sbin" >> $GITHUB_PATH
           # Cleanup any stale locks
           rm -rf /opt/homebrew/var/homebrew/locks || true
-
       - name: Install dependencies (macOS)
         if: runner.os == 'macOS'
         timeout-minutes: 60
@@ -122,7 +101,6 @@ jobs:
           # Skip brew update to save time and avoid cancellations
           export HOMEBREW_NO_AUTO_UPDATE=1
           export HOMEBREW_NO_INSTALL_CLEANUP=1
-
           # Install packages individually to handle failures gracefully
           packages=(qt@6 create-dmg libsodium argon2 sqlcipher cmocka)
           for pkg in "${packages[@]}"; do
@@ -136,7 +114,6 @@ jobs:
               echo "$pkg already installed"
             fi
           done
-
       - name: Install libcsv from source (macOS)
         if: runner.os == 'macOS'
         run: |
@@ -145,11 +122,9 @@ jobs:
           ./configure
           make
           sudo make install
-
           # Verify installation
           ls -la /usr/local/lib/libcsv* || true
           ls -la /usr/local/include/csv.h || true
-
       - name: Configure CMake (Linux)
         if: runner.os == 'Linux'
         run: |
@@ -160,7 +135,6 @@ jobs:
             -DCPACK_GENERATOR="${{ matrix.cpack_generator }}" \
             -DCPACK_PACKAGE_CONTACT="fam007e <faisalmoshiur+secpasswdmgmt@gmail.com>" \
             -DCPACK_DEBIAN_PACKAGE_MAINTAINER="fam007e <faisalmoshiur+secpasswdmgmt@gmail.com>"
-
       - name: Configure CMake (macOS)
         if: runner.os == 'macOS'
         run: |
@@ -171,15 +145,12 @@ jobs:
           ARGON2_INC=$(brew --prefix argon2)/include
           OPENSSL_INC=$(brew --prefix openssl@3)/include
           CMOCKA_INC=$(brew --prefix cmocka)/include
-
           ARGON2_LIB=$(brew --prefix argon2)/lib/libargon2.dylib
           SQLCIPHER_LIB=$(brew --prefix sqlcipher)/lib/libsqlcipher.dylib
           SODIUM_LIB=$(brew --prefix libsodium)/lib/libsodium.dylib
-
           # Clean build directory
           rm -rf build
           mkdir build
-
           # Run CMake
           cmake -B build \
             -DCMAKE_BUILD_TYPE=Release \
@@ -196,14 +167,12 @@ jobs:
             -DSQLCIPHER_LIBRARIES="${SQLCIPHER_LIB}" \
             -DLIBSODIUM_LIBRARIES="${SODIUM_LIB}" \
             -DCMAKE_PREFIX_PATH="$(brew --prefix qt@6);$(brew --prefix sqlcipher);$(brew --prefix openssl@3);$(brew --prefix argon2);$(brew --prefix libsodium);$(brew --prefix cmocka)"
-
       - name: Configure CMake (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
         run: |
           $vcpkgRoot = "${{ github.workspace }}/vcpkg"
           $version = "${{ steps.get_version.outputs.version }}"
-
           cmake -B build `
             -DCMAKE_BUILD_TYPE=Release `
             -DCPACK_PACKAGE_VERSION="$version" `
@@ -211,16 +180,15 @@ jobs:
             -DCPACK_GENERATOR="${{ matrix.cpack_generator }}" `
             -DCMAKE_TOOLCHAIN_FILE="$vcpkgRoot\scripts\buildsystems\vcpkg.cmake" `
             -DVCPKG_TARGET_TRIPLET=x64-windows
-
       - name: Build
         run: cmake --build build --config Release
-
+      
       - name: Package
         working-directory: build
         id: package
-        run: cpack -G ${{ matrix.cpack_generator }}
+        run: cpack -G ${{ matrix.cpack_generator }} -C Release
         continue-on-error: true
-
+      
       - name: Display NSIS log on failure (Windows)
         if: runner.os == 'Windows' && steps.package.outcome == 'failure'
         shell: pwsh
@@ -235,25 +203,32 @@ jobs:
               Get-ChildItem "build/_CPack_Packages" -Recurse | Select-Object FullName
             }
           }
-          
           Write-Host "`n=== Checking build output directory ==="
           if (Test-Path "build/Release") {
             Get-ChildItem "build/Release" -Recurse | Select-Object FullName
           }
-          
           Write-Host "`n=== Checking for executables ==="
           Get-ChildItem "build" -Recurse -Filter "*.exe" | Select-Object FullName
-          
           # Re-throw the error to fail the job
           exit 1
-
+      
+      - name: List generated packages
+        if: steps.package.outcome == 'success'
+        shell: bash
+        run: |
+          echo "=== Generated packages ==="
+          ls -lh build/${{ matrix.package_glob }} || true
+          ls -lh build/*.exe || true
+          ls -lh build/*.deb || true
+          ls -lh build/*.dmg || true
+      
       - name: Upload artifact
         if: steps.package.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
           path: build/${{ matrix.package_glob }}
-
+  
   build-arch:
     runs-on: ubuntu-latest
     container:
@@ -263,18 +238,15 @@ jobs:
       - name: Get the version
         id: get_version
         run: echo "version=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_OUTPUT
-
       - name: Download source tarball
         uses: actions/download-artifact@v4
         with:
           name: source-tarball
-
       - name: Install build tools and dependencies
         run: |
           pacman -Sy --noconfirm
           pacman -S --noconfirm git base-devel libsodium argon2 sqlcipher \
             qt6-base openssl curl cmake sudo fakeroot cmocka
-
       - name: Install libcsv from source (Arch)
         run: |
           git clone https://github.com/rgamble/libcsv.git
@@ -289,11 +261,9 @@ jobs:
           ldconfig
           ls -la /usr/local/lib/libcsv* || true
           ls -la /usr/local/include/csv.h || true
-
       - name: Extract source tarball
         run: |
           tar -xzvf securepasswd_mgmt-${{ steps.get_version.outputs.version }}.tar.gz
-
       - name: Create PKGBUILD
         run: |
           sha256=$(sha256sum securepasswd_mgmt-${{ steps.get_version.outputs.version }}.tar.gz | awk '{print $1}')
@@ -310,7 +280,6 @@ jobs:
           makedepends=('cmake' 'gcc')
           source=("\$pkgname-\$pkgver.tar.gz")
           sha256sums=("$sha256")
-
           build() {
               cd "\$srcdir/SecurePasswd_MGMT"
               mkdir -p build
@@ -323,7 +292,6 @@ jobs:
                 -DLIBCSV_LIBRARIES=/usr/local/lib/libcsv.a
               make
           }
-
           package() {
               cd "\$srcdir/SecurePasswd_MGMT/build"
               make DESTDIR="\$pkgdir/" install
@@ -332,27 +300,22 @@ jobs:
               install -Dm644 /usr/local/include/csv.h "\$pkgdir/usr/include/csv.h"
           }
           EOF
-
       - name: Build Arch package
         run: |
           # Create a non-root user for makepkg
           useradd -m builder
-          
           # Configure sudo to allow builder user to run pacman without password prompt
           echo "builder ALL=(ALL) NOPASSWD: /usr/bin/pacman" >> /etc/sudoers
-          
           # Give ownership to builder user
           chown -R builder:builder .
-
           # Build as the builder user
           sudo -u builder makepkg -s --noconfirm
-
       - name: Upload Arch package
         uses: actions/upload-artifact@v4
         with:
           name: arch-package
           path: "*.pkg.tar.zst"
-
+  
   release:
     needs: [build, build-arch]
     runs-on: ubuntu-latest
@@ -362,23 +325,23 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
       - name: Get the version
         id: get_version
         run: echo "version=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_OUTPUT
-
       - name: Download all artifacts
         uses: actions/download-artifact@v4
         with:
           path: artifacts
-
+      - name: Display downloaded artifacts
+        run: |
+          echo "=== Downloaded artifacts structure ==="
+          find artifacts -type f -ls
       - name: Get previous tag
         id: previous_tag
         run: |
           previous_tag=$(git describe --tags --abbrev=0 ${{ github.ref }}^ 2>/dev/null || echo "")
           echo "previous_tag=$previous_tag" >> $GITHUB_OUTPUT
         continue-on-error: true
-
       - name: Generate Release Body
         id: generate_release_body
         run: |
@@ -392,7 +355,6 @@ jobs:
             echo ""
             echo "EOF"
           } >> $GITHUB_OUTPUT
-
       - name: Create Release
         uses: softprops/action-gh-release@v2
         env:
@@ -402,13 +364,9 @@ jobs:
           name: Release ${{ steps.get_version.outputs.version }}
           body: |
             ## Release ${{ steps.get_version.outputs.version }}
-
             This release includes the following changes:
-
             ${{ steps.generate_release_body.outputs.body }}
-
             ## Downloads
-
             - **Linux (Debian/Ubuntu)**: `securepasswd_mgmt-${{ steps.get_version.outputs.version }}.deb`
             - **Linux (Arch)**: `securepasswd_mgmt-${{ steps.get_version.outputs.version }}.pkg.tar.zst`
             - **Windows**: `SecurePasswd_MGMT-${{ steps.get_version.outputs.version }}.exe`
