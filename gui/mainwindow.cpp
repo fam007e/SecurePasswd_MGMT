@@ -6,6 +6,7 @@
 extern "C" {
 #include "database.h"
 #include "totp.h"
+#include "platform_paths.h"
 }
 
 #include <QAction>
@@ -58,8 +59,11 @@ void import_row_cb(int c, void *data) {
 }
 
 MainWindow::MainWindow(const QString& password, QWidget *parent) : QMainWindow(parent), m_databaseOpen(false) {
-    QString configPath = QStandardPaths::writableLocation(QStandardPaths::ConfigLocation);
-    QString dbDirPath = configPath + "/SecurePasswd_MGMT";
+    // Use shared platform_paths function
+    char dirPath[1024];
+    get_config_path(dirPath, sizeof(dirPath));
+    QString dbDirPath = QString::fromUtf8(dirPath);
+    
     QDir dir(dbDirPath);
     if (!dir.exists()) {
         dir.mkpath(".");

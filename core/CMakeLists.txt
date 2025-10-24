@@ -3,6 +3,7 @@ add_library(core_lib STATIC
     database.c
     totp.c
     pwned_check.c
+    platform_paths.c
 )
 
 # Include directories

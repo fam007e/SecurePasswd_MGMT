@@ -1,0 +1,233 @@
+PS C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin> .\securepasswd_cli.exe
+Enter master password:
+A subdirectory or file C:\Users\gfahad\AppData\Roaming\SecurePasswd_MGMT already exists.
+Database opened successfully.
+
+[l]ist, [a]dd, [v]iew, [e]dit, [d]elete, [g]enerate, [h]ealth-check, [i]mport, [e]xport, [q]uit
+> d
+Enter ID of entry to delete: 1
+Error: Could not delete entry with ID 1. It may not exist.
+
+[l]ist, [a]dd, [v]iew, [e]dit, [d]elete, [g]enerate, [h]ealth-check, [i]mport, [e]xport, [q]uit
+> q
+Database closed. Exiting.
+PS C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin> cd C:\Users\gfahad\AppData\
+PS C:\Users\gfahad\AppData> cd .\Local\
+PS C:\Users\gfahad\AppData\Local> ls
+
+    Directory: C:\Users\gfahad\AppData\Local
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d----          10/20/2025  9:48 PM                AFFiNE
+d----          10/20/2025  9:53 PM                Anki
+d----          10/20/2025  9:52 PM                AnkiProgramFiles
+d----           7/20/2025 10:38 AM                BattlEye
+d----           6/26/2025 10:52 PM                bitwarden-updater
+d----           6/26/2025  9:51 PM                BraveSoftware
+d----           6/26/2025 11:25 PM                cache
+d----            7/4/2025  6:55 PM                CEF
+d----           7/10/2025  2:59 AM                clink
+d----           6/26/2025  9:23 PM                Comms
+d----           6/26/2025  9:13 PM                ConnectedDevicesPlatform
+d----          10/24/2025 10:52 PM                CrashDumps
+d----           8/11/2025  5:26 PM                CrashReportClient
+da---          10/24/2025  4:52 PM                D3DSCache
+d----           8/13/2025  9:51 AM                DBG
+d----          10/10/2025 12:23 PM                Discord
+d----           7/17/2025  2:42 PM                Docker
+d----            8/1/2025  2:28 PM                ElevatedDiagnostics
+d----           8/11/2025  1:05 PM                Epic Games
+d----           8/11/2025  1:05 PM                EpicGamesLauncher
+d----          10/24/2025  6:20 PM                Everything
+d----           6/26/2025 11:29 PM                exifcleaner-updater
+d----           6/26/2025 11:33 PM                FileConverter
+d----           6/26/2025 11:33 PM                FluxSoftware
+d----           8/11/2025  5:26 PM                FortniteGame
+d----          10/20/2025  4:50 PM                GitExtensions
+d----           7/17/2025  3:23 PM                gnupg
+d----           6/26/2025 11:49 PM                GOG.com
+d----           7/14/2025 12:51 PM                Google
+d----           6/26/2025 11:57 PM                itch
+da---           6/27/2025  1:33 AM                kdeconnect
+d----          10/24/2025  6:22 PM                LGHUB
+d----           7/10/2025 12:54 AM                Microsoft SDKs
+d----           6/26/2025  9:25 PM                motrix-updater
+d----            7/6/2025  8:33 PM                npm-cache
+d----          10/19/2025  8:34 AM                NVIDIA
+d----            8/1/2025  2:15 PM                NVIDIA Corporation
+d----           6/26/2025 10:23 PM                nvm
+d----           6/27/2025 12:45 AM                obsidian-updater
+d----           6/26/2025 11:25 PM                Origin
+d----          10/20/2025 10:14 PM                Package Cache
+d----          10/20/2025 10:14 PM                Packages
+d----           6/27/2025  3:09 AM                PDFgear
+d----           6/26/2025 10:36 PM                PeerDistRepub
+d----          10/21/2025  2:19 PM                pip
+d----          10/20/2025  9:40 PM                pixi
+d----            7/6/2025 10:06 PM                PlaceholderTileLogoFolder
+d----          10/20/2025  9:59 PM                Postman
+d----          10/20/2025 10:14 PM                PowerToys
+d----          10/20/2025 10:17 PM                Programs
+d----           7/29/2025  6:30 PM                Proton
+d----           6/26/2025  9:14 PM                Publishers
+d----            7/4/2025  4:59 PM                qBittorrent
+d----          10/21/2025  3:33 PM                realmesystemupgradetool-updater
+d----            7/4/2025  6:54 PM                Riot Games
+d----            7/9/2025 11:02 AM                Rockstar Games
+d----           6/26/2025  9:28 PM                Rufus
+d----          10/24/2025 10:45 PM                securepasswd
+d----            7/4/2025  4:43 PM                Sentry
+d----           7/17/2025  2:29 PM                Spotify
+d----          10/20/2025  9:59 PM                SquirrelTemp
+d----            7/6/2025 10:29 PM                Steam
+d----           6/27/2025 12:21 AM                Sublime Text
+d----           6/27/2025  2:07 PM                Tailscale
+da---          10/24/2025 10:53 PM                Temp
+d----            7/6/2025  8:35 PM                Thunderbird
+d----           6/27/2025  3:17 AM                ToastNotificationManagerCompat
+d----           7/20/2025 10:40 AM                TslGame
+d----           6/26/2025 10:36 PM                unityhub-updater
+d----           8/11/2025  5:26 PM                UnrealEngine
+d----           8/11/2025  1:05 PM                UnrealEngineLauncher
+d----          10/20/2025  9:48 PM                uv
+d----            7/4/2025  6:55 PM                VALORANT
+d----           6/26/2025  9:13 PM                VirtualStore
+d----           6/26/2025  9:23 PM                winutil
+
+PS C:\Users\gfahad\AppData\Local> cd .\securepasswd\
+PS C:\Users\gfahad\AppData\Local\securepasswd> cd .\securepasswd\
+PS C:\Users\gfahad\AppData\Local\securepasswd\securepasswd> ls
+
+    Directory: C:\Users\gfahad\AppData\Local\securepasswd\securepasswd
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d----          10/24/2025 10:46 PM                SecurePasswd_MGMT
+
+PS C:\Users\gfahad\AppData\Local\securepasswd\securepasswd> cd .\SecurePasswd_MGMT\
+PS C:\Users\gfahad\AppData\Local\securepasswd\securepasswd\SecurePasswd_MGMT> ls
+
+    Directory: C:\Users\gfahad\AppData\Local\securepasswd\securepasswd\SecurePasswd_MGMT
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          10/24/2025 10:46 PM          12288 vault.db
+-a---          10/24/2025 10:45 PM             16 vault.db.salt
+
+PS C:\Users\gfahad\AppData\Local\securepasswd\securepasswd\SecurePasswd_MGMT> cd -
+PS C:\Users\gfahad\AppData\Local\securepasswd\securepasswd> cd C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin>
+PS C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin> ls
+
+    Directory: C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d----          10/24/2025 10:41 PM                iconengines
+d----          10/24/2025 10:41 PM                icons
+d----          10/24/2025 10:41 PM                imageformats
+d----          10/24/2025 10:41 PM                platforms
+d----          10/24/2025 10:41 PM                styles
+-a---          10/24/2025 10:01 PM          32256 argon2.dll
+-a---          10/24/2025  9:08 PM           1484 dark.qss
+-a---          10/24/2025 10:01 PM          75776 double-conversion.dll
+-a---            7/9/2025  6:33 PM       14019960 dxcompiler.dll
+-a---            7/9/2025  6:33 PM        1503600 dxil.dll
+-a---          10/24/2025 10:01 PM        5328384 libcrypto-3-x64.dll
+-a---          10/24/2025 10:01 PM         643072 libcurl.dll
+-a---          10/24/2025 10:01 PM         344064 libsodium.dll
+-a---          10/24/2025  9:08 PM           1519 light.qss
+-a---          10/24/2025 10:01 PM         561152 pcre2-16.dll
+-a---          10/24/2025 10:02 PM        8928768 Qt6Core.dll
+-a---          10/24/2025 10:02 PM        6577152 Qt6Gui.dll
+-a---          10/24/2025 10:01 PM         554496 Qt6Svg.dll
+-a---          10/24/2025 10:02 PM        6058496 Qt6Widgets.dll
+-a---          10/24/2025 10:02 PM          30208 securepasswd_cli.exe
+-a---          10/24/2025 10:02 PM         169984 securepasswd_gui.exe
+-a---          10/24/2025 10:01 PM        1177600 sqlcipher.dll
+-a---          10/24/2025 10:01 PM          90112 zlib1.dll
+
+PS C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin> cd .\iconengines\
+PS C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin\iconengines> ls
+
+    Directory: C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin\iconengines
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          10/24/2025 10:01 PM          55808 qsvgicon.dll
+
+PS C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin\iconengines> cd ..
+PS C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin> cd .\icons\
+PS C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin\icons> ls
+
+    Directory: C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin\icons
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          10/24/2025  9:08 PM            315 add.svg
+-a---          10/24/2025  9:08 PM           5554 app_icon.svg
+-a---          10/24/2025  9:08 PM            406 copy_passwd.svg
+-a---          10/24/2025  9:08 PM            407 copy_totp.svg
+-a---          10/24/2025  9:08 PM            742 copy_username.svg
+-a---          10/24/2025  9:08 PM            895 darkmode.svg
+-a---          10/24/2025  9:08 PM            416 delete.svg
+-a---          10/24/2025  9:08 PM            336 edit.svg
+-a---          10/24/2025  9:08 PM            335 export.svg
+-a---          10/24/2025  9:08 PM            248 health-check.svg
+-a---          10/24/2025  9:08 PM            337 import.svg
+-a---          10/24/2025  9:08 PM           1104 lightmode.svg
+
+PS C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin\icons> cd ..
+PS C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin> cd .\imageformats\
+PS C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin\imageformats> ls
+
+    Directory: C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin\imageformats
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          10/24/2025 10:02 PM          35840 qgif.dll
+-a---          10/24/2025 10:02 PM          34304 qico.dll
+-a---          10/24/2025 10:01 PM          26624 qsvg.dll
+
+PS C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin\imageformats> cd ..
+PS C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin> cd .\platforms\
+PS C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin\platforms> ls
+
+    Directory: C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin\platforms
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          10/24/2025 10:02 PM         817152 qwindows.dll
+
+PS C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin\platforms> cd ..
+PS C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin> cd .\styles\
+PS C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin\styles> ls
+
+    Directory: C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin\styles
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a---          10/24/2025 10:02 PM         211968 qmodernwindowsstyle.dll
+
+
+PS C:\Users\gfahad\AppData\Local\securepasswd\securepasswd> cd 'C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin'
+PS C:\Program Files\SecurePasswd_MGMT 2025.10.25\bin> cd ..
+PS C:\Program Files\SecurePasswd_MGMT 2025.10.25> tree
+Folder PATH listing
+Volume serial number is 7CD8-578E
+C:.
+└───bin
+    ├───iconengines
+    ├───icons
+    ├───imageformats
+    ├───platforms
+    └───styles
+PS C:\Program Files\SecurePasswd_MGMT 2025.10.25> ls
+
+    Directory: C:\Program Files\SecurePasswd_MGMT 2025.10.25
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+d----          10/24/2025 10:41 PM                bin
+-a---          10/24/2025 10:41 PM         287765 Uninstall.exe
+

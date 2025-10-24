@@ -105,30 +105,8 @@ void print_help();
 
 void cli_health_check();
 
-// --- Helper Functions ---
-
-// Function to get the configuration directory path
-void get_config_path(char* path_buffer, size_t buffer_size) {
-#ifdef _WIN32
-    // On Windows, use APPDATA environment variable
-    const char* appdata = getenv("APPDATA");
-    if (appdata) {
-        snprintf(path_buffer, buffer_size, "%s\\SecurePasswd_MGMT", appdata);
-    } else {
-        // Fallback if APPDATA is not set
-        snprintf(path_buffer, buffer_size, "."); 
-    }
-#else
-    // On Linux/macOS, use XDG_CONFIG_HOME or ~/.config
-    const char* config_home = getenv("XDG_CONFIG_HOME");
-    if (config_home) {
-        snprintf(path_buffer, buffer_size, "%s/SecurePasswd_MGMT", config_home);
-    } else {
-        const char* home = getenv("HOME");
-        snprintf(path_buffer, buffer_size, "%s/.config/SecurePasswd_MGMT", home);
-    }
-#endif
-}
+#include "pwned_check.h"
+#include "platform_paths.h"
 
 
 // A simple helper to read a line of input securely
@@ -150,10 +128,10 @@ void cli_list_entries() {
         return;
     }
 
-    printf("%-5s %-25s %-25s\n", "ID", "Service", "Username");
+    printf("% -5s % -25s % -25s\n", "ID", "Service", "Username");
     printf("--------------------------------------------------------\n");
     for (int i = 0; i < count; i++) {
-        printf("%-5d %-25s %-25s\n", entries[i].id, entries[i].service, entries[i].username);
+        printf("% -5d % -25s % -25s\n", entries[i].id, entries[i].service, entries[i].username);
     }
 
     free_password_entries(entries, count);
@@ -307,7 +285,7 @@ int main(int argc, char *argv[]) {
 
     char dbPath[1024];
 #ifdef _WIN32
-    snprintf(dbPath, sizeof(dbPath), "%s\\vault.db", dirPath);
+    snprintf(dbPath, sizeof(dbPath), "%s\vault.db", dirPath);
 #else
     snprintf(dbPath, sizeof(dbPath), "%s/vault.db", dirPath);
 #endif
