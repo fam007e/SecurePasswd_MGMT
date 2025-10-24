@@ -63,7 +63,7 @@ else()
 endif()
 
 # Find Qt6
-find_package(Qt6 COMPONENTS Widgets REQUIRED)
+find_package(Qt6 COMPONENTS Widgets Svg REQUIRED)
 
 # Find OpenSSL and CURL
 find_package(OpenSSL REQUIRED)

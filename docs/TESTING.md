@@ -189,8 +189,6 @@ GoodService,user9,MySecureP@ssw0rd2024!,https://good.com,22 chars with all types
 
 ### 3. GUI Segfault Prevention
 
-#### Test Case 3.1: Launch with Correct Password
-**Steps:**
 1. Launch GUI: `./build/gui/securepasswd_gui`
 2. Enter correct master password
 3. Click OK

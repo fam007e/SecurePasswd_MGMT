@@ -8,6 +8,8 @@
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
+    QCoreApplication::setOrganizationName("securepasswd");
+    QCoreApplication::setApplicationName("securepasswd");
     app.setWindowIcon(QIcon(":/icons/app_icon.svg"));
 
     PasswordDialog passwordDialog;

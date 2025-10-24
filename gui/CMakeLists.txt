@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.21)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
@@ -49,6 +50,7 @@ endif()
 # Link libraries
 target_link_libraries(securepasswd_gui PRIVATE
     Qt6::Widgets
+    Qt6::Svg
     core_lib
     ${LIBCSV_LIBRARIES}
 )

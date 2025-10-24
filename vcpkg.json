@@ -14,7 +14,8 @@
       "name": "qtbase",
       "default-features": false,
       "features": ["widgets", "concurrent"]
-    }
+    },
+    "qtsvg"
   ],
   "builtin-baseline": "faf665cf8aca288b636d9de887f5cdfa3cff1a9e"
 }

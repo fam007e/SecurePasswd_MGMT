@@ -76,7 +76,7 @@ MainWindow::MainWindow(const QString& password, QWidget *parent) : QMainWindow(p
     setupUI();
     refreshEntryList();
 
-    QSettings settings("SecurePasswd_MGMT", "SecurePasswd_MGMT");
+    QSettings settings("securepasswd", "securepasswd");
     currentTheme = settings.value("theme", "light").toString();
     loadTheme(currentTheme);
 }
@@ -176,6 +176,7 @@ void MainWindow::onCurrentRowChanged(int currentRow) {
         totpLabel->setText("------");
         totpProgressBar->setValue(0);
     } else {
+        totpLabel->setText("------");
         updateTotpDisplay();
         totpTimer->start(1000);
     }
@@ -192,7 +193,7 @@ void MainWindow::updateTotpDisplay() {
     int remaining = 30 - (now % 30);
     totpProgressBar->setValue(remaining);
 
-    if (remaining == 30) {
+    if (remaining == 30 || totpLabel->text() == "------") {
         char *code = generate_totp_code(secret.toUtf8().constData());
         if (code) {
             totpLabel->setText(code);

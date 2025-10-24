@@ -107,6 +107,30 @@ void cli_health_check();
 
 // --- Helper Functions ---
 
+// Function to get the configuration directory path
+void get_config_path(char* path_buffer, size_t buffer_size) {
+#ifdef _WIN32
+    // On Windows, use APPDATA environment variable
+    const char* appdata = getenv("APPDATA");
+    if (appdata) {
+        snprintf(path_buffer, buffer_size, "%s\\SecurePasswd_MGMT", appdata);
+    } else {
+        // Fallback if APPDATA is not set
+        snprintf(path_buffer, buffer_size, "."); 
+    }
+#else
+    // On Linux/macOS, use XDG_CONFIG_HOME or ~/.config
+    const char* config_home = getenv("XDG_CONFIG_HOME");
+    if (config_home) {
+        snprintf(path_buffer, buffer_size, "%s/SecurePasswd_MGMT", config_home);
+    } else {
+        const char* home = getenv("HOME");
+        snprintf(path_buffer, buffer_size, "%s/.config/SecurePasswd_MGMT", home);
+    }
+#endif
+}
+
+
 // A simple helper to read a line of input securely
 void read_line(char *buf, int size) {
     if (fgets(buf, size, stdin) == NULL) {
@@ -265,28 +289,28 @@ int main(int argc, char *argv[]) {
     char *password = getpass("Enter master password: ");
 
     // --- Open Database ---
-    char dbPath[1024];
-    const char* configHome = getenv("XDG_CONFIG_HOME");
-    if (configHome) {
-        snprintf(dbPath, sizeof(dbPath), "%s/SecurePasswd_MGMT/vault.db", configHome);
-    } else {
-        snprintf(dbPath, sizeof(dbPath), "%s/.config/SecurePasswd_MGMT/vault.db", getenv("HOME"));
-    }
-    
-    // This is a simplified way to ensure the directory exists.
     char dirPath[1024];
-    strncpy(dirPath, dbPath, sizeof(dirPath) - 1);
-    dirPath[sizeof(dirPath) - 1] = '\0'; // Ensure null termination
-    char* last_slash = strrchr(dirPath, '/');
-    if (last_slash != NULL) {
-        *last_slash = '\0';
+    get_config_path(dirPath, sizeof(dirPath));
+
+    char cmd[2048];
+#ifdef _WIN32
+    snprintf(cmd, sizeof(cmd), "mkdir \"%s\"", dirPath); // Quoted path for Windows
+#else
+    snprintf(cmd, sizeof(cmd), "mkdir -p \"%s\"", dirPath); // Quoted path for others
+#endif
+    
+    // Execute the command, but ignore errors if the directory already exists
+    if (system(cmd) != 0) {
+        // You might want to add more robust error handling here
+        // to distinguish between "directory exists" and other errors.
     }
 
-    char cmd[2048]; // Increased buffer size
-    snprintf(cmd, sizeof(cmd), "mkdir -p \"%s\"", dirPath); // Quoted path
-    if (system(cmd) != 0) {
-        fprintf(stderr, "Failed to create directory: %s\n", dirPath);
-    }
+    char dbPath[1024];
+#ifdef _WIN32
+    snprintf(dbPath, sizeof(dbPath), "%s\\vault.db", dirPath);
+#else
+    snprintf(dbPath, sizeof(dbPath), "%s/vault.db", dirPath);
+#endif
 
     if (database_open(dbPath, password) != 0) {
         fprintf(stderr, "Failed to open database. Check master password or file permissions.\n");
