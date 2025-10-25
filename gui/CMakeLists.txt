@@ -38,6 +38,11 @@ qt_add_executable(securepasswd_gui
     icons.qrc
 )
 
+# Embed Windows icon into executable
+if(WIN32)
+    target_sources(securepasswd_gui PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/app.rc")
+endif()
+
 # Include directories
 target_include_directories(securepasswd_gui PRIVATE
     ${CMAKE_SOURCE_DIR}/cli
