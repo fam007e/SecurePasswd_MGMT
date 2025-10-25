@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=SecurePasswd MGMT
+Comment=A secure password manager
+Exec=@CMAKE_INSTALL_PREFIX@/bin/securepasswd_gui
+Icon=securepasswd_gui
+Terminal=false
+Categories=Utility;Security;

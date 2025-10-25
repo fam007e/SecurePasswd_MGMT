@@ -73,3 +73,24 @@ install(FILES ${THEMES} DESTINATION bin)
 if(WIN32)
     deploy_windows_dependencies(securepasswd_gui USES_QT)
 endif()
+
+if(UNIX AND NOT APPLE)
+    # Install desktop file
+    configure_file(
+        "${CMAKE_CURRENT_SOURCE_DIR}/securepasswd_gui.desktop.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/securepasswd_gui.desktop"
+        @ONLY
+    )
+
+    install(
+        FILES "${CMAKE_CURRENT_BINARY_DIR}/securepasswd_gui.desktop"
+        DESTINATION "${CMAKE_INSTALL_DATADIR}/applications"
+    )
+
+    # Install icon
+    install(
+        FILES "${CMAKE_CURRENT_SOURCE_DIR}/icons/app_icon.svg"
+        RENAME "securepasswd_gui.svg"
+        DESTINATION "${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps"
+    )
+endif()

@@ -104,14 +104,18 @@ set(CPACK_NSIS_MUI_UNIICON "${CMAKE_CURRENT_SOURCE_DIR}/gui/icons/app_icon.ico")
 
 set(CPACK_NSIS_PACKAGE_NAME "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION}")
 set(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_NAME}")
-set(CPACK_NSIS_START_MENU_LINKS "bin/securepasswd_gui.exe" "${CPACK_PACKAGE_NAME}")
+set(CPACK_NSIS_PROGRAM_GROUP "SecurePasswd MGMT")
 
-# NSIS shortcuts - Fixed escaping for proper NSIS generation
+# NSIS shortcuts
 set(CPACK_NSIS_CREATE_ICONS_EXTRA
-    "CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\Uninstall.lnk' '$INSTDIR\\\\uninstall.exe'")
+    "CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\SecurePasswd MGMT.lnk' '$INSTDIR\\\\bin\\\\securepasswd_gui.exe'"
+    "CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\Uninstall.lnk' '$INSTDIR\\\\uninstall.exe'"
+)
 
 set(CPACK_NSIS_DELETE_ICONS_EXTRA
-    "Delete '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\Uninstall.lnk'")
+    "Delete '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\SecurePasswd MGMT.lnk'"
+    "Delete '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\Uninstall.lnk'"
+)
 
 # Include CPack AFTER all CPACK_* variables are set
 include(CPack)
