@@ -5,6 +5,12 @@
 #include <getopt.h>
 #include <sodium.h>
 
+#ifndef _WIN32
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <errno.h>
+#endif
+
 #ifndef _MSC_VER
 #include <unistd.h> // For getpass
 #include <termios.h> // For hiding input
@@ -265,38 +271,83 @@ int main(int argc, char *argv[]) {
 
     // --- Get Master Password ---
     char *password = getpass("Enter master password: ");
+    if (!password || strlen(password) == 0) {
+        fprintf(stderr, "Error: Password cannot be empty.\n");
+        return 1;
+    }
 
     // --- Open Database ---
     char dirPath[1024];
     get_config_path(dirPath, sizeof(dirPath));
 
-    char cmd[2048];
-#ifdef _WIN32
-    snprintf(cmd, sizeof(cmd), "mkdir \"%s\"", dirPath); // Quoted path for Windows
-#else
-    snprintf(cmd, sizeof(cmd), "mkdir -p \"%s\"", dirPath); // Quoted path for others
-#endif
-    
-    // Execute the command, but ignore errors if the directory already exists
-    if (system(cmd) != 0) {
-        // You might want to add more robust error handling here
-        // to distinguish between "directory exists" and other errors.
-    }
+    printf("Configuration directory: %s\n", dirPath);
 
+    // Create directory if it doesn't exist (platform-specific)
+#ifdef _WIN32
+    // Check if directory exists using Windows API
+    DWORD attribs = GetFileAttributesA(dirPath);
+    if (attribs == INVALID_FILE_ATTRIBUTES || !(attribs & FILE_ATTRIBUTE_DIRECTORY)) {
+        // Directory doesn't exist, create it
+        printf("Creating directory...\n");
+        if (!CreateDirectoryA(dirPath, NULL)) {
+            DWORD err = GetLastError();
+            if (err != ERROR_ALREADY_EXISTS) {
+                fprintf(stderr, "Error: Failed to create directory '%s' (Error code: %lu)\n", dirPath, err);
+                sodium_memzero(password, strlen(password));
+                return 1;
+            }
+        } else {
+            printf("Directory created successfully.\n");
+        }
+    } else {
+        printf("Directory already exists.\n");
+    }
+#else
+    // Linux/macOS: Use POSIX mkdir
+    struct stat st = {0};
+    if (stat(dirPath, &st) == -1) {
+        // Directory doesn't exist
+        printf("Creating directory...\n");
+        
+        // Create parent directories if needed (simple version)
+        // For full recursive creation, you'd need to parse the path
+        if (mkdir(dirPath, 0700) != 0 && errno != EEXIST) {
+            fprintf(stderr, "Error: Failed to create directory '%s' (%s)\n", dirPath, strerror(errno));
+            sodium_memzero(password, strlen(password));
+            return 1;
+        } else {
+            printf("Directory created successfully.\n");
+        }
+    } else {
+        printf("Directory already exists.\n");
+    }
+#endif
+
+    // Construct database path
     char dbPath[1024];
 #ifdef _WIN32
-    snprintf(dbPath, sizeof(dbPath), "%s\vault.db", dirPath);
+    snprintf(dbPath, sizeof(dbPath), "%s\\vault.db", dirPath);
 #else
     snprintf(dbPath, sizeof(dbPath), "%s/vault.db", dirPath);
 #endif
 
+    printf("Database path: %s\n", dbPath);
+
+    // Open/create the database
     if (database_open(dbPath, password) != 0) {
-        fprintf(stderr, "Failed to open database. Check master password or file permissions.\n");
+        fprintf(stderr, "\nError: Failed to open database.\n");
+        fprintf(stderr, "Possible causes:\n");
+        fprintf(stderr, "  - Incorrect master password\n");
+        fprintf(stderr, "  - Insufficient file permissions\n");
+        fprintf(stderr, "  - Corrupted database file\n");
+        fprintf(stderr, "\nDatabase location: %s\n", dbPath);
         sodium_memzero(password, strlen(password));
         return 1;
     }
+    
+    // Clear password from memory
     sodium_memzero(password, strlen(password));
-    printf("Database opened successfully.\n");
+    printf("Database opened successfully.\n\n");
 
     // --- Main Application Logic ---
     interactive_mode();

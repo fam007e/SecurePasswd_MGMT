@@ -24,6 +24,7 @@ set(THEMES
 )
 
 qt_add_executable(securepasswd_gui
+    WIN32  # This prevents console window on Windows
     main.cpp
     passworddialog.cpp
     mainwindow.cpp
