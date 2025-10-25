@@ -40,6 +40,10 @@
 - **Real-time TOTP:** Displays TOTP codes with a progress bar indicating the time until the next code is generated.
 - **Password Health Check:** Analyzes your passwords for weaknesses (e.g., reuse, short length) and provides recommendations.
 
+### Desktop Integration
+- **Linux:** Provides a `.desktop` file for better integration with desktop environments.
+- **Windows:** Includes an installer and a proper application icon.
+
 ## Requirements
 
 - **C/C++ Compiler** (GCC, Clang, MSVC)
@@ -103,6 +107,7 @@ Pre-built packages for various platforms are available on the [GitHub Releases](
 
 ### Build from Source
 
+#### Linux
 1.  **Clone the repository:**
     ```bash
     git clone https://github.com/fam007e/SecurePasswd_MGMT.git
@@ -110,24 +115,52 @@ Pre-built packages for various platforms are available on the [GitHub Releases](
     ```
 
 2.  **Install Dependencies:**
-    Follow the instructions in the "Installation of Dependencies" section above.
+    Follow the instructions for your distribution in the "Installation of Dependencies" section above.
 
-3.  **Configure the build:**
+3.  **Configure and build:**
     ```bash
     mkdir build && cd build
     cmake ..
-    ```
-    For Windows with MSVC, you might need to specify the generator:
-    ```bash
-    cmake .. -G "Visual Studio 17 2022" -A x64
-    ```
-
-4.  **Compile the project:**
-    ```bash
     cmake --build . --config Release
     ```
 
-    The compiled binaries (`securepasswd_cli` and `securepasswd_gui`) will be created in the `build/bin` (or `build/Release` on Windows) directory.
+#### macOS
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/fam007e/SecurePasswd_MGMT.git
+    cd SecurePasswd_MGMT
+    ```
+
+2.  **Install Dependencies:**
+    ```bash
+    brew install cmake libsodium argon2 sqlcipher libcsv qt6 openssl curl
+    ```
+
+3.  **Configure and build:**
+    ```bash
+    mkdir build && cd build
+    cmake ..
+    cmake --build . --config Release
+    ```
+
+#### Windows
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/fam007e/SecurePasswd_MGMT.git
+    cd SecurePasswd_MGMT
+    ```
+
+2.  **Install Dependencies with vcpkg:**
+    Follow the instructions in the "Windows (vcpkg)" section above to install the required dependencies.
+
+3.  **Configure and build:**
+    ```bash
+    mkdir build && cd build
+    cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_TOOLCHAIN_FILE=C:/path/to/your/vcpkg/scripts/buildsystems/vcpkg.cmake
+    cmake --build . --config Release
+    ```
+
+    The compiled binaries (`securepasswd_cli.exe` and `securepasswd_gui.exe`) will be created in the `build/bin/Release` directory.
 
 ## Usage
 
@@ -167,6 +200,33 @@ SecurePasswd_MGMT/
 ├── SECURITY.md       # Detailed security policy
 └── LICENSE           # Project license
 ```
+
+## API Documentation
+
+The API documentation for the `core` library can be generated using Doxygen.
+
+1.  **Install Doxygen:**
+    ```bash
+    # Ubuntu/Debian
+    sudo apt-get install doxygen
+
+    # macOS (Homebrew)
+    brew install doxygen
+
+    # Arch Linux
+    sudo pacman -S doxygen
+
+    # Fedora/RHEL
+    sudo dnf install doxygen
+    ```
+
+2.  **Generate Documentation:**
+    From the root of the project directory, run:
+    ```bash
+    doxygen Doxyfile
+    ```
+
+    The documentation will be generated in the `docs/api` directory. Open `docs/api/html/index.html` in your web browser to view the documentation.
 
 ## Contribution
 

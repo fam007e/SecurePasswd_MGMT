@@ -83,4 +83,4 @@ Report bugs and request features via GitHub Issues.
 
 ---
 
-Last Updated: 2024
+Last Updated: 2025

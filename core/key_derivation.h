@@ -10,11 +10,23 @@ extern "C" {
 #define SALT_LEN 16
 #define KEY_LEN 32
 
-// Derives a key from a password and salt using Argon2id.
+/**
+ * @brief Derives a key from a password and salt using Argon2id.
+ *
+ * @param password The password to derive the key from.
+ * @param salt The salt to use for key derivation.
+ * @param key The buffer to store the derived key in. Must be KEY_LEN bytes.
+ * @return 0 on success, -1 on error.
+ */
 int derive_key(const char *password, const uint8_t *salt, uint8_t *key);
 
-// Loads the salt from the specified path.
-// If the file doesn't exist, it generates a new salt and saves it.
+/**
+ * @brief Loads the salt from the specified path, or generates a new one if it doesn't exist.
+ *
+ * @param path The path to the salt file.
+ * @param salt The buffer to store the loaded or generated salt in. Must be SALT_LEN bytes.
+ * @return 0 on success, -1 on error.
+ */
 int load_or_generate_salt(const char *path, uint8_t *salt);
 
 #ifdef __cplusplus

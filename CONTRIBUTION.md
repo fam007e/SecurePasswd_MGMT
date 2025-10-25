@@ -16,6 +16,27 @@ Given the nature of this project, security is our top priority. All contribution
 
 All pull requests, especially those that touch security-sensitive code in the `core/` directory, will undergo a thorough code review. Be prepared to explain your changes and justify your design decisions.
 
+## Coding Style
+
+To maintain a consistent and readable codebase, we adhere to the following coding style guidelines:
+
+- **Brace Style:** Allman style (braces on new lines).
+  ```c
+  if (condition)
+  {
+      // ...
+  }
+  ```
+- **Indentation:** 4 spaces.
+- **Line Length:** 80 characters.
+- **Naming Conventions:**
+  - Functions: `snake_case` (e.g., `database_open()`)
+  - Variables: `snake_case` (e.g., `db_path`)
+  - Structs: `PascalCase` (e.g., `PasswordEntry`)
+  - Enums: `PascalCase`
+  - Macros: `UPPER_CASE_SNAKE_CASE` (e.g., `KEY_LEN`)
+- **Comments:** Use `//` for single-line comments and `/* ... */` for multi-line comments. Explain *why* you are doing something, not *what* you are doing.
+
 ## Testing
 
 - **Unit Tests:** All new features should be accompanied by unit tests. The project uses CTest to manage and run tests.

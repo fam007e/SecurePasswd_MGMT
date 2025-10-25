@@ -8,12 +8,21 @@
 extern "C" {
 #endif
 
-// Generates a 6-digit TOTP code from a base32-encoded secret.
-// The caller is responsible for freeing the returned string.
+/**
+ * @brief Generates a 6-digit TOTP code from a base32-encoded secret for the current time.
+ *
+ * @param base32_secret The base32-encoded TOTP secret.
+ * @return A dynamically allocated string containing the 6-digit TOTP code. The caller is responsible for freeing this string.
+ */
 char* generate_totp_code(const char *base32_secret);
 
-// Generates a 6-digit TOTP code from a base32-encoded secret for a specific time.
-// The caller is responsible for freeing the returned string.
+/**
+ * @brief Generates a 6-digit TOTP code from a base32-encoded secret for a specific time.
+ *
+ * @param base32_secret The base32-encoded TOTP secret.
+ * @param current_time The time to generate the TOTP code for.
+ * @return A dynamically allocated string containing the 6-digit TOTP code. The caller is responsible for freeing this string.
+ */
 char* generate_totp_code_at_time(const char *base32_secret, time_t current_time);
 
 #ifdef __cplusplus

@@ -7,38 +7,69 @@
 extern "C" {
 #endif
 
+/**
+ * @brief A struct representing a password entry.
+ */
 typedef struct {
-    int id;
-    char *service;
-    char *username;
-    char *password;
-    char *totp_secret;
+    int id;             /**< The unique ID of the entry. */
+    char *service;      /**< The name of the service. */
+    char *username;     /**< The username for the service. */
+    char *password;     /**< The password for the service. */
+    char *totp_secret;  /**< The TOTP secret for the service. */
 } PasswordEntry;
 
-// Function to open and initialize the database.
-// Returns 0 on success, -1 on error.
+/**
+ * @brief Opens and initializes the database.
+ *
+ * @param db_path The path to the database file.
+ * @param password The master password for the database.
+ * @return 0 on success, -1 on error.
+ */
 int database_open(const char *db_path, const char *password);
 
-// Function to close the database.
+/**
+ * @brief Closes the database.
+ */
 void database_close();
 
-// Function to retrieve all password entries.
-// The caller is responsible for freeing the returned array and its contents.
+/**
+ * @brief Retrieves all password entries from the database.
+ *
+ * @param count A pointer to an integer that will be filled with the number of entries.
+ * @return A dynamically allocated array of PasswordEntry structs. The caller is responsible for freeing this array and its contents using free_password_entries().
+ */
 PasswordEntry* database_get_all_entries(int *count);
 
-// Function to add a new password entry.
-// Returns the ID of the new entry, or -1 on error.
+/**
+ * @brief Adds a new password entry to the database.
+ *
+ * @param entry A pointer to the PasswordEntry to add.
+ * @return The ID of the new entry, or -1 on error.
+ */
 int database_add_entry(const PasswordEntry *entry);
 
-// Function to update an existing password entry.
-// Returns 0 on success, -1 on error.
+/**
+ * @brief Updates an existing password entry in the database.
+ *
+ * @param entry A pointer to the PasswordEntry to update.
+ * @return 0 on success, -1 on error.
+ */
 int database_update_entry(const PasswordEntry *entry);
 
-// Function to delete a password entry by its ID.
-// Returns 0 on success, -1 on error.
+/**
+ * @brief Deletes a password entry from the database by its ID.
+ *
+ * @param id The ID of the entry to delete.
+ * @return 0 on success, -1 on error.
+ */
 int database_delete_entry(int id);
 
-// Function to free a list of PasswordEntry structs.
+/**
+ * @brief Frees a list of PasswordEntry structs.
+ *
+ * @param entries The array of PasswordEntry structs to free.
+ * @param count The number of entries in the array.
+ */
 void free_password_entries(PasswordEntry *entries, int count);
 
 

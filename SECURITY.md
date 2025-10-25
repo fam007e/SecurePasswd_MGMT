@@ -22,35 +22,37 @@ SecurePasswd_MGMT is designed with security-first principles and implements defe
 
 ### Encryption
 - **Algorithm:** AES-256
-- **Details:** The database is encrypted using SQLCipher, which uses AES-256 in CBC mode by default.
+- **Details:** The database is encrypted using SQLCipher, which uses AES-256 in CBC mode by default. The encryption key is passed to the database using the `sqlite3_key` function in `core/database.c`.
 - **Library:** **SQLCipher**, a widely-used, open-source library that provides transparent 256-bit AES encryption of SQLite database files.
 
 ### Key Derivation Function (KDF)
 **Specifications:**
 - **Algorithm:** **Argon2id**
-- **Details:** Argon2 is the winner of the Password Hashing Competition (2015) and is widely considered the best-in-class KDF. The `id` variant provides a hybrid approach that is resistant to both side-channel and GPU cracking attacks.
+- **Details:** Argon2 is the winner of the Password Hashing Competition (2015) and is widely considered the best-in-class KDF. The `id` variant provides a hybrid approach that is resistant to both side-channel and GPU cracking attacks. The key is derived using the `argon2id_hash_raw` function in `core/key_derivation.c`.
 - **Library:** The official `libargon2` reference implementation.
-- **Parameters:** Secure defaults are used for memory cost, time cost, and parallelism to make brute-force attacks computationally infeasible.
+- **Parameters:** Secure defaults are used for memory cost (`1 << 16`), time cost (`3`), and parallelism (`1`) to make brute-force attacks computationally infeasible.
 
 ### Random Number Generation
 - **Source:** Libsodium's `randombytes_buf()` function.
-- **Usage:** Salt generation for Argon2.
+- **Usage:** Salt generation for Argon2 in `core/key_derivation.c`.
 - **Quality:** Uses the operating system's best available Cryptographically Secure Pseudorandom Number Generator (CSPRNG), such as `/dev/urandom`.
 
 ## Data Protection
 
 ### Master Password Security Flow
 
+The following diagram illustrates the process of deriving the encryption key from the master password:
+
 ```mermaid
 graph TD
     A[User Input] --> B[Master Password]
     B --> C{Salt File Exists?}
-    C -- Yes --> D[Load Salt]
-    C -- No --> E[Generate and Save Salt]
-    D --> F[Argon2id Key Derivation]
+    C -- Yes --> D[Load Salt from vault.db.salt]
+    C -- No --> E[Generate and Save Salt using randombytes_buf]
+    D --> F[Argon2id Key Derivation using argon2id_hash_raw]
     E --> F
     F --> G[32-byte Encryption Key Generated]
-    G --> H[SQLCipher Encrypted Database]
+    G --> H[SQLCipher Encrypted Database via sqlite3_key]
 ```
 
 ### Data Storage Format
@@ -59,7 +61,7 @@ graph TD
 
 ## Memory Management
 
-Sensitive data (master password, derived keys, plaintext data) is explicitly cleared from memory as soon as it is no longer needed using `sodium_memzero()` or a similar secure memory wiping function.
+Sensitive data, specifically the master password and the derived encryption key, is explicitly cleared from memory as soon as it is no longer needed. This is done using the `sodium_memzero()` function from `libsodium` in `core/database.c` to prevent sensitive data from being exposed in memory.
 
 ## File System Security
 
@@ -71,7 +73,10 @@ Sensitive data (master password, derived keys, plaintext data) is explicitly cle
 The project uses **CMake**, a modern and cross-platform build system generator. Security is a primary consideration in the build process.
 
 - **Dependency Management:** CMake's `find_package` and `pkg_check_modules` are used to locate required libraries like Libsodium, Argon2, and SQLCipher, ensuring they are present before building.
-- **Compiler Flags:** Security hardening flags (e.g., `-fstack-protector-strong`, `-D_FORTIFY_SOURCE=2`, `-Wl,-z,relro`) are explicitly set in the `CMakeLists.txt` for production builds.
+- **Compiler Flags:** The following security hardening flags are explicitly set in the `CMakeLists.txt` for production builds on Linux:
+  - `-fstack-protector-strong`: Helps prevent stack-based buffer overflows.
+  - `-D_FORTIFY_SOURCE=2`: Adds checks for buffer overflows in common library functions.
+  - `-Wl,-z,relro,-z,now`: Hardens the binary against certain types of memory corruption attacks.
 
 ## Password Strength Validation
 
