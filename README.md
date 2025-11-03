@@ -61,22 +61,27 @@
 **Ubuntu/Debian:**
 ```bash
 sudo apt-get update
-sudo apt-get install build-essential cmake libsodium-dev libargon2-dev libsqlcipher-dev libcsv-dev qt6-base-dev libssl-dev libcurl4-openssl-dev
+sudo apt-get install -y build-essential cmake libsodium-dev libargon2-dev \
+  libsqlcipher-dev libcsv-dev qt6-base-dev libqt6svg6-dev libssl-dev libcurl4-openssl-dev \
+  libcmocka-dev
 ```
 
 **macOS (Homebrew):**
 ```bash
-brew install cmake libsodium argon2 sqlcipher libcsv qt6 openssl curl
+brew install qt@6 create-dmg libsodium argon2 sqlcipher cmocka
 ```
 
 **Arch Linux:**
 ```bash
-sudo pacman -Syu --needed base-devel cmake libsodium argon2 sqlcipher libcsv qt6-base openssl curl
+sudo pacman -Syu --noconfirm git base-devel libsodium argon2 sqlcipher \
+  qt6-base qt6-svg openssl curl cmake sudo fakeroot cmocka pcre2
 ```
 
 **Fedora/RHEL:**
 ```bash
-sudo dnf install gcc-c++ cmake libsodium-devel argon2-devel sqlcipher-devel libcsv-devel qt6-qtbase-devel openssl-devel libcurl-devel
+sudo dnf install gcc-c++ cmake libsodium-devel argon2-devel sqlcipher-devel \
+  libcsv-devel qt6-qtbase-devel qt6-qtsvg-devel openssl-devel libcurl-devel \
+  cmocka-devel
 ```
 
 **Windows (vcpkg):**
@@ -88,17 +93,14 @@ On Windows, this project uses `vcpkg` to manage dependencies. The setup is handl
     git clone https://github.com/microsoft/vcpkg.git
     ./vcpkg/bootstrap-vcpkg.bat
     ```
-
 2.  **Install dependencies:**
     ```bash
     ./vcpkg/vcpkg install --triplet x64-windows
     ```
-
     When you run CMake, you must point it to the vcpkg toolchain file:
     ```bash
     cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_TOOLCHAIN_FILE=path/to/your/vcpkg/scripts/buildsystems/vcpkg.cmake
     ```
-
 ## Installation
 
 ### Pre-built Packages
@@ -107,53 +109,50 @@ Pre-built packages for various platforms are available on the [GitHub Releases](
 
 ### Build from Source
 
-#### Linux
-1.  **Clone the repository:**
+#### Linux (Ubuntu)
+
+1.  **Install Dependencies:**
     ```bash
-    git clone https://github.com/fam007e/SecurePasswd_MGMT.git
-    cd SecurePasswd_MGMT
+    sudo apt-get update
+    sudo apt-get install -y build-essential cmake libsodium-dev libargon2-dev \
+      libsqlcipher-dev libcsv-dev qt6-base-dev libqt6svg6-dev libssl-dev libcurl4-openssl-dev \
+      libcmocka-dev
     ```
 
-2.  **Install Dependencies:**
-    Follow the instructions for your distribution in the "Installation of Dependencies" section above.
-
-3.  **Configure and build:**
+2.  **Configure and Build:**
     ```bash
     mkdir build && cd build
-    cmake ..
+    cmake .. -DCMAKE_BUILD_TYPE=Release
     cmake --build . --config Release
     ```
 
 #### macOS
-1.  **Clone the repository:**
+
+1.  **Install Dependencies:**
     ```bash
-    git clone https://github.com/fam007e/SecurePasswd_MGMT.git
-    cd SecurePasswd_MGMT
+    brew install qt@6 create-dmg libsodium argon2 sqlcipher cmocka
+    git clone https://github.com/rgamble/libcsv.git
+    cd libcsv
+    ./configure
+    make
+    sudo make install
     ```
 
-2.  **Install Dependencies:**
-    ```bash
-    brew install cmake libsodium argon2 sqlcipher libcsv qt6 openssl curl
-    ```
-
-3.  **Configure and build:**
+2.  **Configure and Build:**
     ```bash
     mkdir build && cd build
-    cmake ..
+    cmake .. -DCMAKE_BUILD_TYPE=Release \
+      -DLIBCSV_INCLUDE_DIRS=/usr/local/include \
+      -DLIBCSV_LIBRARIES=/usr/local/lib/libcsv.a
     cmake --build . --config Release
     ```
 
 #### Windows
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/fam007e/SecurePasswd_MGMT.git
-    cd SecurePasswd_MGMT
-    ```
 
-2.  **Install Dependencies with vcpkg:**
+1.  **Install Dependencies with vcpkg:**
     Follow the instructions in the "Windows (vcpkg)" section above to install the required dependencies.
 
-3.  **Configure and build:**
+2.  **Configure and Build:**
     ```bash
     mkdir build && cd build
     cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_TOOLCHAIN_FILE=C:/path/to/your/vcpkg/scripts/buildsystems/vcpkg.cmake
@@ -182,7 +181,7 @@ The CLI provides an interactive menu for managing your passwords and TOTP secret
 
 ## Security
 
-This project was designed with a security-first mindset, incorporating modern, vetted cryptographic primitives. For a detailed breakdown of the security architecture, see our **[Security Policy](SECURITY.md)**.
+This project was designed with a security-first mindset, incorporating modern, vetted cryptographic primitives. For a detailed breakdown of the security architecture, see our **[Security Policy](@ref SECURITY.md)**.
 
 ## Project Structure
 
@@ -220,7 +219,13 @@ The API documentation for the `core` library can be generated using Doxygen.
     sudo dnf install doxygen
     ```
 
-2.  **Generate Documentation:**
+2.  **Prepare Markdown Files for Doxygen:**
+    Before generating the documentation, you need to convert the markdown files to a Doxygen-friendly format. You can do this automatically by running the following `sed` command from the root of the project directory:
+    ```bash
+    sed -i 's/```bash/@code/g; s/```/@endcode/g' README.md SECURITY.md
+    ```
+
+3.  **Generate Documentation:**
     From the root of the project directory, run:
     ```bash
     doxygen Doxyfile
@@ -230,8 +235,8 @@ The API documentation for the `core` library can be generated using Doxygen.
 
 ## Contribution
 
-We welcome contributions! Please read our [Contribution Guidelines](CONTRIBUTION.md) for details on our code of conduct and the process for submitting pull requests.
+We welcome contributions! Please read our [Contribution Guidelines](@ref CONTRIBUTION.md) for details on our code of conduct and the process for submitting pull requests.
 
 ## License
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License** - see the [LICENSE](@ref LICENSE) file for details.
