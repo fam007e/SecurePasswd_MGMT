@@ -181,7 +181,7 @@ The CLI provides an interactive menu for managing your passwords and TOTP secret
 
 ## Security
 
-This project was designed with a security-first mindset, incorporating modern, vetted cryptographic primitives. For a detailed breakdown of the security architecture, see our **[Security Policy](@ref SECURITY.md)**.
+This project was designed with a security-first mindset, incorporating modern, vetted cryptographic primitives. For a detailed breakdown of the security architecture, see our **[Security Policy](SECURITY.md)**.
 
 ## Project Structure
 
@@ -235,8 +235,8 @@ The API documentation for the `core` library can be generated using Doxygen.
 
 ## Contribution
 
-We welcome contributions! Please read our [Contribution Guidelines](@ref CONTRIBUTION.md) for details on our code of conduct and the process for submitting pull requests.
+We welcome contributions! Please read our [Contribution Guidelines](CONTRIBUTION.md) for details on our code of conduct and the process for submitting pull requests.
 
 ## License
 
-This project is licensed under the **MIT License** - see the [LICENSE](@ref LICENSE) file for details.
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
