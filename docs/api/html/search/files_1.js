@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['database_2ec_0',['database.c',['../database_8c.html',1,'']]],
-  ['database_2eh_1',['database.h',['../database_8h.html',1,'']]]
+  ['citation_2ecff_0',['CITATION.cff',['../CITATION_8cff.html',1,'']]],
+  ['code_5fof_5fconduct_2emd_1',['CODE_OF_CONDUCT.md',['../CODE__OF__CONDUCT_8md.html',1,'']]],
+  ['contributing_2emd_2',['CONTRIBUTING.md',['../CONTRIBUTING_8md.html',1,'']]]
 ];

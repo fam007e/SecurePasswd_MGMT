@@ -26,62 +26,74 @@ var NAVTREE =
 [
   [ "SecurePasswd_MGMT", "index.html", [
     [ "Key Security Features", "index.html#autotoc_md1", null ],
-    [ "Table of Contents", "index.html#autotoc_md2", null ],
-    [ "Features", "index.html#autotoc_md3", [
-      [ "Command-Line Interface (CLI)", "index.html#autotoc_md4", null ],
-      [ "Graphical User Interface (GUI)", "index.html#autotoc_md5", null ],
-      [ "Desktop Integration", "index.html#autotoc_md6", null ]
+    [ "Features", "index.html#autotoc_md2", [
+      [ "Command-Line Interface (CLI)", "index.html#autotoc_md3", null ],
+      [ "Graphical User Interface (GUI)", "index.html#autotoc_md4", null ],
+      [ "Desktop Integration", "index.html#autotoc_md5", null ]
     ] ],
-    [ "Requirements", "index.html#autotoc_md7", [
-      [ "Installation of Dependencies", "index.html#autotoc_md8", null ]
+    [ "Requirements", "index.html#autotoc_md6", [
+      [ "Installation of Dependencies", "index.html#autotoc_md7", null ]
     ] ],
-    [ "Installation", "index.html#autotoc_md9", [
-      [ "Pre-built Packages", "index.html#autotoc_md10", null ],
-      [ "Build from Source", "index.html#autotoc_md11", [
-        [ "Linux (Ubuntu)", "index.html#autotoc_md12", null ],
-        [ "macOS", "index.html#autotoc_md13", null ],
-        [ "Windows", "index.html#autotoc_md14", null ]
+    [ "Installation", "index.html#autotoc_md8", [
+      [ "Pre-built Packages", "index.html#autotoc_md9", null ],
+      [ "Build from Source", "index.html#autotoc_md10", [
+        [ "Linux (Ubuntu)", "index.html#autotoc_md11", null ],
+        [ "macOS", "index.html#autotoc_md12", null ],
+        [ "Windows", "index.html#autotoc_md13", null ]
       ] ]
     ] ],
-    [ "Usage", "index.html#autotoc_md15", [
-      [ "GUI Application", "index.html#autotoc_md16", null ],
-      [ "Command-Line Interface", "index.html#autotoc_md17", null ]
+    [ "Usage", "index.html#autotoc_md14", [
+      [ "GUI Application", "index.html#autotoc_md15", null ],
+      [ "Command-Line Interface", "index.html#autotoc_md16", null ]
     ] ],
-    [ "Security", "index.html#autotoc_md18", null ],
-    [ "Project Structure", "index.html#autotoc_md19", null ],
-    [ "API Documentation", "index.html#autotoc_md20", null ],
-    [ "Contribution", "index.html#autotoc_md21", null ],
+    [ "Security", "index.html#autotoc_md17", null ],
+    [ "Project Structure", "index.html#autotoc_md18", null ],
+    [ "API Documentation", "index.html#autotoc_md19", null ],
+    [ "Contribution", "index.html#autotoc_md20", null ],
+    [ "Code of Conduct", "index.html#autotoc_md21", null ],
     [ "License", "index.html#autotoc_md22", null ],
     [ "Security Policy", "md_SECURITY.html", [
-      [ "Table of Contents", "md_SECURITY.html#autotoc_md24", null ],
-      [ "Security Overview", "md_SECURITY.html#autotoc_md25", [
-        [ "Security Goals", "md_SECURITY.html#autotoc_md26", null ]
+      [ "Security Overview", "md_SECURITY.html#autotoc_md24", [
+        [ "Security Goals", "md_SECURITY.html#autotoc_md25", null ]
       ] ],
-      [ "Cryptographic Implementation", "md_SECURITY.html#autotoc_md27", [
-        [ "Encryption", "md_SECURITY.html#autotoc_md28", null ],
-        [ "Key Derivation Function (KDF)", "md_SECURITY.html#autotoc_md29", null ],
-        [ "Random Number Generation", "md_SECURITY.html#autotoc_md30", null ]
+      [ "Cryptographic Implementation", "md_SECURITY.html#autotoc_md26", [
+        [ "Encryption", "md_SECURITY.html#autotoc_md27", null ],
+        [ "Key Derivation Function (KDF)", "md_SECURITY.html#autotoc_md28", null ],
+        [ "Random Number Generation", "md_SECURITY.html#autotoc_md29", null ]
       ] ],
-      [ "Data Protection", "md_SECURITY.html#autotoc_md31", [
-        [ "Master Password Security Flow", "md_SECURITY.html#autotoc_md32", null ],
-        [ "Data Storage Format", "md_SECURITY.html#autotoc_md33", null ]
+      [ "Data Protection", "md_SECURITY.html#autotoc_md30", [
+        [ "Master Password Security Flow", "md_SECURITY.html#autotoc_md31", null ],
+        [ "Data Storage Format", "md_SECURITY.html#autotoc_md32", null ]
       ] ],
-      [ "Memory Management", "md_SECURITY.html#autotoc_md34", null ],
-      [ "File System Security", "md_SECURITY.html#autotoc_md35", null ],
-      [ "Secure Build Process", "md_SECURITY.html#autotoc_md36", null ],
-      [ "Password Strength Validation", "md_SECURITY.html#autotoc_md37", [
-        [ "Health Check Requirements", "md_SECURITY.html#autotoc_md38", null ],
-        [ "Compliance", "md_SECURITY.html#autotoc_md39", null ]
+      [ "Memory Management", "md_SECURITY.html#autotoc_md33", null ],
+      [ "File System Security", "md_SECURITY.html#autotoc_md34", null ],
+      [ "Secure Build Process", "md_SECURITY.html#autotoc_md35", null ],
+      [ "Password Strength Validation", "md_SECURITY.html#autotoc_md36", [
+        [ "Health Check Requirements", "md_SECURITY.html#autotoc_md37", null ],
+        [ "Compliance", "md_SECURITY.html#autotoc_md38", null ]
       ] ],
-      [ "Reporting Security Vulnerabilities", "md_SECURITY.html#autotoc_md40", null ]
+      [ "Reporting Security Vulnerabilities", "md_SECURITY.html#autotoc_md39", null ]
     ] ],
-    [ "Contributing to SecurePasswd_MGMT", "md_CONTRIBUTION.html", [
-      [ "Security-Focused Development", "md_CONTRIBUTION.html#autotoc_md42", null ],
-      [ "Code Review", "md_CONTRIBUTION.html#autotoc_md43", null ],
-      [ "Coding Style", "md_CONTRIBUTION.html#autotoc_md44", null ],
-      [ "Testing", "md_CONTRIBUTION.html#autotoc_md45", null ],
-      [ "How to Contribute", "md_CONTRIBUTION.html#autotoc_md46", null ],
-      [ "Release Guidelines", "md_CONTRIBUTION.html#autotoc_md47", null ]
+    [ "Contributing to SecurePasswd_MGMT", "md_CONTRIBUTING.html", [
+      [ "Security-Focused Development", "md_CONTRIBUTING.html#autotoc_md41", null ],
+      [ "Code Review", "md_CONTRIBUTING.html#autotoc_md42", null ],
+      [ "Coding Style", "md_CONTRIBUTING.html#autotoc_md43", null ],
+      [ "Testing", "md_CONTRIBUTING.html#autotoc_md44", null ],
+      [ "How to Contribute", "md_CONTRIBUTING.html#autotoc_md45", null ],
+      [ "Release Guidelines", "md_CONTRIBUTING.html#autotoc_md46", null ]
+    ] ],
+    [ "Contributor Covenant Code of Conduct", "md_CODE__OF__CONDUCT.html", [
+      [ "Our Pledge", "md_CODE__OF__CONDUCT.html#autotoc_md48", null ],
+      [ "Our Standards", "md_CODE__OF__CONDUCT.html#autotoc_md49", null ],
+      [ "Enforcement Responsibilities", "md_CODE__OF__CONDUCT.html#autotoc_md50", null ],
+      [ "Scope", "md_CODE__OF__CONDUCT.html#autotoc_md51", null ],
+      [ "Enforcement", "md_CODE__OF__CONDUCT.html#autotoc_md52", null ],
+      [ "Attribution", "md_CODE__OF__CONDUCT.html#autotoc_md53", null ]
+    ] ],
+    [ "Authors", "md_AUTHORS.html", [
+      [ "Core Team", "md_AUTHORS.html#autotoc_md55", null ],
+      [ "Contributors", "md_AUTHORS.html#autotoc_md56", null ],
+      [ "Acknowledgements", "md_AUTHORS.html#autotoc_md57", null ]
     ] ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
@@ -105,7 +117,7 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"LICENSE.html"
+"CITATION_8cff.html"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

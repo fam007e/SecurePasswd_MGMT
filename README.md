@@ -14,17 +14,6 @@
 - **Memory Safety:** Sensitive data is explicitly cleared from memory after use.
 - **Secure Storage:** All data is stored locally, encrypted, in a secure directory.
 
-## Table of Contents
-- [Key Security Features](#key-security-features)
-- [Features](#features)
-- [Requirements](#requirements)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Security](#security)
-- [Project Structure](#project-structure)
-- [Contribution](#contribution)
-- [License](#license)
-
 ## Features
 
 ### Command-Line Interface (CLI)
@@ -195,7 +184,7 @@ SecurePasswd_MGMT/
 ├── tests/            # Unit and integration tests
 ├── CMakeLists.txt    # Root CMake build script
 ├── README.md         # This file
-├── CONTRIBUTION.md   # Guidelines for contributing
+├── CONTRIBUTING.md   # Guidelines for contributing
 ├── SECURITY.md       # Detailed security policy
 └── LICENSE           # Project license
 ```
@@ -205,37 +194,37 @@ SecurePasswd_MGMT/
 The API documentation for the `core` library can be generated using Doxygen.
 
 1.  **Install Doxygen:**
-    ```bash
-    # Ubuntu/Debian
-    sudo apt-get install doxygen
 
-    # macOS (Homebrew)
-    brew install doxygen
+```bash
+# Ubuntu/Debian
+sudo apt-get install doxygen
 
-    # Arch Linux
-    sudo pacman -S doxygen
+# macOS (Homebrew)
+brew install doxygen
 
-    # Fedora/RHEL
-    sudo dnf install doxygen
-    ```
+# Arch Linux
+sudo pacman -S doxygen
 
-2.  **Prepare Markdown Files for Doxygen:**
-    Before generating the documentation, you need to convert the markdown files to a Doxygen-friendly format. You can do this automatically by running the following `sed` command from the root of the project directory:
-    ```bash
-    sed -i 's/```bash/@code/g; s/```/@endcode/g' README.md SECURITY.md
-    ```
+# Fedora/RHEL
+sudo dnf install doxygen
+```
 
-3.  **Generate Documentation:**
+2.  **Generate Documentation:**
     From the root of the project directory, run:
-    ```bash
-    doxygen Doxyfile
-    ```
+
+```bash
+doxygen Doxyfile
+```
 
     The documentation will be generated in the `docs/api` directory. Open `docs/api/html/index.html` in your web browser to view the documentation.
 
 ## Contribution
 
-We welcome contributions! Please read our [Contribution Guidelines](CONTRIBUTION.md) for details on our code of conduct and the process for submitting pull requests.
+We welcome contributions! Please read our [Contribution Guidelines](CONTRIBUTING.md) for details on the process for submitting pull requests.
+
+## Code of Conduct
+
+We are committed to providing a friendly, safe, and welcoming environment for all. Please read and respect our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## License
 

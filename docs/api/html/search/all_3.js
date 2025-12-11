@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['data_20protection_0',['Data Protection',['../md_SECURITY.html#autotoc_md31',1,'']]],
-  ['data_20storage_20format_1',['Data Storage Format',['../md_SECURITY.html#autotoc_md33',1,'']]],
+  ['data_20protection_0',['Data Protection',['../md_SECURITY.html#autotoc_md30',1,'']]],
+  ['data_20storage_20format_1',['Data Storage Format',['../md_SECURITY.html#autotoc_md32',1,'']]],
   ['database_2ec_2',['database.c',['../database_8c.html',1,'']]],
   ['database_2eh_3',['database.h',['../database_8h.html',1,'']]],
   ['database_5fadd_5fentry_4',['database_add_entry',['../database_8c.html#a49b60bc340abf21b96b5195b57f902c4',1,'database_add_entry(const PasswordEntry *entry):&#160;database.c'],['../database_8h.html#a49b60bc340abf21b96b5195b57f902c4',1,'database_add_entry(const PasswordEntry *entry):&#160;database.c']]],
@@ -11,10 +11,10 @@ var searchData=
   ['database_5fopen_8',['database_open',['../database_8c.html#ac727a80b7864ac3b8e30e14bc0164887',1,'database_open(const char *db_path, const char *password):&#160;database.c'],['../database_8h.html#ac727a80b7864ac3b8e30e14bc0164887',1,'database_open(const char *db_path, const char *password):&#160;database.c']]],
   ['database_5fupdate_5fentry_9',['database_update_entry',['../database_8c.html#a3c5e8e2581663e90084591b7e2590615',1,'database_update_entry(const PasswordEntry *entry):&#160;database.c'],['../database_8h.html#a3c5e8e2581663e90084591b7e2590615',1,'database_update_entry(const PasswordEntry *entry):&#160;database.c']]],
   ['db_10',['db',['../database_8c.html#ad6e663497d2c934364b3bcf07496b30b',1,'database.c']]],
-  ['dependencies_11',['Installation of Dependencies',['../index.html#autotoc_md8',1,'']]],
-  ['derivation_20function_20kdf_12',['Key Derivation Function (KDF)',['../md_SECURITY.html#autotoc_md29',1,'']]],
+  ['dependencies_11',['Installation of Dependencies',['../index.html#autotoc_md7',1,'']]],
+  ['derivation_20function_20kdf_12',['Key Derivation Function (KDF)',['../md_SECURITY.html#autotoc_md28',1,'']]],
   ['derive_5fkey_13',['derive_key',['../key__derivation_8c.html#a54ef4e1a1ee65f727df0a38518d1c540',1,'derive_key(const char *password, const uint8_t *salt, uint8_t *key):&#160;key_derivation.c'],['../key__derivation_8h.html#a54ef4e1a1ee65f727df0a38518d1c540',1,'derive_key(const char *password, const uint8_t *salt, uint8_t *key):&#160;key_derivation.c']]],
-  ['desktop_20integration_14',['Desktop Integration',['../index.html#autotoc_md6',1,'']]],
-  ['development_15',['Security-Focused Development',['../md_CONTRIBUTION.html#autotoc_md42',1,'']]],
-  ['documentation_16',['API Documentation',['../index.html#autotoc_md20',1,'']]]
+  ['desktop_20integration_14',['Desktop Integration',['../index.html#autotoc_md5',1,'']]],
+  ['development_15',['Security-Focused Development',['../md_CONTRIBUTING.html#autotoc_md41',1,'']]],
+  ['documentation_16',['API Documentation',['../index.html#autotoc_md19',1,'']]]
 ];

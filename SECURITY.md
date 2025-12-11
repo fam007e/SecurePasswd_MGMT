@@ -1,14 +1,5 @@
 # Security Policy
 
-## Table of Contents
-- [Security Overview](#security-overview)
-- [Cryptographic Implementation](#cryptographic-implementation)
-- [Data Protection](#data-protection)
-- [Memory Management](#memory-management)
-- [File System Security](#file-system-security)
-- [Password Strength Validation](#password-strength-validation)
-- [Reporting Security Vulnerabilities](#reporting-security-vulnerabilities)
-
 ## Security Overview
 
 SecurePasswd_MGMT is designed with security-first principles and implements defense-in-depth strategies using modern, vetted cryptographic libraries. This document outlines the comprehensive security measures implemented to protect user data.
