@@ -86,6 +86,7 @@ void cli_import_row_cb(int c, void *data) {
         entry.username = row->fields[1];
         entry.password = row->fields[2];
         entry.totp_secret = (row->count >= 4) ? row->fields[3] : "";
+        entry.recovery_codes = (row->count >= 5) ? row->fields[4] : "";
 
         if(database_add_entry(&entry) < 0) {
             fprintf(stderr, "Failed to import row for service: %s\n", entry.service);
@@ -145,7 +146,7 @@ void cli_list_entries() {
 
 void cli_add_entry() {
     PasswordEntry entry;
-    char service[256], username[256], password[256], totp[256];
+    char service[256], username[256], password[256], totp[256], recovery[1024];
 
     printf("Service: ");
     read_line(service, sizeof(service));
@@ -155,11 +156,14 @@ void cli_add_entry() {
     read_line(password, sizeof(password));
     printf("TOTP Secret (optional): ");
     read_line(totp, sizeof(totp));
+    printf("Recovery Codes (optional): ");
+    read_line(recovery, sizeof(recovery));
 
     entry.service = service;
     entry.username = username;
     entry.password = password;
     entry.totp_secret = totp;
+    entry.recovery_codes = recovery;
 
     if (database_add_entry(&entry) < 0) {
         fprintf(stderr, "Error: Could not add entry.\n");
@@ -202,6 +206,59 @@ void cli_view_entry() {
         } else {
             printf("TOTP:     (none)\n");
         }
+        if (target->recovery_codes && strlen(target->recovery_codes) > 0) {
+            printf("Recovery Codes:\n");
+            char *codes_copy = strdup(target->recovery_codes);
+            char *line = strtok(codes_copy, "\n");
+            int line_count = 0;
+            char *lines[100];
+            while (line && line_count < 100) {
+                lines[line_count++] = line;
+                printf("  [%d] %s\n", line_count, line);
+                line = strtok(NULL, "\n");
+            }
+
+            printf("\nMark a code as used? (Enter number, or 0 to skip): ");
+            int mark_idx;
+            if (scanf("%d", &mark_idx) == 1 && mark_idx > 0 && mark_idx <= line_count) {
+                while(getchar() != '\n'); // consume newline
+                if (lines[mark_idx-1][0] != '*') {
+                    // Update in database
+                    size_t new_len = strlen(target->recovery_codes) + 2; // +1 for '*'
+                    char *new_codes = malloc(new_len);
+                    new_codes[0] = '\0';
+                    for (int i = 0; i < line_count; i++) {
+                        if (i == mark_idx - 1) {
+                            strcat(new_codes, "*");
+                        }
+                        strcat(new_codes, lines[i]);
+                        if (i < line_count - 1) strcat(new_codes, "\n");
+                    }
+
+                    PasswordEntry updated;
+                    updated.id = target->id;
+                    updated.service = target->service;
+                    updated.username = target->username;
+                    updated.password = target->password;
+                    updated.totp_secret = target->totp_secret;
+                    updated.recovery_codes = new_codes;
+
+                    if (database_update_entry(&updated) == 0) {
+                        printf("Recovery code marked as used.\n");
+                    } else {
+                        printf("Error updating entry.\n");
+                    }
+                    free(new_codes);
+                } else {
+                    printf("Code already marked as used.\n");
+                }
+            } else if (mark_idx != 0) {
+                while(getchar() != '\n'); // consume newline
+            }
+            free(codes_copy);
+        } else {
+            printf("Recovery Codes: (none)\n");
+        }
         printf("----------------\n");
     } else {
         fprintf(stderr, "Could not find entry with ID %d\n", id);
@@ -226,7 +283,7 @@ void cli_delete_entry() {
 void interactive_mode() {
     char choice;
     while (true) {
-        printf("\n[l]ist, [a]dd, [v]iew, [e]dit, [d]elete, [g]enerate, [h]ealth-check, [i]mport, [e]xport, [q]uit\n");
+        printf("\n[l]ist, [a]dd, [v]iew, [e]dit, [d]elete, [g]enerate, [h]ealth-check, [i]mport, e[x]port, [q]uit\n");
         printf("> ");
         if (scanf(" %c", &choice) != 1) { choice = 0; }
         while(getchar() != '\n'); // consume trailing chars and newline
@@ -236,7 +293,7 @@ void interactive_mode() {
             case 'a': cli_add_entry(); break;
             case 'v': cli_view_entry(); break;
             case 'd': cli_delete_entry(); break;
-            case 'g': { 
+            case 'g': {
                 char* pw = generate_password(16, true, true, true);
                 printf("Generated password: %s\n", pw);
                 free(pw);
@@ -250,7 +307,8 @@ void interactive_mode() {
                 cli_import_csv(path);
                 break;
             }
-            case 'e': {
+            case 'e': cli_edit_entry(); break;
+            case 'x': {
                 char path[256];
                 printf("Path to export CSV file: ");
                 read_line(path, sizeof(path));
@@ -308,7 +366,7 @@ int main(int argc, char *argv[]) {
     if (stat(dirPath, &st) == -1) {
         // Directory doesn't exist
         printf("Creating directory...\n");
-        
+
         // Create parent directories if needed (simple version)
         // For full recursive creation, you'd need to parse the path
         if (mkdir(dirPath, 0700) != 0 && errno != EEXIST) {
@@ -344,7 +402,7 @@ int main(int argc, char *argv[]) {
         sodium_memzero(password, strlen(password));
         return 1;
     }
-    
+
     // Clear password from memory
     sodium_memzero(password, strlen(password));
     printf("Database opened successfully.\n\n");
@@ -383,7 +441,7 @@ void cli_edit_entry() {
 
     if (target) {
         PasswordEntry updated_entry;
-        char service[256], username[256], password[256], totp[256];
+        char service[256], username[256], password[256], totp[256], recovery[1024];
 
         printf("Service [%s]: ", target->service);
         read_line(service, sizeof(service));
@@ -393,12 +451,15 @@ void cli_edit_entry() {
         read_line(password, sizeof(password));
         printf("TOTP Secret [%s]: ", target->totp_secret);
         read_line(totp, sizeof(totp));
+        printf("Recovery Codes [%s]: ", target->recovery_codes ? target->recovery_codes : "(none)");
+        read_line(recovery, sizeof(recovery));
 
         updated_entry.id = id;
         updated_entry.service = strlen(service) > 0 ? service : target->service;
         updated_entry.username = strlen(username) > 0 ? username : target->username;
         updated_entry.password = strlen(password) > 0 ? password : target->password;
         updated_entry.totp_secret = strlen(totp) > 0 ? totp : target->totp_secret;
+        updated_entry.recovery_codes = strlen(recovery) > 0 ? recovery : target->recovery_codes;
 
         if (database_update_entry(&updated_entry) != 0) {
             fprintf(stderr, "Error: Could not update entry.\n");
@@ -460,10 +521,10 @@ void cli_export_csv(const char* filepath) {
         return;
     }
 
-    fprintf(fp, "service,username,password,totp_secret\n");
+    fprintf(fp, "service,username,password,totp_secret,recovery_codes\n");
     for (int i = 0; i < count; i++) {
-        fprintf(fp, "\"%s\",\"%s\",\"%s\",\"%s\"\n",
-                entries[i].service, entries[i].username, entries[i].password, entries[i].totp_secret);
+        fprintf(fp, "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
+                entries[i].service, entries[i].username, entries[i].password, entries[i].totp_secret, entries[i].recovery_codes);
     }
 
     fclose(fp);
@@ -486,7 +547,7 @@ void cli_health_check() {
     for (int i = 0; i < count; i++) {
         size_t len = strlen(entries[i].password);
         if (len < 16) {
-            printf("  [ID %d] %s - %s: Password is only %zu characters (recommended: 16+)\n", 
+            printf("  [ID %d] %s - %s: Password is only %zu characters (recommended: 16+)\n",
                    entries[i].id, entries[i].service, entries[i].username, len);
             short_found = true;
         }
@@ -501,14 +562,14 @@ void cli_health_check() {
     for (int i = 0; i < count; i++) {
         const char *pwd = entries[i].password;
         bool has_upper = false, has_lower = false, has_digit = false, has_special = false;
-        
+
         for (size_t j = 0; j < strlen(pwd); j++) {
             if (pwd[j] >= 'A' && pwd[j] <= 'Z') has_upper = true;
             else if (pwd[j] >= 'a' && pwd[j] <= 'z') has_lower = true;
             else if (pwd[j] >= '0' && pwd[j] <= '9') has_digit = true;
             else has_special = true;
         }
-        
+
         if (!has_upper || !has_lower || !has_digit || !has_special) {
             printf("  [ID %d] %s - %s: Missing ", entries[i].id, entries[i].service, entries[i].username);
             bool first = true;
@@ -530,7 +591,7 @@ void cli_health_check() {
     for (int i = 0; i < count; i++) {
         int reuse_count = 0;
         int reused_ids[256];  // Store IDs of entries with same password
-        
+
         for (int j = 0; j < count; j++) {
             if (i != j && strcmp(entries[i].password, entries[j].password) == 0) {
                 if (reuse_count == 0) {
@@ -539,7 +600,7 @@ void cli_health_check() {
                 reused_ids[reuse_count++] = entries[j].id;
             }
         }
-        
+
         if (reuse_count > 0) {
             // Only print once per unique password (check if this is the first occurrence)
             bool is_first = true;
@@ -549,7 +610,7 @@ void cli_health_check() {
                     break;
                 }
             }
-            
+
             if (is_first) {
                 printf("  Password reused across %d services: ", reuse_count);
                 for (int k = 0; k < reuse_count; k++) {

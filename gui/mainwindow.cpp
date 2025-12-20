@@ -47,11 +47,13 @@ void import_row_cb(int c, void *data) {
         QByteArray username = fields->at(1).toUtf8();
         QByteArray password = fields->at(2).toUtf8();
         QByteArray totpSecret = (fields->size() >= 4) ? fields->at(3).toUtf8() : QByteArray();
+        QByteArray recoveryCodes = (fields->size() >= 5) ? fields->at(4).toUtf8() : QByteArray();
 
         entry.service = (char*)service.constData();
         entry.username = (char*)username.constData();
         entry.password = (char*)password.constData();
         entry.totp_secret = (char*)totpSecret.constData();
+        entry.recovery_codes = (char*)recoveryCodes.constData();
 
         database_add_entry(&entry);
     }
@@ -63,7 +65,7 @@ MainWindow::MainWindow(const QString& password, QWidget *parent) : QMainWindow(p
     char dirPath[1024];
     get_config_path(dirPath, sizeof(dirPath));
     QString dbDirPath = QString::fromUtf8(dirPath);
-    
+
     QDir dir(dbDirPath);
     if (!dir.exists()) {
         dir.mkpath(".");
@@ -80,9 +82,12 @@ MainWindow::MainWindow(const QString& password, QWidget *parent) : QMainWindow(p
     setupUI();
     refreshEntryList();
 
-    QSettings settings("securepasswd", "securepasswd");
+    QSettings settings("SecurePasswd_MGMT", "SecurePasswd_MGMT");
     currentTheme = settings.value("theme", "light").toString();
     loadTheme(currentTheme);
+
+    recoveryCodesEnabled = settings.value("recovery_codes_enabled", false).toBool();
+    updateRecoveryCodesVisibility();
 }
 
 MainWindow::~MainWindow() {
@@ -135,13 +140,14 @@ void MainWindow::onExport() {
         return;
     }
 
-    fprintf(fp, "service,username,password,totp_secret\n");
+    fprintf(fp, "service,username,password,totp_secret,recovery_codes\n");
     for (const auto& entry : m_entries) {
-        fprintf(fp, "\"%s\",\"%s\",\"%s\",\"%s\"\n",
+        fprintf(fp, "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
                 entry.service.toUtf8().constData(),
                 entry.username.toUtf8().constData(),
                 entry.password.toUtf8().constData(),
-                entry.totpSecret.toUtf8().constData());
+                entry.totpSecret.toUtf8().constData(),
+                entry.recoveryCodes.toUtf8().constData());
     }
 
     fclose(fp);
@@ -168,6 +174,7 @@ void MainWindow::refreshEntryList() {
         qt_entry.username = QString::fromUtf8(db_entries[i].username);
         qt_entry.password = QString::fromUtf8(db_entries[i].password);
         qt_entry.totpSecret = QString::fromUtf8(db_entries[i].totp_secret);
+        qt_entry.recoveryCodes = QString::fromUtf8(db_entries[i].recovery_codes);
         m_entries.append(qt_entry);
     }
 
@@ -176,11 +183,27 @@ void MainWindow::refreshEntryList() {
 
 void MainWindow::onCurrentRowChanged(int currentRow) {
     totpTimer->stop();
-    if (currentRow < 0 || currentRow >= m_entries.size() || m_entries[currentRow].totpSecret.isEmpty()) {
+    if (currentRow < 0 || currentRow >= m_entries.size()) {
         totpLabel->setText("------");
         totpProgressBar->setValue(0);
+        recoveryCodesList->clear();
     } else {
         totpLabel->setText("------");
+        totpProgressBar->setValue(0);
+        recoveryCodesList->clear();
+        QString codesStr = m_entries[currentRow].recoveryCodes;
+        if (!codesStr.isEmpty()) {
+            QStringList codes = codesStr.split("\n", Qt::SkipEmptyParts);
+            for (const QString& code : codes) {
+                QListWidgetItem* item = new QListWidgetItem(code, recoveryCodesList);
+                if (code.startsWith("*")) {
+                    QFont font = item->font();
+                    font.setStrikeOut(true);
+                    item->setFont(font);
+                    item->setForeground(Qt::gray);
+                }
+            }
+        }
         updateTotpDisplay();
         totpTimer->start(1000);
     }
@@ -191,7 +214,11 @@ void MainWindow::updateTotpDisplay() {
     if (currentRow < 0 || currentRow >= m_entries.size()) return;
 
     const QString secret = m_entries[currentRow].totpSecret;
-    if (secret.isEmpty()) return;
+    if (secret.isEmpty()) {
+        totpLabel->setText("------");
+        totpProgressBar->setValue(0);
+        return;
+    }
 
     time_t now = time(NULL);
     int remaining = 30 - (now % 30);
@@ -224,11 +251,13 @@ void MainWindow::onAdd() {
         QByteArray username = dialog.getUsername().toUtf8();
         QByteArray password = dialog.getPassword().toUtf8();
         QByteArray totpSecret = dialog.getTotpSecret().toUtf8();
+        QByteArray recoveryCodes = dialog.getRecoveryCodes().toUtf8();
 
         entry.service = (char*)service.constData();
         entry.username = (char*)username.constData();
         entry.password = (char*)password.constData();
         entry.totp_secret = (char*)totpSecret.constData();
+        entry.recovery_codes = (char*)recoveryCodes.constData();
 
         if (database_add_entry(&entry) < 0) {
             QMessageBox::critical(this, "Database Error", "Failed to add new entry to the database.");
@@ -257,12 +286,14 @@ void MainWindow::onEdit() {
         QByteArray username = dialog.getUsername().toUtf8();
         QByteArray password = dialog.getPassword().toUtf8();
         QByteArray totpSecret = dialog.getTotpSecret().toUtf8();
+        QByteArray recoveryCodes = dialog.getRecoveryCodes().toUtf8();
 
         updated_entry.id = entry_id;
         updated_entry.service = (char*)service.constData();
         updated_entry.username = (char*)username.constData();
         updated_entry.password = (char*)password.constData();
         updated_entry.totp_secret = (char*)totpSecret.constData();
+        updated_entry.recovery_codes = (char*)recoveryCodes.constData();
 
         if (database_update_entry(&updated_entry) != 0) {
             QMessageBox::critical(this, "Database Error", "Failed to update the entry in the database.");
@@ -311,7 +342,10 @@ void MainWindow::setupUI() {
 
     // Toolbar
     toolBar = new QToolBar(this);
+    toolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     addToolBar(toolBar);
+
+    // Menus (Removed for icon-only UI)
 
     addAction = new QAction(QIcon(":/icons/add.svg"), "Add", this);
     toolBar->addAction(addAction);
@@ -333,19 +367,32 @@ void MainWindow::setupUI() {
 
     toolBar->addSeparator();
 
+    healthCheckAction = new QAction(QIcon(":/icons/health-check.svg"), "Health Check", this);
+    toolBar->addAction(healthCheckAction);
+
+    toolBar->addSeparator();
+
     importAction = new QAction(QIcon(":/icons/import.svg"), "Import", this);
     toolBar->addAction(importAction);
 
     exportAction = new QAction(QIcon(":/icons/export.svg"), "Export", this);
     toolBar->addAction(exportAction);
 
-    healthCheckAction = new QAction(QIcon(":/icons/health-check.svg"), "Health Check", this);
-    toolBar->addAction(healthCheckAction);
-
     toolBar->addSeparator();
 
     themeAction = new QAction(this);
     toolBar->addAction(themeAction);
+
+    toggleRecoveryCodesAction = new QAction(this);
+    toolBar->addAction(toggleRecoveryCodesAction);
+    updateRecoveryCodesIcon();
+
+    toolBar->addSeparator();
+
+    QAction *exitAction = new QAction(QIcon(":/icons/exit.svg"), "Exit", this);
+    exitAction->setToolTip("Exit Application");
+    toolBar->addAction(exitAction);
+    connect(exitAction, &QAction::triggered, qApp, &QApplication::quit);
 
 
     // List widget
@@ -362,6 +409,21 @@ void MainWindow::setupUI() {
     totpLayout->addWidget(totpProgressBar);
     mainLayout->addLayout(totpLayout);
 
+    // Recovery codes display
+    recoveryCodesLabel = new QLabel("2FA Recovery Codes:", this);
+    mainLayout->addWidget(recoveryCodesLabel);
+
+    QHBoxLayout *recoveryLayout = new QHBoxLayout();
+    recoveryCodesList = new QListWidget(this);
+    recoveryCodesList->setMaximumHeight(100);
+    recoveryLayout->addWidget(recoveryCodesList);
+
+    markUsedButton = new QPushButton("Mark as Used", this);
+    recoveryLayout->addWidget(markUsedButton);
+    mainLayout->addLayout(recoveryLayout);
+
+    updateRecoveryCodesVisibility();
+
     // Status bar
     statusBar();
 
@@ -377,6 +439,8 @@ void MainWindow::setupUI() {
     connect(healthCheckAction, &QAction::triggered, this, &MainWindow::onHealthCheck);
     connect(listWidget, &QListWidget::currentRowChanged, this, &MainWindow::onCurrentRowChanged);
     connect(themeAction, &QAction::triggered, this, &MainWindow::onToggleTheme);
+    connect(toggleRecoveryCodesAction, &QAction::triggered, this, &MainWindow::onToggleRecoveryCodes);
+    connect(markUsedButton, &QPushButton::clicked, this, &MainWindow::onMarkAsUsed);
 
     // TOTP timer
     totpTimer = new QTimer(this);
@@ -431,6 +495,84 @@ void MainWindow::loadTheme(const QString& theme) {
         file.close();
     }
     updateThemeIcon();
+}
+
+void MainWindow::onToggleRecoveryCodes() {
+    recoveryCodesEnabled = !recoveryCodesEnabled;
+    QSettings settings("SecurePasswd_MGMT", "SecurePasswd_MGMT");
+    settings.setValue("recovery_codes_enabled", recoveryCodesEnabled);
+    updateRecoveryCodesVisibility();
+    updateRecoveryCodesIcon();
+}
+
+void MainWindow::updateRecoveryCodesIcon() {
+    if (recoveryCodesEnabled) {
+        toggleRecoveryCodesAction->setIcon(QIcon(":/icons/recovery-enabled.svg"));
+        toggleRecoveryCodesAction->setText("Disable Recovery Codes");
+    } else {
+        toggleRecoveryCodesAction->setIcon(QIcon(":/icons/recovery-disabled.svg"));
+        toggleRecoveryCodesAction->setText("Enable Recovery Codes");
+    }
+}
+
+void MainWindow::updateRecoveryCodesVisibility() {
+    if (recoveryCodesLabel) recoveryCodesLabel->setVisible(recoveryCodesEnabled);
+    if (recoveryCodesList) recoveryCodesList->setVisible(recoveryCodesEnabled);
+    if (markUsedButton) markUsedButton->setVisible(recoveryCodesEnabled);
+}
+
+void MainWindow::onMarkAsUsed() {
+    int currentRow = listWidget->currentRow();
+    if (currentRow < 0 || currentRow >= m_entries.size()) return;
+
+    QListWidgetItem *selectedItem = recoveryCodesList->currentItem();
+    if (!selectedItem) {
+        QMessageBox::warning(this, "No Selection", "Please select a recovery code to mark as used.");
+        return;
+    }
+
+    QString code = selectedItem->text();
+    if (code.startsWith("*")) {
+        return; // Already used
+    }
+
+    // Mark as used in UI Cache
+    QString originalCodes = m_entries[currentRow].recoveryCodes;
+    QStringList codesList = originalCodes.split("\n", Qt::SkipEmptyParts);
+    for (int i = 0; i < codesList.size(); ++i) {
+        if (codesList[i] == code) {
+            codesList[i] = "*" + code;
+            break;
+        }
+    }
+    m_entries[currentRow].recoveryCodes = codesList.join("\n");
+
+    // Update database
+    PasswordEntry updated_entry;
+    updated_entry.id = m_entries[currentRow].id;
+    QByteArray service = m_entries[currentRow].service.toUtf8();
+    QByteArray username = m_entries[currentRow].username.toUtf8();
+    QByteArray password = m_entries[currentRow].password.toUtf8();
+    QByteArray totpSecret = m_entries[currentRow].totpSecret.toUtf8();
+    QByteArray recoveryCodes = m_entries[currentRow].recoveryCodes.toUtf8();
+
+    updated_entry.service = (char*)service.constData();
+    updated_entry.username = (char*)username.constData();
+    updated_entry.password = (char*)password.constData();
+    updated_entry.totp_secret = (char*)totpSecret.constData();
+    updated_entry.recovery_codes = (char*)recoveryCodes.constData();
+
+    if (database_update_entry(&updated_entry) != 0) {
+        QMessageBox::critical(this, "Database Error", "Failed to update the entry in the database.");
+    } else {
+        // Update list item visual
+        QFont font = selectedItem->font();
+        font.setStrikeOut(true);
+        selectedItem->setFont(font);
+        selectedItem->setText("*" + code);
+        selectedItem->setForeground(Qt::gray);
+        statusBar()->showMessage("Recovery code marked as used.", 3000);
+    }
 }
 
 void MainWindow::updateThemeIcon() {

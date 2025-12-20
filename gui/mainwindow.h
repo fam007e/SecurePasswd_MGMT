@@ -13,8 +13,10 @@
 #include <QMenu>
 
 class QListWidget;
+class QTextEdit;
 class QToolBar;
 class QAction;
+class QPushButton;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -22,7 +24,7 @@ class MainWindow : public QMainWindow {
 public:
     explicit MainWindow(const QString& password, QWidget *parent = nullptr);
     ~MainWindow();
-    
+
     bool isDatabaseOpen() const { return m_databaseOpen; }
 
 private slots:
@@ -38,19 +40,21 @@ private slots:
     void onDelete();
     void onHealthCheck();
     void onToggleTheme();
+    void onToggleRecoveryCodes();
+    void onMarkAsUsed();
 
 private:
     void setupUI();
     void refreshEntryList();
     void loadTheme(const QString& theme);
     void updateThemeIcon();
+    void updateRecoveryCodesIcon();
+    void updateRecoveryCodesVisibility();
 
 
     QListWidget *listWidget;
     QVector<GUIPasswordEntry> m_entries; // UI Cache
     QToolBar *toolBar;
-    QMenu *fileMenu;
-    QMenu *toolsMenu;
     QAction *addAction;
     QAction *editAction;
     QAction *copyUsernameAction;
@@ -61,14 +65,20 @@ private:
     QAction *exportAction;
     QAction *healthCheckAction;
     QAction *themeAction;
+    QAction *toggleRecoveryCodesAction;
     QString currentTheme;
-    QVector<GUIPasswordEntry> entries;
 
     // TOTP Display
     QLabel *totpLabel;
     QProgressBar *totpProgressBar;
     QTimer *totpTimer;
-    
+
+    // Recovery Codes Display
+    QLabel *recoveryCodesLabel;
+    QListWidget *recoveryCodesList;
+    QPushButton *markUsedButton;
+    bool recoveryCodesEnabled;
+
     bool m_databaseOpen;
 };
 

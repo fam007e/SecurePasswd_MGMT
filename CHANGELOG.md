@@ -5,7 +5,23 @@ All notable changes to SecurePasswd_MGMT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to date-based versioning (YYYY.MM.DD).
 
-## [Unreleased]
+## [2025.12.20]
+
+### Added
+- **2FA Recovery Codes:** Added support for managing 2FA recovery codes in both GUI and CLI.
+- **Recovery Toggle:** Added a visual toggle in the GUI for recovery codes with dynamic icons.
+- **Secure Exit:** Added a dedicated exit action with a custom SVG icon.
+- **Password Entropy:** Guaranteed character diversity in the password generator using a secured Fisher-Yates shuffle.
+
+### Changed
+- **GUI Refinement:** Transitioned to a modern, icon-only toolbar UI; removed text-based menus.
+- **Core Architecture:** Relocated password generator to the core library for better modularity.
+- **CLI Parity:** Achieved full feature parity with the GUI, including interactive editing and recovery codes.
+
+### Fixed
+- **GUI Stability:** Resolved a segmentation fault caused by uninitialized menu pointers.
+- **TOTP Display:** Fixed the "stuck" state of the TOTP progress bar when switching entries.
+- **Theme Persistence:** Improved the consistency of theme loading and saving.
 
 ---
 

@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2025.10.25</span>
+   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2025.12.20</span>
    </div>
    <div id="projectbrief">A modern, cross-platform password manager and two-factor authenticator (TOTP) designed with state-of-the-art security.</div>
   </td>
@@ -124,8 +124,9 @@ Key Derivation Function (KDF)</h2>
 Random Number Generation</h2>
 <ul>
 <li><b>Source:</b> Libsodium's <span class="tt">randombytes_buf()</span> function.</li>
-<li><b>Usage:</b> Salt generation for Argon2 in <span class="tt"><a class="el" href="key__derivation_8c.html">core/key_derivation.c</a></span>.</li>
-<li><b>Quality:</b> Uses the operating system's best available Cryptographically Secure Pseudorandom Number Generator (CSPRNG), such as <span class="tt">/dev/urandom</span>.</li>
+<li><b>Usage:</b> Salt generation for Argon2 and secure password generation.</li>
+<li><b>Entropy Guarantee:</b> The password generator (in <span class="tt"><a class="el" href="password__generator_8c.html">core/password_generator.c</a></span>) uses a secured Fisher-Yates shuffle to guarantee the inclusion of at least one character from every selected category (Uppercase, Numbers, Special), ensuring high-entropy output even with shorter lengths.</li>
+<li><b>Quality:</b> Uses the operating system's best available Cryptographically Secure Pseudorandom Number Generator (CSPRNG).</li>
 </ul>
 <h1 class="doxsection"><a class="anchor" id="autotoc_md30"></a>
 Data Protection</h1>

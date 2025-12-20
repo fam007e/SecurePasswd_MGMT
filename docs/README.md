@@ -53,13 +53,13 @@ Guidelines for contributing to the project, including security-focused developme
 ## For Developers
 
 ### Modified Files Summary
-1. `core/database.c` - Delete entry verification
-2. `cli/main.c` - Enhanced health check
+1. `core/database.c` - Delete entry verification, recovery codes support
+2. `cli/main.c` - Enhanced health check, feature parity with GUI
 3. `gui/healthcheckdialog.cpp` - Updated thresholds
-4. `gui/mainwindow.{h,cpp}` - Segfault fix, toolbar buttons
+4. `gui/mainwindow.{h,cpp}` - Segfault fix, icon-only toolbar, recovery toggle
 5. `gui/main.cpp` - Database status check
-6. `gui/entrydialog.{h,cpp}` - Entry validation
-7. `tests/test_core.c` - Delete entry tests
+6. `gui/entrydialog.{h,cpp}` - Entry validation, recovery codes display logic
+7. `core/password_generator.{h,c}` - Relocated to core, guaranteed entropy shuffle
 
 ### Build Status
 - CLI: Building successfully

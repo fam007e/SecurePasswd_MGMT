@@ -25,8 +25,9 @@ SecurePasswd_MGMT is designed with security-first principles and implements defe
 
 ### Random Number Generation
 - **Source:** Libsodium's `randombytes_buf()` function.
-- **Usage:** Salt generation for Argon2 in `core/key_derivation.c`.
-- **Quality:** Uses the operating system's best available Cryptographically Secure Pseudorandom Number Generator (CSPRNG), such as `/dev/urandom`.
+- **Usage:** Salt generation for Argon2 and secure password generation.
+- **Entropy Guarantee:** The password generator (in `core/password_generator.c`) uses a secured Fisher-Yates shuffle to guarantee the inclusion of at least one character from every selected category (Uppercase, Numbers, Special), ensuring high-entropy output even with shorter lengths.
+- **Quality:** Uses the operating system's best available Cryptographically Secure Pseudorandom Number Generator (CSPRNG).
 
 ## Data Protection
 

@@ -32,7 +32,6 @@ qt_add_executable(securepasswd_gui
     passwordentry.h
     passwordgeneratordialog.h
     passwordgeneratordialog.cpp
-    ../cli/password_generator.c
     healthcheckdialog.h
     healthcheckdialog.cpp
     icons.qrc
@@ -45,7 +44,7 @@ endif()
 
 # Include directories
 target_include_directories(securepasswd_gui PRIVATE
-    ${CMAKE_SOURCE_DIR}/cli
+    ${CMAKE_SOURCE_DIR}/core
 )
 
 # Only add LIBCSV_INCLUDE_DIRS if it's not empty (to avoid warnings)

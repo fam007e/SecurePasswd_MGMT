@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['username_0',['username',['../structPasswordEntry.html#ac010387094106edd5158adf122543d5a',1,'PasswordEntry']]]
+  ['totp_5fsecret_0',['totp_secret',['../structPasswordEntry.html#a6c74fecfdd830886fe688d2f38fabdfa',1,'PasswordEntry']]]
 ];

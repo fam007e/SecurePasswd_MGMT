@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sodium.h>
+#include <stdbool.h>
 
 static sqlite3 *db = NULL;
 
@@ -93,7 +94,7 @@ PasswordEntry* database_get_all_entries(int *count) {
     }
 
     // Then, get all the data
-    if (sqlite3_prepare_v2(db, "SELECT id, service, username, password, totp_secret FROM passwords", -1, &stmt, NULL) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, "SELECT id, service, username, password, totp_secret, recovery_codes FROM passwords", -1, &stmt, NULL) != SQLITE_OK) {
         fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db));
         free(entries);
         return NULL;
@@ -106,11 +107,13 @@ PasswordEntry* database_get_all_entries(int *count) {
         const unsigned char *username = sqlite3_column_text(stmt, 2);
         const unsigned char *password = sqlite3_column_text(stmt, 3);
         const unsigned char *totp_secret = sqlite3_column_text(stmt, 4);
+        const unsigned char *recovery_codes = sqlite3_column_text(stmt, 5);
 
         entries[i].service = service ? strdup((const char *)service) : strdup("");
         entries[i].username = username ? strdup((const char *)username) : strdup("");
         entries[i].password = password ? strdup((const char *)password) : strdup("");
         entries[i].totp_secret = totp_secret ? strdup((const char *)totp_secret) : strdup("");
+        entries[i].recovery_codes = recovery_codes ? strdup((const char *)recovery_codes) : strdup("");
         i++;
     }
 
@@ -122,7 +125,7 @@ int database_add_entry(const PasswordEntry *entry) {
     if (!db) return -1;
 
     sqlite3_stmt *stmt;
-    const char *sql = "INSERT INTO passwords (service, username, password, totp_secret) VALUES (?, ?, ?, ?);";
+    const char *sql = "INSERT INTO passwords (service, username, password, totp_secret, recovery_codes) VALUES (?, ?, ?, ?, ?);";
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
         fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db));
         return -1;
@@ -132,6 +135,7 @@ int database_add_entry(const PasswordEntry *entry) {
     sqlite3_bind_text(stmt, 2, entry->username, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 3, entry->password, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 4, entry->totp_secret, -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 5, entry->recovery_codes, -1, SQLITE_STATIC);
 
     if (sqlite3_step(stmt) != SQLITE_DONE) {
         fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
@@ -147,7 +151,7 @@ int database_update_entry(const PasswordEntry *entry) {
     if (!db) return -1;
 
     sqlite3_stmt *stmt;
-    const char *sql = "UPDATE passwords SET service = ?, username = ?, password = ?, totp_secret = ? WHERE id = ?;";
+    const char *sql = "UPDATE passwords SET service = ?, username = ?, password = ?, totp_secret = ?, recovery_codes = ? WHERE id = ?;";
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
         fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db));
         return -1;
@@ -157,7 +161,8 @@ int database_update_entry(const PasswordEntry *entry) {
     sqlite3_bind_text(stmt, 2, entry->username, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 3, entry->password, -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 4, entry->totp_secret, -1, SQLITE_STATIC);
-    sqlite3_bind_int(stmt, 5, entry->id);
+    sqlite3_bind_text(stmt, 5, entry->recovery_codes, -1, SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 6, entry->id);
 
     if (sqlite3_step(stmt) != SQLITE_DONE) {
         fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db));
@@ -190,11 +195,11 @@ int database_delete_entry(int id) {
     // Check if any rows were actually deleted
     int changes = sqlite3_changes(db);
     sqlite3_finalize(stmt);
-    
+
     if (changes == 0) {
         return -1; // Entry with this ID does not exist
     }
-    
+
     return 0;
 }
 
@@ -205,22 +210,47 @@ void free_password_entries(PasswordEntry *entries, int count) {
         free(entries[i].username);
         free(entries[i].password);
         free(entries[i].totp_secret);
+        free(entries[i].recovery_codes);
     }
     free(entries);
 }
 
 static int initialize_schema() {
     char *err_msg = 0;
-    const char *sql = "CREATE TABLE IF NOT EXISTS passwords (" 
-                        "id INTEGER PRIMARY KEY AUTOINCREMENT, " 
-                        "service TEXT NOT NULL, " 
-                        "username TEXT NOT NULL, " 
-                        "password TEXT NOT NULL, " 
-                        "totp_secret TEXT);";
+    const char *sql = "CREATE TABLE IF NOT EXISTS passwords ("
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                        "service TEXT NOT NULL, "
+                        "username TEXT NOT NULL, "
+                        "password TEXT NOT NULL, "
+                        "totp_secret TEXT, "
+                        "recovery_codes TEXT);";
     if (sqlite3_exec(db, sql, 0, 0, &err_msg) != SQLITE_OK) {
         fprintf(stderr, "SQL error: %s\n", err_msg);
         sqlite3_free(err_msg);
         return -1;
     }
+
+    // Migration: Check if recovery_codes column exists, if not add it
+    sqlite3_stmt *stmt;
+    bool has_recovery_codes = false;
+    if (sqlite3_prepare_v2(db, "PRAGMA table_info(passwords)", -1, &stmt, NULL) == SQLITE_OK) {
+        while (sqlite3_step(stmt) == SQLITE_ROW) {
+            const unsigned char *name = sqlite3_column_text(stmt, 1);
+            if (name && strcmp((const char *)name, "recovery_codes") == 0) {
+                has_recovery_codes = true;
+                break;
+            }
+        }
+        sqlite3_finalize(stmt);
+    }
+
+    if (!has_recovery_codes) {
+        const char *alter_sql = "ALTER TABLE passwords ADD COLUMN recovery_codes TEXT;";
+        if (sqlite3_exec(db, alter_sql, 0, 0, &err_msg) != SQLITE_OK) {
+            fprintf(stderr, "Migration error adding recovery_codes: %s\n", err_msg);
+            sqlite3_free(err_msg);
+        }
+    }
+
     return 0;
 }

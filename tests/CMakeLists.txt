@@ -28,9 +28,8 @@ if(NOT WIN32)
     target_include_directories(cmocka_tests PRIVATE ${CMOCKA_INCLUDE_DIRS})
 endif()
 
-target_link_libraries(cmocka_tests PRIVATE 
-    core_lib 
-    password_generator_lib 
+target_link_libraries(cmocka_tests PRIVATE
+    core_lib
     ${CMOCKA_LIBRARIES}
 )
 

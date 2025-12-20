@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QLineEdit>
+#include <QTextEdit>
 #include <QDialogButtonBox>
 #include <QFormLayout>
 #include <QMessageBox>
@@ -22,6 +23,7 @@ public:
     QString getUsername() const;
     QString getPassword() const;
     QString getTotpSecret() const;
+    QString getRecoveryCodes() const;
 
     void setData(const GUIPasswordEntry &entry);
 
@@ -34,6 +36,8 @@ private:
     QLineEdit *usernameEdit;
     QLineEdit *passwordEdit;
     QLineEdit *totpSecretEdit;
+    QLabel *recoveryCodesLabel;
+    QTextEdit *recoveryCodesEdit;
     QPushButton *generateButton;
     QDialogButtonBox *buttonBox;
 };

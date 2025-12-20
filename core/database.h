@@ -16,6 +16,7 @@ typedef struct {
     char *username;     /**< The username for the service. */
     char *password;     /**< The password for the service. */
     char *totp_secret;  /**< The TOTP secret for the service. */
+    char *recovery_codes; /**< The recovery codes for the service (newline-separated). Used codes are prefixed with '*'. */
 } PasswordEntry;
 
 /**

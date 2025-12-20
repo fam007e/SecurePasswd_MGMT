@@ -9,6 +9,7 @@ struct GUIPasswordEntry {
     QString username;
     QString password;
     QString totpSecret;
+    QString recoveryCodes;
 };
 
 #endif // GUIPASSWORDENTRY_H

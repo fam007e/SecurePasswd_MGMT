@@ -3,6 +3,8 @@
 #include <QFormLayout>
 #include <QHBoxLayout>
 #include <QDialogButtonBox>
+#include <QSettings>
+#include <QLabel>
 #include <stdlib.h> // For free()
 
 // Need to link against the C password generator
@@ -20,6 +22,9 @@ EntryDialog::EntryDialog(QWidget *parent)
     serviceEdit = new QLineEdit(this);
     usernameEdit = new QLineEdit(this);
     totpSecretEdit = new QLineEdit(this);
+    recoveryCodesEdit = new QTextEdit(this);
+    recoveryCodesEdit->setAcceptRichText(false);
+    recoveryCodesEdit->setPlaceholderText("Paste 2FA recovery codes here...");
 
     // Password field with a generate button
     QHBoxLayout *passwordLayout = new QHBoxLayout();
@@ -33,6 +38,14 @@ EntryDialog::EntryDialog(QWidget *parent)
     formLayout->addRow("Username:", usernameEdit);
     formLayout->addRow("Password:", passwordLayout);
     formLayout->addRow("TOTP Secret (Optional):", totpSecretEdit);
+
+    recoveryCodesLabel = new QLabel("Recovery Codes:", this);
+    formLayout->addRow(recoveryCodesLabel, recoveryCodesEdit);
+
+    QSettings settings("SecurePasswd_MGMT", "SecurePasswd_MGMT");
+    bool enabled = settings.value("recovery_codes_enabled", false).toBool();
+    recoveryCodesLabel->setVisible(enabled);
+    recoveryCodesEdit->setVisible(enabled);
 
     buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
     formLayout->addWidget(buttonBox);
@@ -100,10 +113,16 @@ QString EntryDialog::getTotpSecret() const
     return totpSecretEdit->text();
 }
 
+QString EntryDialog::getRecoveryCodes() const
+{
+    return recoveryCodesEdit->toPlainText();
+}
+
 void EntryDialog::setData(const GUIPasswordEntry &entry)
 {
     serviceEdit->setText(entry.service);
     usernameEdit->setText(entry.username);
     passwordEdit->setText(entry.password);
     totpSecretEdit->setText(entry.totpSecret);
+    recoveryCodesEdit->setPlainText(entry.recoveryCodes);
 }

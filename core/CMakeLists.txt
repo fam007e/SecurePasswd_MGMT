@@ -4,6 +4,7 @@ add_library(core_lib STATIC
     totp.c
     pwned_check.c
     platform_paths.c
+    password_generator.c
 )
 
 # Include directories

@@ -24,7 +24,7 @@ void test_database_lifecycle() {
     printf("  [PASSED] database_open with correct key\n");
 
     // 2. Test adding an entry
-    PasswordEntry entry = { .service = "TestService", .username = "TestUser", .password = "TestPass", .totp_secret = "JBSWY3DPEHPK3PXP" };
+    PasswordEntry entry = { .service = "TestService", .username = "TestUser", .password = "TestPass", .totp_secret = "JBSWY3DPEHPK3PXP", .recovery_codes = "CODE1\nCODE2" };
     int new_id = database_add_entry(&entry);
     assert(new_id > 0);
     printf("  [PASSED] database_add_entry\n");
@@ -35,15 +35,17 @@ void test_database_lifecycle() {
     assert(count == 1);
     assert(entries[0].id == new_id);
     assert(strcmp(entries[0].service, "TestService") == 0);
+    assert(strcmp(entries[0].recovery_codes, "CODE1\nCODE2") == 0);
     free_password_entries(entries, count);
     printf("  [PASSED] database_get_all_entries\n");
 
     // 4. Test updating the entry
-    PasswordEntry updated_entry = { .id = new_id, .service = "UpdatedService", .username = "UpdatedUser", .password = "UpdatedPass", .totp_secret = "" };
+    PasswordEntry updated_entry = { .id = new_id, .service = "UpdatedService", .username = "UpdatedUser", .password = "UpdatedPass", .totp_secret = "", .recovery_codes = "NEWCODE" };
     assert(database_update_entry(&updated_entry) == 0);
     entries = database_get_all_entries(&count);
     assert(count == 1);
     assert(strcmp(entries[0].service, "UpdatedService") == 0);
+    assert(strcmp(entries[0].recovery_codes, "NEWCODE") == 0);
     free_password_entries(entries, count);
     printf("  [PASSED] database_update_entry\n");
 
