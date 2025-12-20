@@ -15,22 +15,21 @@ When you launch the application for the first time, you will be prompted to crea
 The main window is divided into the following sections:
 
 - **Password List:** A list of all your saved password entries. You can select an entry to view its details.
-- **Toolbar:** A row of buttons for common actions.
+- **Toolbar:** A row of icons for common actions. The toolbar is icon-only for a clean, modern aesthetic.
+- **2FA Recovery Codes:** A list of one-time recovery codes for the selected entry.
 - **TOTP Display:** A section that displays the TOTP code for the selected entry, along with a progress bar indicating the time until the next code is generated.
 
 ### Toolbar Actions
 
-- **Add:** Add a new password entry.
-- **Edit:** Edit the selected password entry.
-- **Delete:** Delete the selected password entry.
-- **Copy Username:** Copy the username of the selected entry to the clipboard.
-- **Copy Password:** Copy the password of the selected entry to the clipboard.
-- **Copy TOTP:** Copy the TOTP code of the selected entry to the clipboard.
-- **Password Generator:** Open the password generator dialog.
-- **Health Check:** Open the password health check dialog.
-- **Import:** Import password entries from a CSV file.
-- **Export:** Export all password entries to a CSV file.
-- **Theme:** Switch between light and dark mode.
+The toolbar uses icons for all major functions (hover for tooltips):
+
+- **Add/Edit/Delete:** Managed your password repository.
+- **Copy Username/Password/TOTP:** One-click clipboard functionality (clears after 30 sec).
+- **Import/Export:** CSV data migration.
+- **Health Check:** Security audit of your entire database.
+- **Theme Toggle:** Switch between light and dark mode.
+- **Recovery Codes Toggle:** NEW: Opt-in visibility for 2FA recovery codes.
+- **Exit:** Securely close the application.
 
 ## Adding a New Entry
 
