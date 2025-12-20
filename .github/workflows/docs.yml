@@ -34,6 +34,12 @@ jobs:
           echo "Documentation generated successfully at docs/api/html"
           ls -la docs/api/html/
 
+      - name: Fix Image Paths in HTML
+        run: |
+          echo "Fixing image paths in generated HTML files..."
+          find docs/api/html -name "*.html" -type f -exec sed -i 's|src="gui/icons/app_icon.svg"|src="app_icon.svg"|g' {} +
+          echo "Image paths fixed successfully"
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
