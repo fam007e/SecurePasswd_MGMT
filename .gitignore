@@ -49,3 +49,7 @@ compile_commands.json
 *.deb
 *.dmg
 *.nsi
+
+# Allow docs generation in CI, but ignore locally
+docs/
+!docs/.gitkeep

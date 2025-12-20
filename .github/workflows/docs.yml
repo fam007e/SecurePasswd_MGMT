@@ -22,8 +22,21 @@ jobs:
       - name: Generate Documentation
         run: doxygen Doxyfile
 
+      - name: Verify Documentation Generated
+        run: |
+          if [ ! -d "docs/api/html" ]; then
+            echo "Error: Documentation not generated at docs/api/html"
+            echo "Checking directory structure..."
+            ls -la docs/ || echo "docs/ directory not found"
+            ls -la docs/api/ || echo "docs/api/ directory not found"
+            exit 1
+          fi
+          echo "Documentation generated successfully at docs/api/html"
+          ls -la docs/api/html/
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
+          publish_dir: ./docs/api/html
+          enable_jekyll: false
