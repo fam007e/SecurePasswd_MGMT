@@ -135,10 +135,10 @@ void cli_list_entries() {
         return;
     }
 
-    printf("% -5s % -25s % -25s\n", "ID", "Service", "Username");
+    printf("%-5s %-25s %-25s\n", "ID", "Service", "Username");
     printf("--------------------------------------------------------\n");
     for (int i = 0; i < count; i++) {
-        printf("% -5d % -25s % -25s\n", entries[i].id, entries[i].service, entries[i].username);
+        printf("%-5d %-25s %-25s\n", entries[i].id, entries[i].service, entries[i].username);
     }
 
     free_password_entries(entries, count);

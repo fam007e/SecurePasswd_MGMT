@@ -50,13 +50,13 @@ function(deploy_windows_dependencies target)
     # Install all DLLs from the build directory to CPack destination
     install(
         DIRECTORY "$<TARGET_FILE_DIR:${target}>/"
-        DESTINATION bin
+        DESTINATION ${CMAKE_INSTALL_BINDIR}
         FILES_MATCHING PATTERN "*.dll"
     )
 
     # Also explicitly install the target executable itself
     install(TARGETS ${target}
-        RUNTIME DESTINATION bin
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
         COMPONENT Runtime
     )
 endfunction()

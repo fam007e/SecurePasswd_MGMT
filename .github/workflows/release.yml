@@ -182,13 +182,13 @@ jobs:
             -DVCPKG_TARGET_TRIPLET=x64-windows
       - name: Build
         run: cmake --build build --config Release
-      
+
       - name: Package
         working-directory: build
         id: package
         run: cpack -G ${{ matrix.cpack_generator }} -C Release
         continue-on-error: true
-      
+
       - name: Display NSIS log on failure (Windows)
         if: runner.os == 'Windows' && steps.package.outcome == 'failure'
         shell: pwsh
@@ -211,7 +211,7 @@ jobs:
           Get-ChildItem "build" -Recurse -Filter "*.exe" | Select-Object FullName
           # Re-throw the error to fail the job
           exit 1
-      
+
       - name: List generated packages
         if: steps.package.outcome == 'success'
         shell: bash
@@ -221,14 +221,14 @@ jobs:
           ls -lh build/*.exe || true
           ls -lh build/*.deb || true
           ls -lh build/*.dmg || true
-      
+
       - name: Upload artifact
         if: steps.package.outcome == 'success'
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
           path: build/${{ matrix.package_glob }}
-  
+
   build-arch:
     runs-on: ubuntu-latest
     container:
@@ -267,6 +267,7 @@ jobs:
       - name: Create PKGBUILD
         run: |
           sha256=$(sha256sum securepasswd_mgmt-${{ steps.get_version.outputs.version }}.tar.gz | awk '{print $1}')
+          cp SecurePasswd_MGMT/securepasswd_mgmt.install .
           cat <<EOF > PKGBUILD
           # Maintainer: fam007e <faisalmoshiur+secpasswdmgmt@gmail.com>
           pkgname=securepasswd_mgmt
@@ -276,10 +277,11 @@ jobs:
           arch=('x86_64')
           url="https://github.com/fam007e/SecurePasswd_MGMT"
           license=('MIT')
-          depends=('libsodium' 'argon2' 'sqlcipher' 'qt6-base' 'qt6-svg' 'openssl' 'curl' 'cmocka')
+          depends=('libsodium' 'argon2' 'sqlcipher' 'qt6-base' 'qt6-svg' 'openssl' 'curl' 'cmocka' 'pcre2')
           makedepends=('cmake' 'gcc')
           source=("\$pkgname-\$pkgver.tar.gz")
           sha256sums=("$sha256")
+          install=securepasswd_mgmt.install
           build() {
               cd "\$srcdir/SecurePasswd_MGMT"
               mkdir -p build
@@ -315,7 +317,7 @@ jobs:
         with:
           name: arch-package
           path: "*.pkg.tar.zst"
-  
+
   release:
     needs: [build, build-arch]
     runs-on: ubuntu-latest

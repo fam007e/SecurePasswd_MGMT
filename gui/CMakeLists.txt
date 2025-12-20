@@ -14,8 +14,11 @@ set(ICONS
     icons/export.svg
     icons/health-check.svg
     icons/import.svg
+    icons/exit.svg
     icons/darkmode.svg
     icons/lightmode.svg
+    icons/recovery-enabled.svg
+    icons/recovery-disabled.svg
 )
 
 set(THEMES
@@ -62,12 +65,9 @@ target_link_libraries(securepasswd_gui PRIVATE
 
 # Installation rules
 install(TARGETS securepasswd_gui
-    RUNTIME DESTINATION bin
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     BUNDLE DESTINATION .
 )
-
-install(FILES ${ICONS} DESTINATION bin/icons)
-install(FILES ${THEMES} DESTINATION bin)
 
 if(WIN32)
     deploy_windows_dependencies(securepasswd_gui USES_QT)

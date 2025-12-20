@@ -9,6 +9,8 @@ endif()
 project(SecurePasswd_MGMT VERSION ${PROJECT_VERSION} LANGUAGES C CXX)
 set(CMAKE_C_STANDARD 11)
 
+include(GNUInstallDirs)
+
 # Handle vcpkg vs system packages
 if(WIN32)
     # vcpkg on Windows uses unofficial- prefix for some packages
@@ -108,7 +110,7 @@ set(CPACK_NSIS_PROGRAM_GROUP "SecurePasswd MGMT")
 
 # NSIS shortcuts
 set(CPACK_NSIS_CREATE_ICONS_EXTRA
-    "CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\SecurePasswd MGMT.lnk' '$INSTDIR\\\\bin\\\\securepasswd_gui.exe'"
+    "CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\SecurePasswd MGMT.lnk' '$INSTDIR\\\\${CMAKE_INSTALL_BINDIR}\\\\securepasswd_gui.exe'"
     "CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\Uninstall.lnk' '$INSTDIR\\\\uninstall.exe'"
 )
 
