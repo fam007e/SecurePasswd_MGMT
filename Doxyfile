@@ -9,8 +9,19 @@ GENERATE_LATEX         = NO
 EXTRACT_ALL            = YES
 EXTRACT_PRIVATE        = NO
 EXTRACT_STATIC         = YES
+
+# Markdown settings - ENHANCED
 MARKDOWN_SUPPORT       = YES
+AUTOLINK_SUPPORT       = YES
+MARKDOWN_ID_STYLE      = DOXYGEN
+TOC_INCLUDE_HEADINGS   = 5
+
+# Code formatting
 VERBATIM_HEADERS       = NO
-IMAGE_PATH             = .
+
+# Image paths 
+IMAGE_PATH             = . 
+
+# Graph settings
 HAVE_DOT               = YES
 DOT_IMAGE_FORMAT       = svg
