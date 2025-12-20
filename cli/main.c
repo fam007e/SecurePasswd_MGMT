@@ -382,7 +382,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     // Construct database path
-    char dbPath[1024];
+    char dbPath[2048];
 #ifdef _WIN32
     snprintf(dbPath, sizeof(dbPath), "%s\\vault.db", dirPath);
 #else

@@ -77,7 +77,7 @@ include(WinDeploy)
 
 # Security flags
 if(NOT MSVC)
-    add_compile_options(-O2 -fstack-protector-strong -D_FORTIFY_SOURCE=2)
+    add_compile_options(-O2 -fstack-protector-strong -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2)
 endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_link_options(-Wl,-z,relro,-z,now)
