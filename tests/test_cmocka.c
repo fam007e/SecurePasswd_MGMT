@@ -17,6 +17,11 @@
 #include <string.h>
 #include "password_generator.h"
 
+/* Compatibility for CMocka < 2.0.0 */
+#ifndef assert_int_in_range
+#define assert_int_in_range(v, min, max) assert_in_range(v, min, max)
+#endif
+
 static void test_generate_password_length(void **state) {
     (void) state; /* unused */
     char *password = generate_password(16, true, true, true);
@@ -30,7 +35,7 @@ static void test_generate_password_charset(void **state) {
     char *password = generate_password(32, false, false, false);
     assert_non_null(password);
     for (int i = 0; i < (int)strlen(password); i++) {
-        assert_in_range(password[i], 'a', 'z');
+        assert_int_in_range(password[i], 'a', 'z');
     }
     free(password);
 
