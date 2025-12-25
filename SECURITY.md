@@ -29,6 +29,17 @@ SecurePasswd_MGMT is designed with security-first principles and implements defe
 - **Entropy Guarantee:** The password generator (in `core/password_generator.c`) uses a secured Fisher-Yates shuffle to guarantee the inclusion of at least one character from every selected category (Uppercase, Numbers, Special), ensuring high-entropy output even with shorter lengths.
 - **Quality:** Uses the operating system's best available Cryptographically Secure Pseudorandom Number Generator (CSPRNG).
 
+### Hashing for External Services
+- **Algorithm:** SHA-1 (Required by HIBP API k-Anonymity model)
+- **Implementation:** Implemented using the modern OpenSSL `EVP_Digest` API (`EVP_sha1()`) to ensure compliance with current security standards and future-proofing, replacing older deprecated functions.
+
+## Input Security & Validation
+
+- **Secure Input:** The Command Line Interface (CLI) utilizes `getpass` (or platform equivalents) to ensure passwords and secrets are never echoed to the console during entry.
+- **Path Validation:** File operations (like CSV import/export) include strict validation to prevent Directory Traversal attacks (e.g., blocking `..` in paths).
+- **Sanitization:** The codebase is regularly tested with AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) to detect and fix memory safety issues and undefined behavior (e.g., integer overflows, misaligned access).
+- **Static Analysis:** `cppcheck` is employed to enforce code quality and catch potential leaks or logic errors early.
+
 ## Data Protection
 
 ### Master Password Security Flow

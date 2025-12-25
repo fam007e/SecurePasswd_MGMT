@@ -41,6 +41,15 @@ To maintain a consistent and readable codebase, we adhere to the following codin
 
 - **Unit Tests:** All new features should be accompanied by unit tests. The project uses CTest to manage and run tests.
 - **Cryptographic Testing:** Any changes to cryptographic functions must be accompanied by tests that verify the correctness of the implementation.
+- **Static Analysis:** Contributors are expected to run `cppcheck` on their changes to ensure no new static analysis warnings are introduced.
+  ```bash
+  cppcheck --enable=all --suppress=missingIncludeSystem cli/ core/
+  ```
+- **Runtime Sanitizers:** It is recommended to build and test with sanitizers enabled to catch runtime errors.
+  ```bash
+  cmake -DCMAKE_C_FLAGS="-fsanitize=address,undefined" ..
+  make && ctest
+  ```
 
 ## How to Contribute
 

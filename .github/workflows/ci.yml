@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    name: Build and Test (ASAN/UBSan)
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake libsodium-dev libargon2-dev \
+          libsqlcipher-dev libcsv-dev qt6-base-dev libqt6svg6-dev libssl-dev \
+          libcurl4-openssl-dev libcmocka-dev cppcheck
+
+    - name: Static Analysis (Cppcheck)
+      run: |
+        cppcheck --enable=all --suppress=missingIncludeSystem --error-exitcode=1 cli/ core/
+
+    - name: Configure CMake (Sanitizers Enabled)
+      run: |
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Debug \
+          -DCMAKE_C_FLAGS="-fsanitize=address,undefined" \
+          -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined"
+
+    - name: Build
+      run: |
+        cd build
+        make
+
+    - name: Run Tests (with Sanitizers)
+      run: |
+        cd build
+        # We run the test binaries directly to ensure sanitizers catch runtime errors
+        ./tests/core_tests
+        ./tests/cmocka_tests
+        # Also run via ctest for summary
+        ctest --output-on-failure

@@ -71,14 +71,14 @@ typedef struct {
     int count;
 } CsvRow;
 
-void cli_import_field_cb(void *s, size_t len, void *data) {
+static void cli_import_field_cb(void *s, size_t len, void *data) {
     CsvRow *row = (CsvRow*)data;
     row->count++;
     row->fields = realloc(row->fields, row->count * sizeof(char*));
     row->fields[row->count - 1] = strndup(s, len);
 }
 
-void cli_import_row_cb(int c, void *data) {
+static void cli_import_row_cb(int c, void *data) {
     CsvRow *row = (CsvRow*)data;
     if (row->count >= 3) {
         PasswordEntry entry;
@@ -101,23 +101,23 @@ void cli_import_row_cb(int c, void *data) {
 }
 
 // --- Forward Declarations for CLI functions ---
-void cli_list_entries();
-void cli_add_entry();
-void cli_view_entry();
-void cli_edit_entry();
-void cli_delete_entry();
-void cli_import_csv(const char* filepath);
-void cli_export_csv(const char* filepath);
-void print_help();
+static void cli_list_entries();
+static void cli_add_entry();
+static void cli_view_entry();
+static void cli_edit_entry();
+static void cli_delete_entry();
+static void cli_import_csv(const char* filepath);
+static void cli_export_csv(const char* filepath);
+static void print_help();
 
-void cli_health_check();
+static void cli_health_check();
 
 #include "pwned_check.h"
 #include "platform_paths.h"
 
 
 // A simple helper to read a line of input securely
-void read_line(char *buf, int size) {
+static void read_line(char *buf, int size) {
     if (fgets(buf, size, stdin) == NULL) {
         buf[0] = '\0';
         return;
@@ -127,7 +127,7 @@ void read_line(char *buf, int size) {
 
 // --- CLI Implementation ---
 
-void cli_list_entries() {
+static void cli_list_entries() {
     int count = 0;
     PasswordEntry *entries = database_get_all_entries(&count);
     if (!entries || count == 0) {
@@ -144,25 +144,34 @@ void cli_list_entries() {
     free_password_entries(entries, count);
 }
 
-void cli_add_entry() {
+static void cli_add_entry() {
     PasswordEntry entry;
-    char service[256], username[256], password[256], totp[256], recovery[1024];
+    char service[256], username[256], password_buf[256], totp_buf[256], recovery[1024];
 
     printf("Service: ");
     read_line(service, sizeof(service));
     printf("Username: ");
     read_line(username, sizeof(username));
-    printf("Password: ");
-    read_line(password, sizeof(password));
-    printf("TOTP Secret (optional): ");
-    read_line(totp, sizeof(totp));
+
+    // Securely read password
+    char *pass_ptr = getpass("Password: ");
+    strncpy(password_buf, pass_ptr, sizeof(password_buf) - 1);
+    password_buf[sizeof(password_buf) - 1] = '\0';
+    // getpass might use a static buffer, so we copied it. Clear the static one if possible?
+    // standard getpass doesn't expose clearing, but we copied it.
+
+    // Securely read TOTP Secret
+    char *totp_ptr = getpass("TOTP Secret (optional): ");
+    strncpy(totp_buf, totp_ptr, sizeof(totp_buf) - 1);
+    totp_buf[sizeof(totp_buf) - 1] = '\0';
+
     printf("Recovery Codes (optional): ");
     read_line(recovery, sizeof(recovery));
 
     entry.service = service;
     entry.username = username;
-    entry.password = password;
-    entry.totp_secret = totp;
+    entry.password = password_buf;
+    entry.totp_secret = totp_buf;
     entry.recovery_codes = recovery;
 
     if (database_add_entry(&entry) < 0) {
@@ -172,7 +181,7 @@ void cli_add_entry() {
     }
 }
 
-void cli_view_entry() {
+static void cli_view_entry() {
     printf("Enter ID of entry to view: ");
     int id;
     if (scanf("%d", &id) != 1) { id = -1; }
@@ -226,29 +235,47 @@ void cli_view_entry() {
                     // Update in database
                     size_t new_len = strlen(target->recovery_codes) + 2; // +1 for '*'
                     char *new_codes = malloc(new_len);
-                    new_codes[0] = '\0';
-                    for (int i = 0; i < line_count; i++) {
-                        if (i == mark_idx - 1) {
-                            strcat(new_codes, "*");
+                    if (new_codes) {
+                        new_codes[0] = '\0';
+                        size_t current_len = 0;
+                        for (int i = 0; i < line_count; i++) {
+                            if (i == mark_idx - 1) {
+                                // Safe concatenation
+                                if (current_len + 1 < new_len) {
+                                    strcat(new_codes, "*");
+                                    current_len++;
+                                }
+                            }
+                            size_t line_len = strlen(lines[i]);
+                            if (current_len + line_len < new_len) {
+                                strcat(new_codes, lines[i]);
+                                current_len += line_len;
+                            }
+                            if (i < line_count - 1) {
+                                if (current_len + 1 < new_len) {
+                                    strcat(new_codes, "\n");
+                                    current_len++;
+                                }
+                            }
                         }
-                        strcat(new_codes, lines[i]);
-                        if (i < line_count - 1) strcat(new_codes, "\n");
-                    }
 
-                    PasswordEntry updated;
-                    updated.id = target->id;
-                    updated.service = target->service;
-                    updated.username = target->username;
-                    updated.password = target->password;
-                    updated.totp_secret = target->totp_secret;
-                    updated.recovery_codes = new_codes;
+                        PasswordEntry updated;
+                        updated.id = target->id;
+                        updated.service = target->service;
+                        updated.username = target->username;
+                        updated.password = target->password;
+                        updated.totp_secret = target->totp_secret;
+                        updated.recovery_codes = new_codes;
 
-                    if (database_update_entry(&updated) == 0) {
-                        printf("Recovery code marked as used.\n");
+                        if (database_update_entry(&updated) == 0) {
+                            printf("Recovery code marked as used.\n");
+                        } else {
+                            printf("Error updating entry.\n");
+                        }
+                        free(new_codes);
                     } else {
-                        printf("Error updating entry.\n");
+                        fprintf(stderr, "Memory allocation error.\n");
                     }
-                    free(new_codes);
                 } else {
                     printf("Code already marked as used.\n");
                 }
@@ -267,7 +294,7 @@ void cli_view_entry() {
     free_password_entries(entries, count);
 }
 
-void cli_delete_entry() {
+static void cli_delete_entry() {
     printf("Enter ID of entry to delete: ");
     int id;
     if (scanf("%d", &id) != 1) { id = -1; }
@@ -280,7 +307,7 @@ void cli_delete_entry() {
     }
 }
 
-void interactive_mode() {
+static void interactive_mode() {
     char choice;
     while (true) {
         printf("\n[l]ist, [a]dd, [v]iew, [e]dit, [d]elete, [g]enerate, [h]ealth-check, [i]mport, e[x]port, [q]uit\n");
@@ -418,7 +445,7 @@ int main(int argc, char *argv[]) {
 }
 
 // Stubs for functions to be fully implemented
-void cli_edit_entry() {
+static void cli_edit_entry() {
     printf("Enter ID of entry to edit: ");
     int id = 0;
     if (scanf("%d", &id) != 1) { id = -1; }
@@ -474,7 +501,12 @@ void cli_edit_entry() {
     free_password_entries(entries, count);
 }
 
-void cli_import_csv(const char* filepath) {
+static void cli_import_csv(const char* filepath) {
+    if (strstr(filepath, "..")) {
+        fprintf(stderr, "Error: Invalid file path (contains '..').\n");
+        return;
+    }
+
     FILE *fp = fopen(filepath, "rb");
     if (!fp) {
         fprintf(stderr, "Error: Could not open file %s\n", filepath);
@@ -506,7 +538,12 @@ void cli_import_csv(const char* filepath) {
     printf("CSV import from %s finished.\n", filepath);
 }
 
-void cli_export_csv(const char* filepath) {
+static void cli_export_csv(const char* filepath) {
+    if (strstr(filepath, "..")) {
+        fprintf(stderr, "Error: Invalid file path (contains '..').\n");
+        return;
+    }
+
     int count = 0;
     PasswordEntry *entries = database_get_all_entries(&count);
     if (!entries) {
@@ -532,7 +569,7 @@ void cli_export_csv(const char* filepath) {
     printf("Exported %d entries to %s\n", count, filepath);
 }
 
-void cli_health_check() {
+static void cli_health_check() {
     printf("Performing password health check...\n");
     int count = 0;
     PasswordEntry *entries = database_get_all_entries(&count);
@@ -651,7 +688,7 @@ void cli_health_check() {
     printf("\nHealth check complete.\n");
 }
 
-void print_help() {
+static void print_help() {
     printf("Usage: securepasswd_cli\n");
     printf("The application runs in interactive mode.\n");
 }

@@ -24,7 +24,7 @@
 
 // Simple base32 decoder
 static int base32_decode(const uint8_t *encoded, uint8_t *result, int bufSize) {
-    int buffer = 0;
+    uint32_t buffer = 0;
     int bitsLeft = 0;
     int count = 0;
     for (const uint8_t *ptr = encoded; count < bufSize && *ptr; ++ptr) {
@@ -65,7 +65,10 @@ char* generate_totp_code_at_time(const char *base32_secret, time_t current_time)
     free(decoded_secret);
 
     int offset = hash[hash_len - 1] & 0x0F;
-    uint32_t truncated_hash = be32toh(*(uint32_t*)(hash + offset)) & 0x7FFFFFFF;
+    uint32_t truncated_hash_raw;
+    memcpy(&truncated_hash_raw, hash + offset, sizeof(uint32_t));
+    
+    uint32_t truncated_hash = be32toh(truncated_hash_raw) & 0x7FFFFFFF;
 
     uint32_t totp = truncated_hash % 1000000;
 

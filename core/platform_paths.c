@@ -20,7 +20,12 @@ void get_config_path(char* path_buffer, size_t buffer_size) {
         snprintf(path_buffer, buffer_size, "%s/securepasswd", data_home);
     } else {
         const char* home = getenv("HOME");
-        snprintf(path_buffer, buffer_size, "%s/.local/share/securepasswd", home);
+        if (home) {
+            snprintf(path_buffer, buffer_size, "%s/.local/share/securepasswd", home);
+        } else {
+            // Fallback if HOME is not set
+            snprintf(path_buffer, buffer_size, ".");
+        }
     }
 #endif
 }

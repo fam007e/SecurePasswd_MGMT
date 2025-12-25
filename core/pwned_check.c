@@ -1,4 +1,5 @@
 #include "pwned_check.h"
+#include <openssl/evp.h>
 #include <openssl/sha.h>
 #include <curl/curl.h>
 #include <string.h>
@@ -29,9 +30,31 @@ static size_t write_callback(void *contents, size_t size, size_t nmemb, void *us
 }
 
 int is_password_pwned(const char *password) {
-    // 1. Calculate SHA-1 hash of the password
-    unsigned char hash[SHA_DIGEST_LENGTH];
-    SHA1((const unsigned char *)password, strlen(password), hash);
+    // 1. Calculate SHA-1 hash of the password using EVP API
+    unsigned char hash[EVP_MAX_MD_SIZE];
+    unsigned int hash_len;
+
+    EVP_MD_CTX *mdctx = EVP_MD_CTX_new();
+    if (mdctx == NULL) {
+        return -1;
+    }
+
+    if (1 != EVP_DigestInit_ex(mdctx, EVP_sha1(), NULL)) {
+        EVP_MD_CTX_free(mdctx);
+        return -1;
+    }
+
+    if (1 != EVP_DigestUpdate(mdctx, password, strlen(password))) {
+        EVP_MD_CTX_free(mdctx);
+        return -1;
+    }
+
+    if (1 != EVP_DigestFinal_ex(mdctx, hash, &hash_len)) {
+        EVP_MD_CTX_free(mdctx);
+        return -1;
+    }
+
+    EVP_MD_CTX_free(mdctx);
 
     char full_hash[SHA_DIGEST_LENGTH * 2 + 1];
     for (int i = 0; i < SHA_DIGEST_LENGTH; i++) {
@@ -49,12 +72,16 @@ int is_password_pwned(const char *password) {
     char url[100];
     snprintf(url, sizeof(url), "https://api.pwnedpasswords.com/range/%s", prefix);
 
-    struct MemoryStruct chunk;
-    chunk.memory = malloc(1);
-    chunk.size = 0;
-
     CURL *curl = curl_easy_init();
     if (!curl) return -1;
+
+    struct MemoryStruct chunk;
+    chunk.memory = malloc(1);
+    if (!chunk.memory) {
+        curl_easy_cleanup(curl);
+        return -1;
+    }
+    chunk.size = 0;
 
     curl_easy_setopt(curl, CURLOPT_URL, url);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, write_callback);
