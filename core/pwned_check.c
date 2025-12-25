@@ -13,7 +13,7 @@ struct MemoryStruct {
 };
 
 // libcurl write callback function
-static size_t write_callback(void *contents, size_t size, size_t nmemb, void *userp) {
+static size_t write_callback(const void *contents, size_t size, size_t nmemb, void *userp) {
     size_t realsize = size * nmemb;
     struct MemoryStruct *mem = (struct MemoryStruct *)userp;
     char *ptr = realloc(mem->memory, mem->size + realsize + 1);
@@ -66,7 +66,7 @@ int is_password_pwned(const char *password) {
     char prefix[6];
     strncpy(prefix, full_hash, 5);
     prefix[5] = '\0';
-    char *suffix = full_hash + 5;
+    const char *suffix = full_hash + 5;
 
     // 3. Query the HIBP API
     char url[100];
@@ -98,9 +98,9 @@ int is_password_pwned(const char *password) {
 
     // 4. Check response for the hash suffix
     int pwn_count = 0;
-    char *line = strtok(chunk.memory, "\r\n");
+    const char *line = strtok(chunk.memory, "\r\n");
     while (line) {
-        char *colon = strchr(line, ':');
+        char *colon = strchr((char*)line, ':');
         if (colon) {
             *colon = '\0'; // Split line into hash and count
             if (strcmp(line, suffix) == 0) {

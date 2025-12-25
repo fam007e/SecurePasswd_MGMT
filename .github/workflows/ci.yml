@@ -8,11 +8,11 @@ on:
 
 jobs:
   build-and-test:
-    name: Build and Test (ASAN/UBSan)
+    name: Build and Test (ASan/UBSan)
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Install Dependencies
       run: |
@@ -23,7 +23,7 @@ jobs:
 
     - name: Static Analysis (Cppcheck)
       run: |
-        cppcheck --enable=all --suppress=missingIncludeSystem --error-exitcode=1 cli/ core/
+        cppcheck --enable=all --suppress=missingIncludeSystem -I . -I core/ -I tests/ -i tests/unity.c --error-exitcode=1 cli/ core/ tests/
 
     - name: Configure CMake (Sanitizers Enabled)
       run: |

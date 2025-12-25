@@ -75,7 +75,7 @@ static void cli_import_field_cb(void *s, size_t len, void *data) {
     CsvRow *row = (CsvRow*)data;
     row->count++;
     row->fields = realloc(row->fields, row->count * sizeof(char*));
-    row->fields[row->count - 1] = strndup(s, len);
+    row->fields[row->count - 1] = strndup((const char*)s, len);
 }
 
 static void cli_import_row_cb(int c, void *data) {
@@ -154,14 +154,14 @@ static void cli_add_entry() {
     read_line(username, sizeof(username));
 
     // Securely read password
-    char *pass_ptr = getpass("Password: ");
+    const char *pass_ptr = getpass("Password: ");
     strncpy(password_buf, pass_ptr, sizeof(password_buf) - 1);
     password_buf[sizeof(password_buf) - 1] = '\0';
     // getpass might use a static buffer, so we copied it. Clear the static one if possible?
     // standard getpass doesn't expose clearing, but we copied it.
 
     // Securely read TOTP Secret
-    char *totp_ptr = getpass("TOTP Secret (optional): ");
+    const char *totp_ptr = getpass("TOTP Secret (optional): ");
     strncpy(totp_buf, totp_ptr, sizeof(totp_buf) - 1);
     totp_buf[sizeof(totp_buf) - 1] = '\0';
 
@@ -355,8 +355,8 @@ int main(int argc, char *argv[]) {
     }
 
     // --- Get Master Password ---
-    char *password = getpass("Enter master password: ");
-    if (!password || strlen(password) == 0) {
+    const char *password = getpass("Enter master password: ");
+    if (strlen(password) == 0) {
         fprintf(stderr, "Error: Password cannot be empty.\n");
         return 1;
     }
@@ -378,7 +378,7 @@ int main(int argc, char *argv[]) {
             DWORD err = GetLastError();
             if (err != ERROR_ALREADY_EXISTS) {
                 fprintf(stderr, "Error: Failed to create directory '%s' (Error code: %lu)\n", dirPath, err);
-                sodium_memzero(password, strlen(password));
+                sodium_memzero((void*)password, strlen(password));
                 return 1;
             }
         } else {
@@ -398,7 +398,7 @@ int main(int argc, char *argv[]) {
         // For full recursive creation, you'd need to parse the path
         if (mkdir(dirPath, 0700) != 0 && errno != EEXIST) {
             fprintf(stderr, "Error: Failed to create directory '%s' (%s)\n", dirPath, strerror(errno));
-            sodium_memzero(password, strlen(password));
+            sodium_memzero((void*)password, strlen(password));
             return 1;
         } else {
             printf("Directory created successfully.\n");
@@ -426,12 +426,12 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "  - Insufficient file permissions\n");
         fprintf(stderr, "  - Corrupted database file\n");
         fprintf(stderr, "\nDatabase location: %s\n", dbPath);
-        sodium_memzero(password, strlen(password));
+        sodium_memzero((void*)password, strlen(password));
         return 1;
     }
 
     // Clear password from memory
-    sodium_memzero(password, strlen(password));
+    sodium_memzero((void*)password, strlen(password));
     printf("Database opened successfully.\n\n");
 
     // --- Main Application Logic ---

@@ -16,7 +16,7 @@
 
 const char* TEST_DB = "test_vault.db";
 
-void test_database_lifecycle() {
+static void test_database_lifecycle() {
     printf("--- Running Test: Database Lifecycle ---\n");
 
     // 1. Test opening and creating the database
@@ -33,6 +33,7 @@ void test_database_lifecycle() {
     int count = 0;
     PasswordEntry *entries = database_get_all_entries(&count);
     assert(count == 1);
+    assert(entries != NULL);
     assert(entries[0].id == new_id);
     assert(strcmp(entries[0].service, "TestService") == 0);
     assert(strcmp(entries[0].recovery_codes, "CODE1\nCODE2") == 0);
@@ -44,6 +45,7 @@ void test_database_lifecycle() {
     assert(database_update_entry(&updated_entry) == 0);
     entries = database_get_all_entries(&count);
     assert(count == 1);
+    assert(entries != NULL);
     assert(strcmp(entries[0].service, "UpdatedService") == 0);
     assert(strcmp(entries[0].recovery_codes, "NEWCODE") == 0);
     free_password_entries(entries, count);
@@ -53,6 +55,7 @@ void test_database_lifecycle() {
     assert(database_delete_entry(new_id) == 0);
     entries = database_get_all_entries(&count);
     assert(count == 0);
+    assert(entries == NULL);
     printf("  [PASSED] database_delete_entry\n");
 
     // 6. Test deleting non-existent entry (should fail)
@@ -73,7 +76,7 @@ void test_database_lifecycle() {
     printf("--- Test Complete ---\n\n");
 }
 
-void test_totp_generation() {
+static void test_totp_generation() {
     printf("--- Running Test: TOTP Generation ---\n");
     // Test vector from RFC 6238 for SHA1
     // Secret: "12345678901234567890"

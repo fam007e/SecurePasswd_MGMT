@@ -27,32 +27,61 @@ jobs:
             libsqlcipher-dev libcsv-dev qt6-base-dev libqt6svg6-dev libssl-dev \
             libcurl4-openssl-dev libcmocka-dev
 
-      - uses: github/codeql-action/init@v3
-        with:
-          languages: cpp
+            - uses: github/codeql-action/init@v4
 
-      - name: Build
-        run: |
-          mkdir build && cd build
-          cmake .. -DCMAKE_BUILD_TYPE=Release
-          cmake --build .
+              with:
 
-      - uses: github/codeql-action/analyze@v3
+                languages: cpp
 
-  flawfinder:
-    name: Flawfinder C/C++ Security
-    runs-on: ubuntu-latest
-    permissions:
-      security-events: write
-      actions: read
-      contents: read
-    steps:
-      - uses: actions/checkout@v4
-      - name: Install and Run Flawfinder
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y flawfinder
-          flawfinder --sarif . > flawfinder.sarif
-      - uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: flawfinder.sarif
+
+
+            - name: Build
+
+              run: |
+
+                mkdir build && cd build
+
+                cmake .. -DCMAKE_BUILD_TYPE=Release
+
+                cmake --build .
+
+
+
+            - uses: github/codeql-action/analyze@v4
+
+
+
+        flawfinder:
+
+          name: Flawfinder C/C++ Security
+
+          runs-on: ubuntu-latest
+
+          permissions:
+
+            security-events: write
+
+            actions: read
+
+            contents: read
+
+          steps:
+
+            - uses: actions/checkout@v4
+
+            - name: Install and Run Flawfinder
+
+              run: |
+
+                sudo apt-get update
+
+                sudo apt-get install -y flawfinder
+
+                flawfinder --sarif . > flawfinder.sarif
+
+            - uses: github/codeql-action/upload-sarif@v4
+
+              with:
+
+                sarif_file: flawfinder.sarif
+
