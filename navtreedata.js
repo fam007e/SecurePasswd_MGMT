@@ -59,41 +59,43 @@ var NAVTREE =
       [ "Cryptographic Implementation", "md_SECURITY.html#autotoc_md26", [
         [ "Encryption", "md_SECURITY.html#autotoc_md27", null ],
         [ "Key Derivation Function (KDF)", "md_SECURITY.html#autotoc_md28", null ],
-        [ "Random Number Generation", "md_SECURITY.html#autotoc_md29", null ]
+        [ "Random Number Generation", "md_SECURITY.html#autotoc_md29", null ],
+        [ "Hashing for External Services", "md_SECURITY.html#autotoc_md30", null ]
       ] ],
-      [ "Data Protection", "md_SECURITY.html#autotoc_md30", [
-        [ "Master Password Security Flow", "md_SECURITY.html#autotoc_md31", null ],
-        [ "Data Storage Format", "md_SECURITY.html#autotoc_md32", null ]
+      [ "Input Security &amp; Validation", "md_SECURITY.html#autotoc_md31", null ],
+      [ "Data Protection", "md_SECURITY.html#autotoc_md32", [
+        [ "Master Password Security Flow", "md_SECURITY.html#autotoc_md33", null ],
+        [ "Data Storage Format", "md_SECURITY.html#autotoc_md34", null ]
       ] ],
-      [ "Memory Management", "md_SECURITY.html#autotoc_md33", null ],
-      [ "File System Security", "md_SECURITY.html#autotoc_md34", null ],
-      [ "Secure Build Process", "md_SECURITY.html#autotoc_md35", null ],
-      [ "Password Strength Validation", "md_SECURITY.html#autotoc_md36", [
-        [ "Health Check Requirements", "md_SECURITY.html#autotoc_md37", null ],
-        [ "Compliance", "md_SECURITY.html#autotoc_md38", null ]
+      [ "Memory Management", "md_SECURITY.html#autotoc_md35", null ],
+      [ "File System Security", "md_SECURITY.html#autotoc_md36", null ],
+      [ "Secure Build Process", "md_SECURITY.html#autotoc_md37", null ],
+      [ "Password Strength Validation", "md_SECURITY.html#autotoc_md38", [
+        [ "Health Check Requirements", "md_SECURITY.html#autotoc_md39", null ],
+        [ "Compliance", "md_SECURITY.html#autotoc_md40", null ]
       ] ],
-      [ "Reporting Security Vulnerabilities", "md_SECURITY.html#autotoc_md39", null ]
+      [ "Reporting Security Vulnerabilities", "md_SECURITY.html#autotoc_md41", null ]
     ] ],
     [ "Contributing to SecurePasswd_MGMT", "md_CONTRIBUTING.html", [
-      [ "Security-Focused Development", "md_CONTRIBUTING.html#autotoc_md41", null ],
-      [ "Code Review", "md_CONTRIBUTING.html#autotoc_md42", null ],
-      [ "Coding Style", "md_CONTRIBUTING.html#autotoc_md43", null ],
-      [ "Testing", "md_CONTRIBUTING.html#autotoc_md44", null ],
-      [ "How to Contribute", "md_CONTRIBUTING.html#autotoc_md45", null ],
-      [ "Release Guidelines", "md_CONTRIBUTING.html#autotoc_md46", null ]
+      [ "Security-Focused Development", "md_CONTRIBUTING.html#autotoc_md43", null ],
+      [ "Code Review", "md_CONTRIBUTING.html#autotoc_md44", null ],
+      [ "Coding Style", "md_CONTRIBUTING.html#autotoc_md45", null ],
+      [ "Testing", "md_CONTRIBUTING.html#autotoc_md46", null ],
+      [ "How to Contribute", "md_CONTRIBUTING.html#autotoc_md47", null ],
+      [ "Release Guidelines", "md_CONTRIBUTING.html#autotoc_md48", null ]
     ] ],
     [ "Contributor Covenant Code of Conduct", "md_CODE__OF__CONDUCT.html", [
-      [ "Our Pledge", "md_CODE__OF__CONDUCT.html#autotoc_md48", null ],
-      [ "Our Standards", "md_CODE__OF__CONDUCT.html#autotoc_md49", null ],
-      [ "Enforcement Responsibilities", "md_CODE__OF__CONDUCT.html#autotoc_md50", null ],
-      [ "Scope", "md_CODE__OF__CONDUCT.html#autotoc_md51", null ],
-      [ "Enforcement", "md_CODE__OF__CONDUCT.html#autotoc_md52", null ],
-      [ "Attribution", "md_CODE__OF__CONDUCT.html#autotoc_md53", null ]
+      [ "Our Pledge", "md_CODE__OF__CONDUCT.html#autotoc_md50", null ],
+      [ "Our Standards", "md_CODE__OF__CONDUCT.html#autotoc_md51", null ],
+      [ "Enforcement Responsibilities", "md_CODE__OF__CONDUCT.html#autotoc_md52", null ],
+      [ "Scope", "md_CODE__OF__CONDUCT.html#autotoc_md53", null ],
+      [ "Enforcement", "md_CODE__OF__CONDUCT.html#autotoc_md54", null ],
+      [ "Attribution", "md_CODE__OF__CONDUCT.html#autotoc_md55", null ]
     ] ],
     [ "Authors", "md_AUTHORS.html", [
-      [ "Core Team", "md_AUTHORS.html#autotoc_md55", null ],
-      [ "Contributors", "md_AUTHORS.html#autotoc_md56", null ],
-      [ "Acknowledgements", "md_AUTHORS.html#autotoc_md57", null ]
+      [ "Core Team", "md_AUTHORS.html#autotoc_md57", null ],
+      [ "Contributors", "md_AUTHORS.html#autotoc_md58", null ],
+      [ "Acknowledgements", "md_AUTHORS.html#autotoc_md59", null ]
     ] ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],

@@ -9,5 +9,5 @@ var searchData=
   ['graphical_20user_20interface_20gui_6',['Graphical User Interface (GUI)',['../index.html#autotoc_md4',1,'']]],
   ['gui_7',['Graphical User Interface (GUI)',['../index.html#autotoc_md4',1,'']]],
   ['gui_20application_8',['GUI Application',['../index.html#autotoc_md15',1,'']]],
-  ['guidelines_9',['Release Guidelines',['../md_CONTRIBUTING.html#autotoc_md46',1,'']]]
+  ['guidelines_9',['Release Guidelines',['../md_CONTRIBUTING.html#autotoc_md48',1,'']]]
 ];
