@@ -19,7 +19,6 @@
 static char *secure_getpass(const char *prompt) {
     static char password[128];
     struct termios old_t, new_t;
-    int n = 0;
 
     printf("%s", prompt);
     fflush(stdout);
