@@ -12,8 +12,43 @@
 #endif
 
 #ifndef _MSC_VER
-#include <unistd.h> // For getpass
 #include <termios.h> // For hiding input
+#include <unistd.h>  // For STDIN_FILENO
+
+// Custom getpass implementation for Linux/macOS to avoid obsolescence warnings
+static char *secure_getpass(const char *prompt) {
+    static char password[128];
+    struct termios old_t, new_t;
+    int n = 0;
+
+    printf("%s", prompt);
+    fflush(stdout);
+
+    // Turn off echoing
+    if (tcgetattr(STDIN_FILENO, &old_t) != 0) {
+        return NULL;
+    }
+    new_t = old_t;
+    new_t.c_lflag &= ~ECHO;
+    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &new_t) != 0) {
+        return NULL;
+    }
+
+    // Read password
+    if (fgets(password, sizeof(password), stdin) != NULL) {
+        size_t len = strlen(password);
+        if (len > 0 && password[len - 1] == '\n') {
+            password[len - 1] = '\0'; // Remove newline
+        }
+    }
+
+    // Restore terminal settings
+    (void)tcsetattr(STDIN_FILENO, TCSAFLUSH, &old_t);
+    printf("\n");
+
+    return password;
+}
+
 #else
 #include <conio.h> // For _getch
 #include <windows.h> // For console functions
@@ -31,7 +66,7 @@ static char* strndup(const char* s, size_t n) {
 
 
 // Windows-specific getpass implementation
-char *getpass(const char *prompt) {
+char *secure_getpass(const char *prompt) {
     static char password[128]; // Buffer for password
     char *p = password;
     int c;
@@ -154,14 +189,14 @@ static void cli_add_entry() {
     read_line(username, sizeof(username));
 
     // Securely read password
-    const char *pass_ptr = getpass("Password: ");
+    const char *pass_ptr = secure_getpass("Password: ");
     strncpy(password_buf, pass_ptr, sizeof(password_buf) - 1);
     password_buf[sizeof(password_buf) - 1] = '\0';
     // getpass might use a static buffer, so we copied it. Clear the static one if possible?
     // standard getpass doesn't expose clearing, but we copied it.
 
     // Securely read TOTP Secret
-    const char *totp_ptr = getpass("TOTP Secret (optional): ");
+    const char *totp_ptr = secure_getpass("TOTP Secret (optional): ");
     strncpy(totp_buf, totp_ptr, sizeof(totp_buf) - 1);
     totp_buf[sizeof(totp_buf) - 1] = '\0';
 
@@ -355,7 +390,7 @@ int main(int argc, char *argv[]) {
     }
 
     // --- Get Master Password ---
-    const char *password = getpass("Enter master password: ");
+    const char *password = secure_getpass("Enter master password: ");
     if (strlen(password) == 0) {
         fprintf(stderr, "Error: Password cannot be empty.\n");
         return 1;
