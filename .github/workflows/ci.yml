@@ -23,7 +23,7 @@ jobs:
 
     - name: Static Analysis (Cppcheck)
       run: |
-        cppcheck --enable=all --suppress=missingIncludeSystem -I . -I core/ -I tests/ -i tests/unity.c --error-exitcode=1 cli/ core/ tests/
+        cppcheck --enable=all --suppress=missingIncludeSystem -I . -I core/ -I tests/ --error-exitcode=1 cli/ core/ gui/ tests/
 
     - name: Configure CMake (Sanitizers Enabled)
       run: |
