@@ -544,6 +544,18 @@ static void cli_export_csv(const char* filepath) {
         return;
     }
 
+    printf("WARNING: You are about to export your vault to a CSV file.\n");
+    printf("This file will contain ALL your passwords and secrets in PLAIN TEXT.\n");
+    printf("Anyone with access to this file will be able to see your credentials.\n");
+    printf("Are you sure you want to continue? (y/N): ");
+
+    char confirm[16];
+    read_line(confirm, sizeof(confirm));
+    if (confirm[0] != 'y' && confirm[0] != 'Y') {
+        printf("Export cancelled.\n");
+        return;
+    }
+
     int count = 0;
     PasswordEntry *entries = database_get_all_entries(&count);
     if (!entries) {
