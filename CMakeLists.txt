@@ -91,6 +91,8 @@ endif()
 add_subdirectory(core)
 add_subdirectory(cli)
 add_subdirectory(gui)
+
+enable_testing()
 add_subdirectory(tests)
 
 # CPack configuration
