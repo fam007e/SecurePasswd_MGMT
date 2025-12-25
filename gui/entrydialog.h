@@ -17,7 +17,7 @@ class EntryDialog : public QDialog
     Q_OBJECT
 
 public:
-    EntryDialog(QWidget *parent = nullptr);
+    explicit EntryDialog(QWidget *parent = nullptr);
 
     QString getService() const;
     QString getUsername() const;

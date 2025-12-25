@@ -10,7 +10,7 @@ class PasswordGeneratorDialog : public QDialog
     Q_OBJECT
 
 public:
-    PasswordGeneratorDialog(QWidget *parent = nullptr);
+    explicit PasswordGeneratorDialog(QWidget *parent = nullptr);
 
     int getLength() const;
     bool getUseUppercase() const;
