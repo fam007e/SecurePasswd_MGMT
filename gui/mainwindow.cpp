@@ -62,7 +62,7 @@ void import_row_cb(int c, void *data) {
 
 MainWindow::MainWindow(const QString& password, QWidget *parent) : QMainWindow(parent), m_databaseOpen(false) {
     // Use shared platform_paths function
-    char dirPath[1024];
+    char dirPath[2048];
     get_config_path(dirPath, sizeof(dirPath));
     QString dbDirPath = QString::fromUtf8(dirPath);
 
@@ -140,7 +140,7 @@ void MainWindow::onExport() {
         return;
     }
 
-    fprintf(fp, "service,username,password,totp_secret,recovery_codes\n");
+    fputs("service,username,password,totp_secret,recovery_codes\n", fp);
     for (const auto& entry : m_entries) {
         fprintf(fp, "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n",
                 entry.service.toUtf8().constData(),

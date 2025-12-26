@@ -20,11 +20,11 @@ int load_or_generate_salt(const char *path, uint8_t *salt) {
     FILE *f = fopen(path, "rb");
     if (f) {
         // Salt file exists, read it
-        if (fread(salt, 1, SALT_LEN, f) != SALT_LEN) {
-            fclose(f);
+        size_t n = fread(salt, 1, SALT_LEN, f);
+        fclose(f);
+        if (n != SALT_LEN) {
             return -1; // Failed to read salt
         }
-        fclose(f);
         return 0;
     } else {
         // Salt file does not exist, generate a new one
@@ -37,11 +37,11 @@ int load_or_generate_salt(const char *path, uint8_t *salt) {
         if (!f) {
             return -1; // Failed to open salt file for writing
         }
-        if (fwrite(salt, 1, SALT_LEN, f) != SALT_LEN) {
-            fclose(f);
+        size_t n = fwrite(salt, 1, SALT_LEN, f);
+        fclose(f);
+        if (n != SALT_LEN) {
             return -1; // Failed to write salt
         }
-        fclose(f);
         return 0;
     }
 }

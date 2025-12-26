@@ -16,29 +16,47 @@ char *generate_password(int len, bool upper, bool num, bool special) {
     const char *num_set = "0123456789";
     const char *special_set = "!@#$%^&*()";
 
-    char charset[128] = "";
-    strcat(charset, lower_set);
+    char charset[128];
+    size_t charset_len = 0;
+
+    // Add lower_set
+    size_t lower_len = strlen(lower_set);
+    memcpy(charset + charset_len, lower_set, lower_len);
+    charset_len += lower_len;
 
     int pos = 0;
     // Always include a lowercase
-    pw[pos++] = lower_set[randombytes_uniform(strlen(lower_set))];
+    pw[pos++] = lower_set[randombytes_uniform(lower_len)];
 
     if (upper) {
-        strcat(charset, upper_set);
-        if (pos < len) pw[pos++] = upper_set[randombytes_uniform(strlen(upper_set))];
+        size_t slen = strlen(upper_set);
+        if (charset_len + slen < sizeof(charset)) {
+            memcpy(charset + charset_len, upper_set, slen);
+            charset_len += slen;
+        }
+        if (pos < len) pw[pos++] = upper_set[randombytes_uniform(slen)];
     }
     if (num) {
-        strcat(charset, num_set);
-        if (pos < len) pw[pos++] = num_set[randombytes_uniform(strlen(num_set))];
+        size_t slen = strlen(num_set);
+        if (charset_len + slen < sizeof(charset)) {
+            memcpy(charset + charset_len, num_set, slen);
+            charset_len += slen;
+        }
+        if (pos < len) pw[pos++] = num_set[randombytes_uniform(slen)];
     }
     if (special) {
-        strcat(charset, special_set);
-        if (pos < len) pw[pos++] = special_set[randombytes_uniform(strlen(special_set))];
+        size_t slen = strlen(special_set);
+        if (charset_len + slen < sizeof(charset)) {
+            memcpy(charset + charset_len, special_set, slen);
+            charset_len += slen;
+        }
+        if (pos < len) pw[pos++] = special_set[randombytes_uniform(slen)];
     }
+    charset[charset_len] = '\0';
 
     // Fill the rest of the password
     for (; pos < len; pos++) {
-        pw[pos] = charset[randombytes_uniform(strlen(charset))];
+        pw[pos] = charset[randombytes_uniform(charset_len)];
     }
 
     // Shuffle the password to avoid predictable positions

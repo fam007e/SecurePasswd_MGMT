@@ -4,7 +4,7 @@ authors:
 - alias: "fam007e"
   # Add actual author details here
 title: "SecurePasswd_MGMT"
-version: 2025.10.25
-date-released: 2025-10-25
+version: 2025.12.26
+date-released: 2025-12-26
 url: "https://github.com/fam007e/SecurePasswd_MGMT"
 license: MIT

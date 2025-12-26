@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2025.12.20</span>
+   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2025.12.26</span>
    </div>
    <div id="projectbrief">A modern, cross-platform password manager and two-factor authenticator (TOTP) designed with state-of-the-art security.</div>
   </td>
@@ -101,7 +101,7 @@ Security-Focused Development</h1>
 <li><b>No Plaintext Secrets:</b> Usernames, passwords, and TOTP secrets must be encrypted when stored. No sensitive information should ever be written to disk in plaintext.</li>
 <li><b>Use Established Cryptographic Libraries:</b> All cryptographic operations must be implemented using well-vetted, modern libraries. This project uses <b>SQLCipher</b> for database encryption and <b>libargon2</b> for key derivation. Do not implement custom cryptographic primitives.</li>
 <li><b>Secure Memory Handling:</b> Sensitive data must be cleared from memory as soon as it is no longer needed. Use <span class="tt">sodium_memzero()</span> or a similar secure function to overwrite sensitive data in memory.</li>
-<li><b>Input Validation:</b> All input from users or files must be validated to prevent vulnerabilities like buffer overflows.</li>
+<li><b>Input Validation:</b> All input from users or files must be validated to prevent vulnerabilities like buffer overflows. <b>Avoid banned C functions like <span class="tt">strcat</span>, <span class="tt">strcpy</span>, and <span class="tt">sprintf</span>; use safer, bounded alternatives like <span class="tt">strncat</span>, <span class="tt">strncpy</span>, and <span class="tt">snprintf</span>.</b></li>
 <li><b>Constant-Time Operations:</b> When comparing sensitive data, use constant-time comparison functions where appropriate to prevent timing attacks.</li>
 </ul>
 <h1 class="doxsection"><a class="anchor" id="autotoc_md44"></a>
@@ -133,7 +133,8 @@ Testing</h1>
 <ul>
 <li><b>Unit Tests:</b> All new features should be accompanied by unit tests. The project uses CTest to manage and run tests.</li>
 <li><b>Cryptographic Testing:</b> Any changes to cryptographic functions must be accompanied by tests that verify the correctness of the implementation.</li>
-<li><b>Static Analysis:</b> Contributors are expected to run <span class="tt">cppcheck</span> on their changes to ensure no new static analysis warnings are introduced. <div class="fragment"><div class="line">cppcheck --enable=all --suppress=missingIncludeSystem cli/ core/</div>
+<li><b>Static Analysis:</b> Contributors are expected to run <span class="tt">cppcheck</span> and <span class="tt">flawfinder</span> on their changes to ensure no new security or logic warnings are introduced. <div class="fragment"><div class="line">cppcheck --enable=all --suppress=missingIncludeSystem cli/ core/</div>
+<div class="line">flawfinder .</div>
 </div><!-- fragment --></li>
 <li><b>Runtime Sanitizers:</b> It is recommended to build and test with sanitizers enabled to catch runtime errors. <div class="fragment"><div class="line">cmake -DCMAKE_C_FLAGS=&quot;-fsanitize=address,undefined&quot; ..</div>
 <div class="line">make &amp;&amp; ctest</div>

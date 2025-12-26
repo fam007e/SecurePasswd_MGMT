@@ -17,18 +17,18 @@ int database_open(const char *db_path, const char *password) {
     uint8_t key[KEY_LEN];
 
     // Construct salt path
-    char salt_path[256];
+    char salt_path[1024];
     snprintf(salt_path, sizeof(salt_path), "%s.salt", db_path);
 
     // Load or generate salt
     if (load_or_generate_salt(salt_path, salt) != 0) {
-        fprintf(stderr, "Failed to load or generate salt.\n");
+        fputs("Failed to load or generate salt.\n", stderr);
         return -1;
     }
 
     // Derive key
     if (derive_key(password, salt, key) != 0) {
-        fprintf(stderr, "Failed to derive key.\n");
+        fputs("Failed to derive key.\n", stderr);
         return -1;
     }
 
@@ -48,7 +48,7 @@ int database_open(const char *db_path, const char *password) {
 
     // Test if the key is correct by trying to access the database
     if (sqlite3_exec(db, "SELECT count(*) FROM sqlite_master;", NULL, NULL, NULL) != SQLITE_OK) {
-        fprintf(stderr, "Invalid key or database file is corrupted.\n");
+        fputs("Invalid key or database file is corrupted.\n", stderr);
         sqlite3_close(db);
         db = NULL;
         sodium_memzero(key, KEY_LEN);
@@ -89,7 +89,7 @@ PasswordEntry* database_get_all_entries(int *count) {
 
     PasswordEntry *entries = malloc(*count * sizeof(PasswordEntry));
     if (!entries) {
-        fprintf(stderr, "Failed to allocate memory for entries\n");
+        fputs("Failed to allocate memory for entries\n", stderr);
         return NULL;
     }
 

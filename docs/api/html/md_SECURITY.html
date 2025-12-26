@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2025.12.20</span>
+   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2025.12.26</span>
    </div>
    <div id="projectbrief">A modern, cross-platform password manager and two-factor authenticator (TOTP) designed with state-of-the-art security.</div>
   </td>
@@ -138,8 +138,9 @@ Hashing for External Services</h2>
 Input Security &amp; Validation</h1>
 <ul>
 <li><b>Secure Input:</b> The Command Line Interface (CLI) utilizes <span class="tt">getpass</span> (or platform equivalents) to ensure passwords and secrets are never echoed to the console during entry.</li>
-<li><b>Path Validation:</b> File operations (like CSV import/export) include strict validation to prevent Directory Traversal attacks (e.g., blocking <span class="tt">..</span> in paths).</li>
-<li><b>Sanitization:</b> The codebase is regularly tested with AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) to detect and fix memory safety issues and undefined behavior (e.g., integer overflows, misaligned access).</li>
+<li><b>Banned Function Mitigation:</b> The codebase explicitly avoids insecure C functions (<span class="tt">strcat</span>, <span class="tt">sprintf</span>, <span class="tt">strncpy</span>, <span class="tt">atoi</span>). We utilize bounded alternatives and manual length tracking to prevent buffer overflows and undefined behavior.</li>
+<li><b>Path Validation &amp; Sanitization:</b> File operations (like CSV import/export) include strict validation to prevent Directory Traversal attacks (e.g., blocking <span class="tt">..</span> in paths). Additionally, platform-specific paths derived from environment variables are processed through a <span class="tt"><a class="el" href="platform__paths_8c.html#a5339ed1fb4e7ecf92035c7f251061991">sanitize_path</a></span> utility to filter untrusted input.</li>
+<li><b>Sanitization:</b> The codebase is regularly tested with AddressSanitizer (ASan), UndefinedBehaviorSanitizer (UBSan), and <b>Flawfinder</b> to detect and fix memory safety issues, race conditions, and undefined behavior.</li>
 <li><b>Static Analysis:</b> <span class="tt">cppcheck</span> is employed to enforce code quality and catch potential leaks or logic errors early.</li>
 </ul>
 <h1 class="doxsection"><a class="anchor" id="autotoc_md32"></a>

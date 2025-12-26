@@ -1,6 +1,6 @@
 PROJECT_NAME           = "SecurePasswd_MGMT"
 PROJECT_BRIEF          = "A modern, cross-platform password manager and two-factor authenticator (TOTP) designed with state-of-the-art security."
-PROJECT_NUMBER         = 2025.12.20
+PROJECT_NUMBER         = 2025.12.26
 OUTPUT_DIRECTORY       = docs/api
 INPUT                  = README.md core/ SECURITY.md CONTRIBUTING.md CODE_OF_CONDUCT.md AUTHORS.md CITATION.cff LICENSE
 USE_MDFILE_AS_MAINPAGE = README.md
@@ -19,8 +19,8 @@ TOC_INCLUDE_HEADINGS   = 5
 # Code formatting
 VERBATIM_HEADERS       = NO
 
-# Image paths 
-IMAGE_PATH             = . 
+# Image paths
+IMAGE_PATH             = .
 
 # Graph settings
 HAVE_DOT               = YES

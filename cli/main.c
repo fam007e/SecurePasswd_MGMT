@@ -20,7 +20,7 @@ static char *secure_getpass(const char *prompt) {
     static char password[128];
     struct termios old_t, new_t;
 
-    printf("%s", prompt);
+    fputs(prompt, stdout);
     fflush(stdout);
 
     // Turn off echoing
@@ -75,7 +75,7 @@ char *secure_getpass(const char *prompt) {
     GetConsoleMode(hStdin, &mode);
     SetConsoleMode(hStdin, mode & (~ENABLE_ECHO_INPUT)); // Disable echo
 
-    printf("%s", prompt);
+    fputs(prompt, stdout);
     fflush(stdout);
 
     while ((c = _getch()) != '\r' && c != '\n' && (p - password < sizeof(password) - 1)) {
@@ -182,9 +182,9 @@ static void cli_add_entry() {
     PasswordEntry entry;
     char service[256], username[256], password_buf[256], totp_buf[256], recovery[1024];
 
-    printf("Service: ");
+    fputs("Service: ", stdout);
     read_line(service, sizeof(service));
-    printf("Username: ");
+    fputs("Username: ", stdout);
     read_line(username, sizeof(username));
 
     // Securely read password
@@ -199,7 +199,7 @@ static void cli_add_entry() {
     strncpy(totp_buf, totp_ptr, sizeof(totp_buf) - 1);
     totp_buf[sizeof(totp_buf) - 1] = '\0';
 
-    printf("Recovery Codes (optional): ");
+    fputs("Recovery Codes (optional): ", stdout);
     read_line(recovery, sizeof(recovery));
 
     entry.service = service;
@@ -239,15 +239,15 @@ static void cli_view_entry() {
 
     if (target) {
         printf("\n--- Entry %d ---\n", target->id);
-        printf("Service:  %s\n", target->service);
-        printf("Username: %s\n", target->username);
-        printf("Password: %s\n", target->password);
+        printf("Service:  %s\n", target->service ? target->service : "");
+        printf("Username: %s\n", target->username ? target->username : "");
+        printf("Password: %s\n", target->password ? target->password : "");
         if (target->totp_secret && strlen(target->totp_secret) > 0) {
             char* code = generate_totp_code(target->totp_secret);
             printf("TOTP:     %s\n", code ? code : "(invalid secret)");
             if(code) free(code);
         } else {
-            printf("TOTP:     (none)\n");
+            fputs("TOTP:     (none)\n", stdout);
         }
         if (target->recovery_codes && strlen(target->recovery_codes) > 0) {
             printf("Recovery Codes:\n");
@@ -271,25 +271,25 @@ static void cli_view_entry() {
                     char *new_codes = malloc(new_len);
                     if (new_codes) {
                         new_codes[0] = '\0';
-                        size_t current_len = 0;
+                        size_t current_pos = 0;
                         for (int i = 0; i < line_count; i++) {
-                            if (i == mark_idx - 1) {
-                                // Safe concatenation
-                                if (current_len + 1 < new_len) {
-                                    strcat(new_codes, "*");
-                                    current_len++;
-                                }
+                            const char *line_text = lines[i];
+                            bool is_marked = (i == mark_idx - 1);
+
+                            int n;
+                            if (is_marked) {
+                                n = snprintf(new_codes + current_pos, new_len - current_pos, "*%s%s",
+                                             line_text, (i < line_count - 1) ? "\n" : "");
+                            } else {
+                                n = snprintf(new_codes + current_pos, new_len - current_pos, "%s%s",
+                                             line_text, (i < line_count - 1) ? "\n" : "");
                             }
-                            size_t line_len = strlen(lines[i]);
-                            if (current_len + line_len < new_len) {
-                                strcat(new_codes, lines[i]);
-                                current_len += line_len;
-                            }
-                            if (i < line_count - 1) {
-                                if (current_len + 1 < new_len) {
-                                    strcat(new_codes, "\n");
-                                    current_len++;
-                                }
+
+                            if (n > 0 && (size_t)n < new_len - current_pos) {
+                                current_pos += n;
+                            } else {
+                                // Should not happen given new_len calculation
+                                break;
                             }
                         }
 
@@ -363,7 +363,7 @@ static void interactive_mode() {
             case 'h': cli_health_check(); break;
             case 'i': {
                 char path[256];
-                printf("Path to CSV file to import: ");
+                fputs("Path to CSV file to import: ", stdout);
                 read_line(path, sizeof(path));
                 cli_import_csv(path);
                 break;
@@ -371,7 +371,7 @@ static void interactive_mode() {
             case 'e': cli_edit_entry(); break;
             case 'x': {
                 char path[256];
-                printf("Path to export CSV file: ");
+                fputs("Path to export CSV file: ", stdout);
                 read_line(path, sizeof(path));
                 cli_export_csv(path);
                 break;

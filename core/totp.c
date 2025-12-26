@@ -58,16 +58,22 @@ char* generate_totp_code_at_time(const char *base32_secret, time_t current_time)
     uint64_t time_step = htobe64((uint64_t)current_time / 30);
 
     unsigned char hash[EVP_MAX_MD_SIZE];
-    unsigned int hash_len;
+    unsigned int hash_len = 0;
 
     HMAC(EVP_sha1(), decoded_secret, actual_len, (const uint8_t*)&time_step, sizeof(time_step), hash, &hash_len);
 
     free(decoded_secret);
 
+    if (hash_len < 4) return NULL; // Should not happen with SHA1
+
     int offset = hash[hash_len - 1] & 0x0F;
+    if (offset + 4 > (int)hash_len) {
+        return NULL;
+    }
+
     uint32_t truncated_hash_raw;
     memcpy(&truncated_hash_raw, hash + offset, sizeof(uint32_t));
-    
+
     uint32_t truncated_hash = be32toh(truncated_hash_raw) & 0x7FFFFFFF;
 
     uint32_t totp = truncated_hash % 1000000;

@@ -14,12 +14,20 @@ struct MemoryStruct {
 
 // libcurl write callback function
 static size_t write_callback(const void *contents, size_t size, size_t nmemb, void *userp) {
+    if (size == 0 || nmemb == 0) return 0;
     size_t realsize = size * nmemb;
     struct MemoryStruct *mem = (struct MemoryStruct *)userp;
+
+    // Check for overflow before realloc
+    if (realsize > (size_t)-1 - mem->size - 1) {
+        fprintf(stderr, "Buffer overflow prevented in write_callback\n");
+        return 0;
+    }
+
     char *ptr = realloc(mem->memory, mem->size + realsize + 1);
     if (!ptr) {
         // out of memory!
-        printf("not enough memory (realloc returned NULL)\n");
+        fprintf(stderr, "not enough memory (realloc returned NULL)\n");
         return 0;
     }
     mem->memory = ptr;
@@ -30,6 +38,7 @@ static size_t write_callback(const void *contents, size_t size, size_t nmemb, vo
 }
 
 int is_password_pwned(const char *password) {
+    if (!password) return -1;
     // 1. Calculate SHA-1 hash of the password using EVP API
     unsigned char hash[EVP_MAX_MD_SIZE];
     unsigned int hash_len;
@@ -56,20 +65,26 @@ int is_password_pwned(const char *password) {
 
     EVP_MD_CTX_free(mdctx);
 
+    if (hash_len > SHA_DIGEST_LENGTH) hash_len = SHA_DIGEST_LENGTH;
+
     char full_hash[SHA_DIGEST_LENGTH * 2 + 1];
-    for (int i = 0; i < SHA_DIGEST_LENGTH; i++) {
-        sprintf(full_hash + (i * 2), "%02X", hash[i]);
+    for (unsigned int i = 0; i < hash_len; i++) {
+        snprintf(full_hash + (i * 2), 3, "%02X", hash[i]);
     }
-    full_hash[SHA_DIGEST_LENGTH * 2] = 0;
+    full_hash[hash_len * 2] = 0;
 
     // 2. Split hash into prefix (5 chars) and suffix
     char prefix[6];
-    strncpy(prefix, full_hash, 5);
-    prefix[5] = '\0';
+    if (hash_len * 2 >= 5) {
+        memcpy(prefix, full_hash, 5);
+        prefix[5] = '\0';
+    } else {
+        return -1;
+    }
     const char *suffix = full_hash + 5;
 
     // 3. Query the HIBP API
-    char url[100];
+    char url[128];
     snprintf(url, sizeof(url), "https://api.pwnedpasswords.com/range/%s", prefix);
 
     CURL *curl = curl_easy_init();
@@ -98,13 +113,17 @@ int is_password_pwned(const char *password) {
 
     // 4. Check response for the hash suffix
     int pwn_count = 0;
-    const char *line = strtok(chunk.memory, "\r\n");
+    char *line = strtok(chunk.memory, "\r\n");
     while (line) {
-        char *colon = strchr((char*)line, ':');
+        char *colon = strchr(line, ':');
         if (colon) {
             *colon = '\0'; // Split line into hash and count
             if (strcmp(line, suffix) == 0) {
-                pwn_count = atoi(colon + 1);
+                char *endptr;
+                long count = strtol(colon + 1, &endptr, 10);
+                if (*endptr == '\0' || *endptr == '\r' || *endptr == '\n') {
+                    pwn_count = (int)count;
+                }
                 break;
             }
         }

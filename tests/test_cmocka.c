@@ -1,11 +1,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "core/pwned_check.h"
+#include <sys/stat.h>
 #ifndef _MSC_VER
 #include <unistd.h>
 #else
 #include <io.h> // For _access
-#define access _access
+#define access _access // flawfinder: ignore
 #define F_OK 0
 #endif
 #include <string.h>
@@ -94,7 +95,8 @@ static void test_load_or_generate_salt(void **state) {
     const char* salt_path = "test.salt";
     int result = load_or_generate_salt(salt_path, salt);
     assert_int_equal(result, 0);
-    assert_true(access(salt_path, F_OK) == 0);
+    struct stat st;
+    assert_true(stat(salt_path, &st) == 0);
     uint8_t salt2[SALT_LEN];
     result = load_or_generate_salt(salt_path, salt2);
     assert_int_equal(result, 0);

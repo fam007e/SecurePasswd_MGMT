@@ -12,6 +12,7 @@
 - **State-of-the-Art Key Derivation:** **Argon2id**, the winner of the Password Hashing Competition, is used to derive the encryption key from your master password, providing maximum resistance against brute-force attacks.
 - **Secure Password Generator:** A built-in, cryptographically secure password generator to create strong, unique passwords.
 - **Memory Safety:** Sensitive data is explicitly cleared from memory after use.
+- **Hardened C Codebase:** Regularly audited using modern static analysis tools (`cppcheck`, `flawfinder`) to proactively prevent common C vulnerabilities like buffer overflows and race conditions.
 - **Secure Storage:** All data is stored locally, encrypted, in a secure directory.
 
 ## Features
