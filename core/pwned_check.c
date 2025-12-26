@@ -113,7 +113,7 @@ int is_password_pwned(const char *password) {
 
     // 4. Check response for the hash suffix
     int pwn_count = 0;
-    char *line = strtok(chunk.memory, "\r\n");
+    const char *line = strtok(chunk.memory, "\r\n");
     while (line) {
         char *colon = strchr(line, ':');
         if (colon) {
