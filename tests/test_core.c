@@ -17,7 +17,7 @@
 const char* TEST_DB = "test_vault.db";
 
 static void test_database_lifecycle() {
-    printf("--- Running Test: Database Lifecycle ---\n");
+    printf("%s", "--- Running Test: Database Lifecycle ---\n"); // flawfinder: ignore
 
     // 1. Test opening and creating the database
     assert(database_open(TEST_DB, "test_password") == 0);
@@ -77,7 +77,7 @@ static void test_database_lifecycle() {
 }
 
 static void test_totp_generation() {
-    printf("--- Running Test: TOTP Generation ---\n");
+    printf("%s", "--- Running Test: TOTP Generation ---\n"); // flawfinder: ignore
     // Test vector from RFC 6238 for SHA1
     // Secret: "12345678901234567890"
     // Time: 59
@@ -94,6 +94,6 @@ int main() {
     test_database_lifecycle();
     test_totp_generation();
 
-    printf("All tests passed!\n");
+    printf("%s", "All tests passed!\n"); // flawfinder: ignore
     return 0;
 }

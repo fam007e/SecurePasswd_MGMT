@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2025.12.26</span>
+   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2025.12.28</span>
    </div>
    <div id="projectbrief">A modern, cross-platform password manager and two-factor authenticator (TOTP) designed with state-of-the-art security.</div>
   </td>
@@ -92,9 +92,9 @@ $(function(){initNavTree('md_CONTRIBUTING.html','',''); });
   <div class="headertitle"><div class="title">Contributing to SecurePasswd_MGMT </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md42"></a></p>
+<div class="textblock"><p><a class="anchor" id="autotoc_md43"></a></p>
 <p>Thank you for your interest in contributing! We welcome contributions of all kinds, from bug reports and documentation improvements to new features and security enhancements.</p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md43"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md44"></a>
 Security-Focused Development</h1>
 <p>Given the nature of this project, security is our top priority. All contributions must adhere to the following security guidelines:</p>
 <ul>
@@ -104,10 +104,10 @@ Security-Focused Development</h1>
 <li><b>Input Validation:</b> All input from users or files must be validated to prevent vulnerabilities like buffer overflows. <b>Avoid banned C functions like <span class="tt">strcat</span>, <span class="tt">strcpy</span>, and <span class="tt">sprintf</span>; use safer, bounded alternatives like <span class="tt">strncat</span>, <span class="tt">strncpy</span>, and <span class="tt">snprintf</span>.</b></li>
 <li><b>Constant-Time Operations:</b> When comparing sensitive data, use constant-time comparison functions where appropriate to prevent timing attacks.</li>
 </ul>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md44"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md45"></a>
 Code Review</h1>
 <p>All pull requests, especially those that touch security-sensitive code in the <span class="tt">core/</span> directory, will undergo a thorough code review. Be prepared to explain your changes and justify your design decisions.</p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md45"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md46"></a>
 Coding Style</h1>
 <p>To maintain a consistent and readable codebase, we adhere to the following coding style guidelines:</p>
 <ul>
@@ -128,7 +128,7 @@ Coding Style</h1>
 </li>
 <li><b>Comments:</b> Use <span class="tt">//</span> for single-line comments and <span class="tt">/* ... */</span> for multi-line comments. Explain <em>why</em> you are doing something, not <em>what</em> you are doing.</li>
 </ul>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md46"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md47"></a>
 Testing</h1>
 <ul>
 <li><b>Unit Tests:</b> All new features should be accompanied by unit tests. The project uses CTest to manage and run tests.</li>
@@ -140,7 +140,7 @@ Testing</h1>
 <div class="line">make &amp;&amp; ctest</div>
 </div><!-- fragment --></li>
 </ul>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md47"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md48"></a>
 How to Contribute</h1>
 <ol type="1">
 <li>Fork the repository.</li>
@@ -149,7 +149,7 @@ How to Contribute</h1>
 <li>Add or update tests in the <span class="tt">tests/</span> directory and ensure they pass by running <span class="tt">ctest</span> in the <span class="tt">build</span> directory.</li>
 <li>Submit a pull request.</li>
 </ol>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md48"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md49"></a>
 Release Guidelines</h1>
 <p>To create a new release:</p>
 <ol type="1">

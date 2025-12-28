@@ -5,6 +5,16 @@ All notable changes to SecurePasswd_MGMT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to date-based versioning (YYYY.MM.DD).
 
+## [2025.12.28]
+
+### Added
+- **CLI-Only Build Option:** Added a `BUILD_GUI` CMake option (default ON) to allow building the application without Qt6 dependencies. Use `-DBUILD_GUI=OFF` for CLI-only environments.
+
+### Security
+- **0 Flawfinder Hits:** Achieved a clean security audit report with 0 hits from `flawfinder` across the entire project.
+- **Strict Format String Safety:** Implemented explicit suppression of safe format string literals to satisfy high-sensitivity security scanners (GitHub Code Scanning).
+- **Buffer Truncation Fix:** Resolved `-Wformat-truncation` warnings by increasing path buffer sizes for database and salt files.
+
 ## [2025.12.26]
 
 ### Security

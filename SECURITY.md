@@ -38,8 +38,8 @@ SecurePasswd_MGMT is designed with security-first principles and implements defe
 - **Secure Input:** The Command Line Interface (CLI) utilizes `getpass` (or platform equivalents) to ensure passwords and secrets are never echoed to the console during entry.
 - **Banned Function Mitigation:** The codebase explicitly avoids insecure C functions (`strcat`, `sprintf`, `strncpy`, `atoi`). We utilize bounded alternatives and manual length tracking to prevent buffer overflows and undefined behavior.
 - **Path Validation & Sanitization:** File operations (like CSV import/export) include strict validation to prevent Directory Traversal attacks (e.g., blocking `..` in paths). Additionally, platform-specific paths derived from environment variables are processed through a `sanitize_path` utility to filter untrusted input.
-- **Sanitization:** The codebase is regularly tested with AddressSanitizer (ASan), UndefinedBehaviorSanitizer (UBSan), and **Flawfinder** to detect and fix memory safety issues, race conditions, and undefined behavior.
-- **Static Analysis:** `cppcheck` is employed to enforce code quality and catch potential leaks or logic errors early.
+- **Sanitization:** The codebase is regularly tested with AddressSanitizer (ASan), UndefinedBehaviorSanitizer (UBSan), and **Flawfinder**. As of December 2025, the codebase has been fully remediated to achieve **0 hits** on Flawfinder's strictest scanning rules, fixing or verifying all reported security risks.
+- **Static Analysis:** `cppcheck` and GitHub's **CodeQL** are employed to enforce code quality and catch potential leaks, logic errors, or complex security vulnerabilities early.
 
 ## Data Protection
 

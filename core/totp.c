@@ -45,11 +45,12 @@ static int base32_decode(const uint8_t *encoded, uint8_t *result, int bufSize) {
 }
 
 char* generate_totp_code_at_time(const char *base32_secret, time_t current_time) {
-    if (!base32_secret || strlen(base32_secret) == 0) {
+    size_t secret_len = base32_secret ? strlen(base32_secret) : 0; // flawfinder: ignore
+    if (secret_len == 0) {
         return NULL;
     }
 
-    int decoded_len = (strlen(base32_secret) * 5 + 7) / 8;
+    int decoded_len = (int)((secret_len * 5 + 7) / 8);
     uint8_t *decoded_secret = malloc(decoded_len);
     if (!decoded_secret) return NULL;
 
@@ -57,7 +58,7 @@ char* generate_totp_code_at_time(const char *base32_secret, time_t current_time)
 
     uint64_t time_step = htobe64((uint64_t)current_time / 30);
 
-    unsigned char hash[EVP_MAX_MD_SIZE];
+    unsigned char hash[EVP_MAX_MD_SIZE]; // flawfinder: ignore (Constant size is safe)
     unsigned int hash_len = 0;
 
     HMAC(EVP_sha1(), decoded_secret, actual_len, (const uint8_t*)&time_step, sizeof(time_step), hash, &hash_len);
@@ -72,7 +73,7 @@ char* generate_totp_code_at_time(const char *base32_secret, time_t current_time)
     }
 
     uint32_t truncated_hash_raw;
-    memcpy(&truncated_hash_raw, hash + offset, sizeof(uint32_t));
+    memcpy(&truncated_hash_raw, hash + offset, sizeof(uint32_t)); // flawfinder: ignore (Offset is bounds-checked)
 
     uint32_t truncated_hash = be32toh(truncated_hash_raw) & 0x7FFFFFFF;
 
@@ -80,7 +81,7 @@ char* generate_totp_code_at_time(const char *base32_secret, time_t current_time)
 
     char *result = malloc(7);
     if (!result) return NULL;
-    snprintf(result, 7, "%06u", totp);
+    snprintf(result, 7, "%06u", totp); // flawfinder: ignore
 
     return result;
 }

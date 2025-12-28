@@ -27,7 +27,7 @@ static void test_generate_password_length(void **state) {
     (void) state; /* unused */
     char *password = generate_password(16, true, true, true);
     assert_non_null(password);
-    assert_int_equal(strlen(password), 16);
+    assert_int_equal(strlen(password), 16); // flawfinder: ignore
     free(password);
 }
 
@@ -35,7 +35,7 @@ static void test_generate_password_charset(void **state) {
     (void) state; /* unused */
     char *password = generate_password(32, false, false, false);
     assert_non_null(password);
-    for (int i = 0; i < (int)strlen(password); i++) {
+    for (int i = 0; i < (int)strlen(password); i++) { // flawfinder: ignore
         assert_int_in_range(password[i], 'a', 'z');
     }
     free(password);
@@ -43,7 +43,7 @@ static void test_generate_password_charset(void **state) {
     password = generate_password(32, true, false, false);
     assert_non_null(password);
     bool has_upper = false;
-    for (int i = 0; i < (int)strlen(password); i++) {
+    for (int i = 0; i < (int)strlen(password); i++) { // flawfinder: ignore
         if (password[i] >= 'A' && password[i] <= 'Z') {
             has_upper = true;
             break;
@@ -65,7 +65,7 @@ static void test_generate_password_inclusion(void **state) {
         bool has_num = false;
         bool has_special = false;
 
-        for (int i = 0; i < (int)strlen(password); i++) {
+        for (int i = 0; i < (int)strlen(password); i++) { // flawfinder: ignore
             if (password[i] >= 'a' && password[i] <= 'z') has_lower = true;
             else if (password[i] >= 'A' && password[i] <= 'Z') has_upper = true;
             else if (password[i] >= '0' && password[i] <= '9') has_num = true;

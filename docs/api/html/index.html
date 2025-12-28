@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2025.12.26</span>
+   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2025.12.28</span>
    </div>
    <div id="projectbrief">A modern, cross-platform password manager and two-factor authenticator (TOTP) designed with state-of-the-art security.</div>
   </td>
@@ -192,6 +192,11 @@ Linux (Ubuntu)</h3>
     </span></li>
 </ol>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md12"></a>
+CLI-Only Build (No GUI)</h3>
+<p>If you do not want to build the GUI and wish to avoid installing Qt dependencies, use the following: </p><div class="fragment"><div class="line">mkdir build &amp;&amp; cd build</div>
+<div class="line">cmake .. -DBUILD_GUI=OFF -DCMAKE_BUILD_TYPE=Release</div>
+<div class="line">cmake --build . --config Release</div>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md13"></a>
 macOS</h3>
 <ol type="1">
 <li><b>Install Dependencies:</b> <span class="tt">
@@ -210,7 +215,7 @@ macOS</h3>
     cmake --build . --config Release
     </span></li>
 </ol>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md13"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md14"></a>
 Windows</h3>
 <ol type="1">
 <li><b>Install Dependencies with vcpkg:</b> Follow the instructions in the "Windows (vcpkg)" section above to install the required dependencies.</li>
@@ -222,22 +227,22 @@ Windows</h3>
 <p class="startli">The compiled binaries (<span class="tt">securepasswd_cli.exe</span> and <span class="tt">securepasswd_gui.exe</span>) will be created in the <span class="tt">build/bin/Release</span> directory.</p>
 </li>
 </ol>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md14"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md15"></a>
 Usage</h1>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md15"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md16"></a>
 GUI Application</h2>
 <p>To run the graphical interface, execute the <span class="tt">securepasswd_gui</span> binary from within your build directory: </p><div class="fragment"><div class="line"># From the project root directory</div>
 <div class="line">./build/bin/securepasswd_gui</div>
 </div><!-- fragment --><p> On the first run, you will be prompted to create a new master password, which will be used to encrypt your vault.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md16"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md17"></a>
 Command-Line Interface</h2>
 <p>To run the command-line interface, execute the <span class="tt">securepasswd_cli</span> binary: </p><div class="fragment"><div class="line"># From the project root directory</div>
 <div class="line">./build/bin/securepasswd_cli</div>
 </div><!-- fragment --><p> The CLI provides an interactive menu for managing your passwords and TOTP secrets.</p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md17"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md18"></a>
 Security</h1>
 <p>This project was designed with a security-first mindset, incorporating modern, vetted cryptographic primitives. For a detailed breakdown of the security architecture, see our <b><a class="el" href="md_SECURITY.html">Security Policy</a></b>.</p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md18"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md19"></a>
 Project Structure</h1>
 <div class="fragment"><div class="line">SecurePasswd_MGMT/</div>
 <div class="line">├── .github/          # GitHub Actions workflows and issue templates</div>
@@ -251,7 +256,7 @@ Project Structure</h1>
 <div class="line">├── CONTRIBUTING.md   # Guidelines for contributing</div>
 <div class="line">├── SECURITY.md       # Detailed security policy</div>
 <div class="line">└── LICENSE           # Project license</div>
-</div><!-- fragment --><h1 class="doxsection"><a class="anchor" id="autotoc_md19"></a>
+</div><!-- fragment --><h1 class="doxsection"><a class="anchor" id="autotoc_md20"></a>
 API Documentation</h1>
 <p>The API documentation for the <span class="tt">core</span> library can be generated using Doxygen.</p>
 <ol type="1">
@@ -273,13 +278,13 @@ API Documentation</h1>
 </ol>
 <div class="fragment"><div class="line">doxygen Doxyfile</div>
 </div><!-- fragment --> <pre class="fragment">The documentation will be generated in the `docs/api` directory. Open `docs/api/html/index.html` in your web browser to view the documentation.
-</pre><h1 class="doxsection"><a class="anchor" id="autotoc_md20"></a>
+</pre><h1 class="doxsection"><a class="anchor" id="autotoc_md21"></a>
 Contribution</h1>
 <p>We welcome contributions! Please read our <a class="el" href="md_CONTRIBUTING.html">Contribution Guidelines</a> for details on the process for submitting pull requests.</p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md21"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md22"></a>
 Code of Conduct</h1>
 <p>We are committed to providing a friendly, safe, and welcoming environment for all. Please read and respect our <a class="el" href="md_CODE__OF__CONDUCT.html">Code of Conduct</a>.</p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md22"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md23"></a>
 License</h1>
 <p>This project is licensed under the <b>MIT License</b> - see the [LICENSE](LICENSE) file for details. </p>
 </div></div><!-- PageDoc -->

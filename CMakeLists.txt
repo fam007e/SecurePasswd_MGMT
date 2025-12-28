@@ -9,6 +9,8 @@ endif()
 project(SecurePasswd_MGMT VERSION ${PROJECT_VERSION} LANGUAGES C CXX)
 set(CMAKE_C_STANDARD 11)
 
+option(BUILD_GUI "Build the GUI application" ON)
+
 include(GNUInstallDirs)
 
 # Handle vcpkg vs system packages
@@ -65,7 +67,9 @@ else()
 endif()
 
 # Find Qt6
-find_package(Qt6 COMPONENTS Widgets Svg REQUIRED)
+if(BUILD_GUI)
+    find_package(Qt6 COMPONENTS Widgets Svg REQUIRED)
+endif()
 
 # Find OpenSSL and CURL
 find_package(OpenSSL REQUIRED)
@@ -87,10 +91,12 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_link_options(-Wl,-z,relro,-z,now)
 endif()
 
-# Add subdirectories
 add_subdirectory(core)
 add_subdirectory(cli)
-add_subdirectory(gui)
+
+if(BUILD_GUI)
+    add_subdirectory(gui)
+endif()
 
 enable_testing()
 add_subdirectory(tests)
@@ -99,7 +105,12 @@ add_subdirectory(tests)
 set(CPACK_PACKAGE_NAME "SecurePasswd_MGMT")
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
 set(CPACK_PACKAGE_FILE_NAME "SecurePasswd_MGMT-${CPACK_PACKAGE_VERSION}")
-set(CPACK_GENERATOR "DEB;RPM;NSIS")
+
+if(BUILD_GUI)
+    set(CPACK_GENERATOR "DEB;RPM;NSIS")
+else()
+    set(CPACK_GENERATOR "DEB;RPM;TGZ")
+endif()
 set(CPACK_PACKAGE_CONTACT "fam007e <faisalmoshiur+secpasswdmgmt@gmail.com>")
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "fam007e")
 set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
@@ -115,15 +126,17 @@ set(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_NAME}")
 set(CPACK_NSIS_PROGRAM_GROUP "SecurePasswd MGMT")
 
 # NSIS shortcuts
-set(CPACK_NSIS_CREATE_ICONS_EXTRA
-    "CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\SecurePasswd MGMT.lnk' '$INSTDIR\\\\${CMAKE_INSTALL_BINDIR}\\\\securepasswd_gui.exe'"
-    "CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\Uninstall.lnk' '$INSTDIR\\\\uninstall.exe'"
-)
+if(BUILD_GUI)
+    set(CPACK_NSIS_CREATE_ICONS_EXTRA
+        "CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\SecurePasswd MGMT.lnk' '$INSTDIR\\\\${CMAKE_INSTALL_BINDIR}\\\\securepasswd_gui.exe'"
+        "CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\Uninstall.lnk' '$INSTDIR\\\\uninstall.exe'"
+    )
 
-set(CPACK_NSIS_DELETE_ICONS_EXTRA
-    "Delete '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\SecurePasswd MGMT.lnk'"
-    "Delete '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\Uninstall.lnk'"
-)
+    set(CPACK_NSIS_DELETE_ICONS_EXTRA
+        "Delete '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\SecurePasswd MGMT.lnk'"
+        "Delete '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\Uninstall.lnk'"
+    )
+endif()
 
 # Include CPack AFTER all CPACK_* variables are set
 include(CPack)

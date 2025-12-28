@@ -116,6 +116,14 @@ Pre-built packages for various platforms are available on the [GitHub Releases](
     cmake --build . --config Release
     ```
 
+#### CLI-Only Build (No GUI)
+If you do not want to build the GUI and wish to avoid installing Qt dependencies, use the following:
+```bash
+mkdir build && cd build
+cmake .. -DBUILD_GUI=OFF -DCMAKE_BUILD_TYPE=Release
+cmake --build . --config Release
+```
+
 #### macOS
 
 1.  **Install Dependencies:**
