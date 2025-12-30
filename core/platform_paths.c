@@ -8,7 +8,7 @@ static void sanitize_path(char* path) {
     // Basic sanitization: only allow alphanumeric, dots, slashes, underscores, hyphens, spaces
     for (char* p = path; *p; p++) {
         if (!((*p >= 'A' && *p <= 'Z') || (*p >= 'a' && *p <= 'z') || (*p >= '0' && *p <= '9') ||
-            *p == '/' || *p == '\\' || *p == '.' || *p == '_' || *p == '-' || *p == ' ')) {
+            *p == '/' || *p == '\\' || *p == '.' || *p == '_' || *p == '-' || *p == ' ' || *p == ':')) {
             *p = '_';
         }
     }
