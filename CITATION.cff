@@ -2,9 +2,8 @@ cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 authors:
 - alias: "fam007e"
-  # Add actual author details here
 title: "SecurePasswd_MGMT"
-version: 2025.12.26
-date-released: 2025-12-26
+version: 2025.12.28
+date-released: 2025-12-28
 url: "https://github.com/fam007e/SecurePasswd_MGMT"
 license: MIT
