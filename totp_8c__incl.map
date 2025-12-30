@@ -1,0 +1,20 @@
+<map id="core/totp.c" name="core/totp.c">
+<area shape="rect" id="Node000001" title=" " alt="" coords="330,5,413,32"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,80,119,107"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="330,32,132,79,130,73,329,27"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="143,80,245,107"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="341,35,240,76,238,71,339,30"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="270,80,334,107"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="361,34,326,70,323,67,357,31"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="419,155,476,181"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="376,32,384,66,399,105,426,141,421,145,394,108,379,68,371,33"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="409,80,470,107"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="385,31,419,67,415,70,381,34"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="493,80,556,107"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="399,30,485,70,483,75,397,35"/>
+<area shape="rect" id="Node000008" href="$totp_8h.html" title=" " alt="" coords="580,80,634,107"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="414,30,566,76,565,82,412,35"/>
+<area shape="poly" id="edge9_Node000008_Node000005" title=" " alt="" coords="581,109,490,150,488,146,579,105"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="575,155,640,181"/>
+<area shape="poly" id="edge8_Node000008_Node000009" title=" " alt="" coords="610,107,610,139,605,139,605,107"/>
+</map>
