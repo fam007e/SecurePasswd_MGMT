@@ -1,10 +1,14 @@
 var searchData=
 [
-  ['macos_0',['macOS',['../index.html#autotoc_md13',1,'']]],
-  ['management_1',['Memory Management',['../md_SECURITY.html#autotoc_md36',1,'']]],
-  ['master_20password_20security_20flow_2',['Master Password Security Flow',['../md_SECURITY.html#autotoc_md34',1,'']]],
-  ['memory_3',['memory',['../structMemoryStruct.html#a218a6fde0f367d44400542cbe523e943',1,'MemoryStruct']]],
-  ['memory_20management_4',['Memory Management',['../md_SECURITY.html#autotoc_md36',1,'']]],
-  ['memory_5fcost_5',['MEMORY_COST',['../key__derivation_8c.html#abbe36b544024ce52b9fb316584e06996',1,'key_derivation.c']]],
-  ['memorystruct_6',['MemoryStruct',['../structMemoryStruct.html',1,'']]]
+  ['id_0',['id',['../structPasswordEntry.html#ac0bc3c60a0046116adcf17fbdcbcadbd',1,'PasswordEntry']]],
+  ['implementation_1',['Cryptographic Implementation',['../md_SECURITY.html#autotoc_md27',1,'']]],
+  ['initialize_5fschema_2',['initialize_schema',['../database_8c.html#a2cb69ec8c2737785c2498ccb4d83f0c6',1,'database.c']]],
+  ['input_20security_20validation_3',['Input Security &amp; Validation',['../md_SECURITY.html#autotoc_md32',1,'']]],
+  ['installation_4',['Installation',['../index.html#autotoc_md8',1,'']]],
+  ['installation_20of_20dependencies_5',['Installation of Dependencies',['../index.html#autotoc_md7',1,'']]],
+  ['integration_6',['Desktop Integration',['../index.html#autotoc_md5',1,'']]],
+  ['interface_7',['Command-Line Interface',['../index.html#autotoc_md17',1,'']]],
+  ['interface_20cli_8',['Command-Line Interface (CLI)',['../index.html#autotoc_md3',1,'']]],
+  ['interface_20gui_9',['Graphical User Interface (GUI)',['../index.html#autotoc_md4',1,'']]],
+  ['is_5fpassword_5fpwned_10',['is_password_pwned',['../pwned__check_8c.html#abcc21ded36a8d943399d681b68c7d269',1,'is_password_pwned(const char *password):&#160;pwned_check.c'],['../pwned__check_8h.html#abcc21ded36a8d943399d681b68c7d269',1,'is_password_pwned(const char *password):&#160;pwned_check.c']]]
 ];

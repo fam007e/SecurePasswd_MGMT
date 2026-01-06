@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2025.12.28</span>
+   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2026.01.06</span>
    </div>
    <div id="projectbrief">A modern, cross-platform password manager and two-factor authenticator (TOTP) designed with state-of-the-art security.</div>
   </td>
@@ -121,7 +121,8 @@ Input Security &amp; Validation</h1>
 <li><b>Secure Input:</b> The Command Line Interface (CLI) utilizes <code>getpass</code> (or platform equivalents) to ensure passwords and secrets are never echoed to the console during entry.</li>
 <li><b>Banned Function Mitigation:</b> The codebase explicitly avoids insecure C functions (<code>strcat</code>, <code>sprintf</code>, <code>strncpy</code>, <code>atoi</code>). We utilize bounded alternatives and manual length tracking to prevent buffer overflows and undefined behavior.</li>
 <li><b>Path Validation &amp; Sanitization:</b> File operations (like CSV import/export) include strict validation to prevent Directory Traversal attacks (e.g., blocking <code>..</code> in paths). Additionally, platform-specific paths derived from environment variables are processed through a <code>sanitize_path</code> utility to filter untrusted input.</li>
-<li><b>Sanitization:</b> The codebase is regularly tested with AddressSanitizer (ASan), UndefinedBehaviorSanitizer (UBSan), and <b>Flawfinder</b>. As of December 2025, the codebase has been fully remediated to achieve <b>0 hits</b> on Flawfinder's strictest scanning rules, fixing or verifying all reported security risks.</li>
+<li><b>Sanitization:</b> The codebase is regularly tested with AddressSanitizer (ASan), UndefinedBehaviorSanitizer (UBSan), and <b>Flawfinder</b>. As of January 2026, the codebase has been fully remediated to achieve <b>0 hits</b> on Flawfinder's strictest scanning rules, fixing or verifying all reported security risks.</li>
+<li><b>Thread Safety:</b> Critical sections, such as the Have I Been Pwned check, utilize thread-safe string manipulation functions (<code>strtok_r</code>) to prevent race conditions during concurrent execution.</li>
 <li><b>Static Analysis:</b> <code>cppcheck</code> and GitHub's <b>CodeQL</b> are employed to enforce code quality and catch potential leaks, logic errors, or complex security vulnerabilities early.</li>
 </ul>
 <h1><a class="anchor" id="autotoc_md33"></a>

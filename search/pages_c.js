@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['no_20gui_0',['CLI-Only Build (No GUI)',['../index.html#autotoc_md12',1,'']]],
-  ['number_20generation_1',['Random Number Generation',['../md_SECURITY.html#autotoc_md30',1,'']]]
+  ['kdf_0',['Key Derivation Function (KDF)',['../md_SECURITY.html#autotoc_md29',1,'']]],
+  ['key_20derivation_20function_20kdf_1',['Key Derivation Function (KDF)',['../md_SECURITY.html#autotoc_md29',1,'']]],
+  ['key_20security_20features_2',['Key Security Features',['../index.html#autotoc_md1',1,'']]]
 ];

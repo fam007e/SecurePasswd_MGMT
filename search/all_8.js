@@ -1,14 +1,13 @@
 var searchData=
 [
-  ['id_0',['id',['../structPasswordEntry.html#ac0bc3c60a0046116adcf17fbdcbcadbd',1,'PasswordEntry']]],
-  ['implementation_1',['Cryptographic Implementation',['../md_SECURITY.html#autotoc_md27',1,'']]],
-  ['initialize_5fschema_2',['initialize_schema',['../database_8c.html#a2cb69ec8c2737785c2498ccb4d83f0c6',1,'database.c']]],
-  ['input_20security_20validation_3',['Input Security &amp; Validation',['../md_SECURITY.html#autotoc_md32',1,'']]],
-  ['installation_4',['Installation',['../index.html#autotoc_md8',1,'']]],
-  ['installation_20of_20dependencies_5',['Installation of Dependencies',['../index.html#autotoc_md7',1,'']]],
-  ['integration_6',['Desktop Integration',['../index.html#autotoc_md5',1,'']]],
-  ['interface_7',['Command-Line Interface',['../index.html#autotoc_md17',1,'']]],
-  ['interface_20cli_8',['Command-Line Interface (CLI)',['../index.html#autotoc_md3',1,'']]],
-  ['interface_20gui_9',['Graphical User Interface (GUI)',['../index.html#autotoc_md4',1,'']]],
-  ['is_5fpassword_5fpwned_10',['is_password_pwned',['../pwned__check_8c.html#abcc21ded36a8d943399d681b68c7d269',1,'is_password_pwned(const char *password):&#160;pwned_check.c'],['../pwned__check_8h.html#abcc21ded36a8d943399d681b68c7d269',1,'is_password_pwned(const char *password):&#160;pwned_check.c']]]
+  ['features_0',['features',['../index.html#autotoc_md2',1,'Features'],['../index.html#autotoc_md1',1,'Key Security Features']]],
+  ['file_20system_20security_1',['File System Security',['../md_SECURITY.html#autotoc_md37',1,'']]],
+  ['fixed_2',['fixed',['../md_CHANGELOG.html#autotoc_md73',1,'Fixed'],['../md_CHANGELOG.html#autotoc_md78',1,'Fixed']]],
+  ['flow_3',['Master Password Security Flow',['../md_SECURITY.html#autotoc_md34',1,'']]],
+  ['focused_20development_4',['Security-Focused Development',['../md_CONTRIBUTING.html#autotoc_md44',1,'']]],
+  ['for_20external_20services_5',['Hashing for External Services',['../md_SECURITY.html#autotoc_md31',1,'']]],
+  ['format_6',['Data Storage Format',['../md_SECURITY.html#autotoc_md35',1,'']]],
+  ['free_5fpassword_5fentries_7',['free_password_entries',['../database_8c.html#a77a357353e4cf3b50bc41fb6727485dc',1,'free_password_entries(PasswordEntry *entries, int count):&#160;database.c'],['../database_8h.html#a77a357353e4cf3b50bc41fb6727485dc',1,'free_password_entries(PasswordEntry *entries, int count):&#160;database.c']]],
+  ['from_20source_8',['Build from Source',['../index.html#autotoc_md10',1,'']]],
+  ['function_20kdf_9',['Key Derivation Function (KDF)',['../md_SECURITY.html#autotoc_md29',1,'']]]
 ];
