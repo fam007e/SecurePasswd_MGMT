@@ -98,6 +98,48 @@ var NAVTREE =
       [ "Contributors", "md_AUTHORS.html#autotoc_md59", null ],
       [ "Acknowledgements", "md_AUTHORS.html#autotoc_md60", null ]
     ] ],
+    [ "LICENSE", "md_LICENSE.html", null ],
+    [ "Changelog", "md_CHANGELOG.html", [
+      [ "[2026.01.06]", "md_CHANGELOG.html#autotoc_md62", [
+        [ "Security", "md_CHANGELOG.html#autotoc_md63", null ]
+      ] ],
+      [ "[2025.12.28]", "md_CHANGELOG.html#autotoc_md64", [
+        [ "Added", "md_CHANGELOG.html#autotoc_md65", null ],
+        [ "Security", "md_CHANGELOG.html#autotoc_md66", null ]
+      ] ],
+      [ "[2025.12.26]", "md_CHANGELOG.html#autotoc_md67", [
+        [ "Security", "md_CHANGELOG.html#autotoc_md68", null ]
+      ] ],
+      [ "[Unreleased]", "md_CHANGELOG.html#autotoc_md69", null ],
+      [ "[2025.12.20]", "md_CHANGELOG.html#autotoc_md70", [
+        [ "Added", "md_CHANGELOG.html#autotoc_md71", null ],
+        [ "Changed", "md_CHANGELOG.html#autotoc_md72", null ],
+        [ "Fixed", "md_CHANGELOG.html#autotoc_md73", null ]
+      ] ],
+      [ "[2025.10.25]", "md_CHANGELOG.html#autotoc_md75", [
+        [ "Added", "md_CHANGELOG.html#autotoc_md76", null ],
+        [ "Changed", "md_CHANGELOG.html#autotoc_md77", null ],
+        [ "Fixed", "md_CHANGELOG.html#autotoc_md78", null ]
+      ] ],
+      [ "Version History", "md_CHANGELOG.html#autotoc_md80", null ],
+      [ "Categories Legend", "md_CHANGELOG.html#autotoc_md82", null ]
+    ] ],
+    [ "Testing and Verification Summary", "md_docs_2TESTING.html", [
+      [ "Overview", "md_docs_2TESTING.html#autotoc_md84", null ],
+      [ "Build Verification", "md_docs_2TESTING.html#autotoc_md85", [
+        [ "Build Status: ✓ PASS", "md_docs_2TESTING.html#autotoc_md86", null ]
+      ] ],
+      [ "Security Verification", "md_docs_2TESTING.html#autotoc_md87", [
+        [ "Static Analysis", "md_docs_2TESTING.html#autotoc_md88", null ],
+        [ "Dynamic Analysis (Sanitizers)", "md_docs_2TESTING.html#autotoc_md89", null ]
+      ] ],
+      [ "Unit Test Execution", "md_docs_2TESTING.html#autotoc_md90", [
+        [ "Test Summary", "md_docs_2TESTING.html#autotoc_md91", null ],
+        [ "Core Tests (<span class=\"tt\">./core_tests</span>)", "md_docs_2TESTING.html#autotoc_md92", null ],
+        [ "CMocka Tests (<span class=\"tt\">./cmocka_tests</span>)", "md_docs_2TESTING.html#autotoc_md93", null ]
+      ] ],
+      [ "Test Environment", "md_docs_2TESTING.html#autotoc_md94", null ]
+    ] ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],

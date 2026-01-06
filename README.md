@@ -237,4 +237,4 @@ We are committed to providing a friendly, safe, and welcoming environment for al
 
 ## License
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License** - see the [LICENSE](https://github.com/fam007e/SecurePasswd_MGMT/blob/main/LICENSE) file for details.

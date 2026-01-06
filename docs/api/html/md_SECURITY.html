@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2025.12.28</span>
+   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2026.01.06</span>
    </div>
    <div id="projectbrief">A modern, cross-platform password manager and two-factor authenticator (TOTP) designed with state-of-the-art security.</div>
   </td>
@@ -140,7 +140,8 @@ Input Security &amp; Validation</h1>
 <li><b>Secure Input:</b> The Command Line Interface (CLI) utilizes <span class="tt">getpass</span> (or platform equivalents) to ensure passwords and secrets are never echoed to the console during entry.</li>
 <li><b>Banned Function Mitigation:</b> The codebase explicitly avoids insecure C functions (<span class="tt">strcat</span>, <span class="tt">sprintf</span>, <span class="tt">strncpy</span>, <span class="tt">atoi</span>). We utilize bounded alternatives and manual length tracking to prevent buffer overflows and undefined behavior.</li>
 <li><b>Path Validation &amp; Sanitization:</b> File operations (like CSV import/export) include strict validation to prevent Directory Traversal attacks (e.g., blocking <span class="tt">..</span> in paths). Additionally, platform-specific paths derived from environment variables are processed through a <span class="tt"><a class="el" href="platform__paths_8c.html#a5339ed1fb4e7ecf92035c7f251061991">sanitize_path</a></span> utility to filter untrusted input.</li>
-<li><b>Sanitization:</b> The codebase is regularly tested with AddressSanitizer (ASan), UndefinedBehaviorSanitizer (UBSan), and <b>Flawfinder</b>. As of December 2025, the codebase has been fully remediated to achieve <b>0 hits</b> on Flawfinder's strictest scanning rules, fixing or verifying all reported security risks.</li>
+<li><b>Sanitization:</b> The codebase is regularly tested with AddressSanitizer (ASan), UndefinedBehaviorSanitizer (UBSan), and <b>Flawfinder</b>. As of January 2026, the codebase has been fully remediated to achieve <b>0 hits</b> on Flawfinder's strictest scanning rules, fixing or verifying all reported security risks.</li>
+<li><b>Thread Safety:</b> Critical sections, such as the Have I Been Pwned check, utilize thread-safe string manipulation functions (<span class="tt">strtok_r</span>) to prevent race conditions during concurrent execution.</li>
 <li><b>Static Analysis:</b> <span class="tt">cppcheck</span> and GitHub's <b>CodeQL</b> are employed to enforce code quality and catch potential leaks, logic errors, or complex security vulnerabilities early.</li>
 </ul>
 <h1 class="doxsection"><a class="anchor" id="autotoc_md33"></a>

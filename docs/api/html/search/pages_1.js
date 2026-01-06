@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['build_20from_20source_0',['Build from Source',['../index.html#autotoc_md10',1,'']]],
-  ['build_20no_20gui_1',['CLI-Only Build (No GUI)',['../index.html#autotoc_md12',1,'']]],
-  ['build_20process_2',['Secure Build Process',['../md_SECURITY.html#autotoc_md38',1,'']]],
-  ['built_20packages_3',['Pre-built Packages',['../index.html#autotoc_md9',1,'']]]
+  ['10_2025_0',['[2025.10.25]',['../md_CHANGELOG.html#autotoc_md75',1,'']]],
+  ['12_2020_1',['[2025.12.20]',['../md_CHANGELOG.html#autotoc_md70',1,'']]],
+  ['12_2026_2',['[2025.12.26]',['../md_CHANGELOG.html#autotoc_md67',1,'']]],
+  ['12_2028_3',['[2025.12.28]',['../md_CHANGELOG.html#autotoc_md64',1,'']]]
 ];

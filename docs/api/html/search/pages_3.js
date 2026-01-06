@@ -1,10 +1,12 @@
 var searchData=
 [
-  ['data_20protection_0',['Data Protection',['../md_SECURITY.html#autotoc_md33',1,'']]],
-  ['data_20storage_20format_1',['Data Storage Format',['../md_SECURITY.html#autotoc_md35',1,'']]],
-  ['dependencies_2',['Installation of Dependencies',['../index.html#autotoc_md7',1,'']]],
-  ['derivation_20function_20kdf_3',['Key Derivation Function (KDF)',['../md_SECURITY.html#autotoc_md29',1,'']]],
-  ['desktop_20integration_4',['Desktop Integration',['../index.html#autotoc_md5',1,'']]],
-  ['development_5',['Security-Focused Development',['../md_CONTRIBUTING.html#autotoc_md44',1,'']]],
-  ['documentation_6',['API Documentation',['../index.html#autotoc_md20',1,'']]]
+  ['acknowledgements_0',['Acknowledgements',['../md_AUTHORS.html#autotoc_md60',1,'']]],
+  ['added_1',['Added',['../md_CHANGELOG.html#autotoc_md65',1,'Added'],['../md_CHANGELOG.html#autotoc_md71',1,'Added'],['../md_CHANGELOG.html#autotoc_md76',1,'Added']]],
+  ['analysis_2',['Static Analysis',['../md_docs_2TESTING.html#autotoc_md88',1,'']]],
+  ['analysis_20sanitizers_3',['Dynamic Analysis (Sanitizers)',['../md_docs_2TESTING.html#autotoc_md89',1,'']]],
+  ['and_20verification_20summary_4',['Testing and Verification Summary',['../md_docs_2TESTING.html',1,'']]],
+  ['api_20documentation_5',['API Documentation',['../index.html#autotoc_md20',1,'']]],
+  ['application_6',['GUI Application',['../index.html#autotoc_md16',1,'']]],
+  ['attribution_7',['Attribution',['../md_CODE__OF__CONDUCT.html#autotoc_md56',1,'']]],
+  ['authors_8',['Authors',['../md_AUTHORS.html',1,'']]]
 ];

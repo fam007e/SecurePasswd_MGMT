@@ -5,6 +5,11 @@ All notable changes to SecurePasswd_MGMT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to date-based versioning (YYYY.MM.DD).
 
+## [2026.01.06]
+
+### Security
+- **Thread Safety:** Replaced non-thread-safe `strtok` with `strtok_r` in the pwned password check to prevent race conditions during concurrent validation.
+
 ## [2025.12.28]
 
 ### Added

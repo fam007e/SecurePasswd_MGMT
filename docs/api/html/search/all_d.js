@@ -1,9 +1,11 @@
 var searchData=
 [
-  ['of_20conduct_0',['of Conduct',['../index.html#autotoc_md22',1,'Code of Conduct'],['../md_CODE__OF__CONDUCT.html',1,'Contributor Covenant Code of Conduct']]],
-  ['of_20dependencies_1',['Installation of Dependencies',['../index.html#autotoc_md7',1,'']]],
-  ['only_20build_20no_20gui_2',['CLI-Only Build (No GUI)',['../index.html#autotoc_md12',1,'']]],
-  ['our_20pledge_3',['Our Pledge',['../md_CODE__OF__CONDUCT.html#autotoc_md51',1,'']]],
-  ['our_20standards_4',['Our Standards',['../md_CODE__OF__CONDUCT.html#autotoc_md52',1,'']]],
-  ['overview_5',['Security Overview',['../md_SECURITY.html#autotoc_md25',1,'']]]
+  ['legend_0',['Categories Legend',['../md_CHANGELOG.html#autotoc_md82',1,'']]],
+  ['license_1',['LICENSE',['../md_LICENSE.html',1,'']]],
+  ['license_2',['License',['../index.html#autotoc_md23',1,'']]],
+  ['license_2emd_3',['LICENSE.md',['../LICENSE_8md.html',1,'']]],
+  ['line_20interface_4',['Command-Line Interface',['../index.html#autotoc_md17',1,'']]],
+  ['line_20interface_20cli_5',['Command-Line Interface (CLI)',['../index.html#autotoc_md3',1,'']]],
+  ['linux_20ubuntu_6',['Linux (Ubuntu)',['../index.html#autotoc_md11',1,'']]],
+  ['load_5for_5fgenerate_5fsalt_7',['load_or_generate_salt',['../key__derivation_8c.html#adacd10ab933416227758a3702aa43ec8',1,'load_or_generate_salt(const char *path, uint8_t *salt):&#160;key_derivation.c'],['../key__derivation_8h.html#adacd10ab933416227758a3702aa43ec8',1,'load_or_generate_salt(const char *path, uint8_t *salt):&#160;key_derivation.c']]]
 ];

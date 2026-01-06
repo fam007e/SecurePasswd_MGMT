@@ -1,11 +1,12 @@
 var searchData=
 [
-  ['implementation_0',['Cryptographic Implementation',['../md_SECURITY.html#autotoc_md27',1,'']]],
-  ['input_20security_20validation_1',['Input Security &amp;amp; Validation',['../md_SECURITY.html#autotoc_md32',1,'']]],
-  ['installation_2',['Installation',['../index.html#autotoc_md8',1,'']]],
-  ['installation_20of_20dependencies_3',['Installation of Dependencies',['../index.html#autotoc_md7',1,'']]],
-  ['integration_4',['Desktop Integration',['../index.html#autotoc_md5',1,'']]],
-  ['interface_5',['Command-Line Interface',['../index.html#autotoc_md17',1,'']]],
-  ['interface_20cli_6',['Command-Line Interface (CLI)',['../index.html#autotoc_md3',1,'']]],
-  ['interface_20gui_7',['Graphical User Interface (GUI)',['../index.html#autotoc_md4',1,'']]]
+  ['features_0',['Features',['../index.html#autotoc_md2',1,'Features'],['../index.html#autotoc_md1',1,'Key Security Features']]],
+  ['file_20system_20security_1',['File System Security',['../md_SECURITY.html#autotoc_md37',1,'']]],
+  ['fixed_2',['Fixed',['../md_CHANGELOG.html#autotoc_md73',1,'Fixed'],['../md_CHANGELOG.html#autotoc_md78',1,'Fixed']]],
+  ['flow_3',['Master Password Security Flow',['../md_SECURITY.html#autotoc_md34',1,'']]],
+  ['focused_20development_4',['Security-Focused Development',['../md_CONTRIBUTING.html#autotoc_md44',1,'']]],
+  ['for_20external_20services_5',['Hashing for External Services',['../md_SECURITY.html#autotoc_md31',1,'']]],
+  ['format_6',['Data Storage Format',['../md_SECURITY.html#autotoc_md35',1,'']]],
+  ['from_20source_7',['Build from Source',['../index.html#autotoc_md10',1,'']]],
+  ['function_20kdf_8',['Key Derivation Function (KDF)',['../md_SECURITY.html#autotoc_md29',1,'']]]
 ];
