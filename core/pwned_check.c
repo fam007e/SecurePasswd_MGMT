@@ -116,20 +116,17 @@ int is_password_pwned(const char *password) {
 
     // 4. Check response for the hash suffix
     int pwn_count = 0;
+    size_t suffix_len = strlen(suffix); // flawfinder: ignore
     char *saveptr;
-    char *line = strtok_r(chunk.memory, "\r\n", &saveptr);
+    const char *line = strtok_r(chunk.memory, "\r\n", &saveptr);
     while (line) {
-        char *colon = strchr(line, ':');
-        if (colon) {
-            *colon = '\0'; // Split line into hash and count
-            if (strcmp(line, suffix) == 0) {
-                char *endptr;
-                long count = strtol(colon + 1, &endptr, 10);
-                if (*endptr == '\0' || *endptr == '\r' || *endptr == '\n') {
-                    pwn_count = (int)count;
-                }
-                break;
+        if (strncmp(line, suffix, suffix_len) == 0 && line[suffix_len] == ':') {
+            char *endptr;
+            long count = strtol(line + suffix_len + 1, &endptr, 10);
+            if (*endptr == '\0' || *endptr == '\r' || *endptr == '\n') {
+                pwn_count = (int)count;
             }
+            break;
         }
         line = strtok_r(NULL, "\r\n", &saveptr);
     }
