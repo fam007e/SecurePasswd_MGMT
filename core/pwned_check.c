@@ -6,6 +6,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#ifdef _WIN32
+#define strtok_r strtok_s
+#endif
+
 // Memory struct for libcurl write callback
 struct MemoryStruct {
     char *memory;
