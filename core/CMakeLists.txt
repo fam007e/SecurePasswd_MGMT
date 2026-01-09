@@ -19,6 +19,21 @@ if(NOT WIN32)
         ${ARGON2_INCLUDE_DIRS}
         ${SQLCIPHER_INCLUDE_DIRS}
     )
+
+    # Check where sqlcipher headers are located
+    include(CheckIncludeFile)
+
+    # Save current includes
+    set(CMAKE_REQUIRED_INCLUDES ${SQLCIPHER_INCLUDE_DIRS})
+
+    check_include_file("sqlcipher/sqlite3.h" HAVE_SQLCIPHER_SUBDIR)
+    check_include_file("sqlcipher.h" HAVE_SQLCIPHER_HEADER)
+
+    if(HAVE_SQLCIPHER_SUBDIR)
+        target_compile_definitions(core_lib PRIVATE HAVE_SQLCIPHER_SUBDIR)
+    elseif(HAVE_SQLCIPHER_HEADER)
+        target_compile_definitions(core_lib PRIVATE HAVE_SQLCIPHER_HEADER)
+    endif()
 endif()
 
 # Always include these (they use traditional find_package)
