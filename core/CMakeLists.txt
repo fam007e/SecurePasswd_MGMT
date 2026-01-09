@@ -75,4 +75,33 @@ if(NOT WIN32)
     )
 endif()
 
+# Check if sqlite3_key symbol is present in the libraries
+include(CheckFunctionExists)
+set(OLD_CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES})
+set(CMAKE_REQUIRED_LIBRARIES
+    ${LIBSODIUM_LIBRARIES}
+    ${ARGON2_LIBRARIES}
+    ${CURL_LIBRARIES}
+    ${OPENSSL_LIBRARIES}
+)
+if(SQLCIPHER_LIBRARY)
+    list(APPEND CMAKE_REQUIRED_LIBRARIES ${SQLCIPHER_LIBRARY})
+else()
+    list(APPEND CMAKE_REQUIRED_LIBRARIES PkgConfig::SQLCIPHER)
+endif()
+
+# We need to include math/dl libs on some platforms for the check to pass
+if(UNIX AND NOT APPLE)
+    list(APPEND CMAKE_REQUIRED_LIBRARIES m dl)
+endif()
+
+check_function_exists(sqlite3_key HAVE_SQLITE3_KEY)
+set(CMAKE_REQUIRED_LIBRARIES ${OLD_CMAKE_REQUIRED_LIBRARIES})
+
+if(NOT HAVE_SQLITE3_KEY)
+    message(STATUS "sqlite3_key not found in libraries - will use PRAGMA key shim")
+    target_compile_definitions(core_lib PRIVATE MISSING_SQLITE3_KEY)
+endif()
+
 target_compile_definitions(core_lib PRIVATE SQLITE_HAS_CODEC)
+
