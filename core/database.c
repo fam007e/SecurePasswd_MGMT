@@ -18,6 +18,33 @@ static sqlite3 *db = NULL;
 // Forward declaration for internal function
 static int initialize_schema();
 
+#ifdef MISSING_SQLITE3_KEY
+/**
+ * Shim implementation of sqlite3_key for environments where the C symbol
+ * is missing from the library but PRAGMA key support exists in the SQL engine.
+ */
+int sqlite3_key(sqlite3 *db, const void *pKey, int nKey) {
+    if (!db || !pKey || nKey <= 0) return SQLITE_ERROR;
+
+    char sql[512];          // flawfinder: ignore
+    char hex_key[129];      // flawfinder: ignore
+    const unsigned char *key = (const unsigned char *)pKey;
+    int key_len = (nKey < 64) ? nKey : 64;
+
+    // SQLCipher raw key format: x'hex'
+    // Convert binary key to hex string
+    for (int i = 0; i < key_len; i++) {
+        snprintf(&hex_key[i * 2], 3, "%02x", key[i]);
+    }
+    hex_key[key_len * 2] = '\0';
+
+    // Use snprintf to safely construct the SQL command
+    snprintf(sql, sizeof(sql), "PRAGMA key = \"x'%s'\";", hex_key);
+    return sqlite3_exec(db, sql, NULL, NULL, NULL);
+}
+#endif
+
+
 int database_open(const char *db_path, const char *password) {
     uint8_t salt[SALT_LEN];
     uint8_t key[KEY_LEN];
