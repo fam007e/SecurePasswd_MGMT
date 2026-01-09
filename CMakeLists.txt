@@ -90,6 +90,7 @@ endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_link_options(-Wl,-z,relro,-z,now)
 endif()
+add_compile_definitions(SQLITE_HAS_CODEC)
 
 add_subdirectory(core)
 add_subdirectory(cli)

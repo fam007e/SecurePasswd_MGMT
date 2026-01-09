@@ -9,6 +9,15 @@ target_link_libraries(securepasswd_cli PRIVATE
     ${LIBCSV_LIBRARIES}
 )
 
+# On non-Windows, ensure we link the same SQLCipher library as core_lib
+if(NOT WIN32)
+    if(SQLCIPHER_LIBRARY)
+        target_link_libraries(securepasswd_cli PRIVATE ${SQLCIPHER_LIBRARY})
+    else()
+        target_link_libraries(securepasswd_cli PRIVATE PkgConfig::SQLCIPHER)
+    endif()
+endif()
+
 # Windows-specific: link getopt
 if(WIN32)
     target_link_libraries(securepasswd_cli PRIVATE ${GETOPT_LIBRARY})
