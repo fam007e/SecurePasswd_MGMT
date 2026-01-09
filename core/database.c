@@ -1,6 +1,12 @@
 #include "database.h"
 #include "key_derivation.h"
-#include <sqlcipher/sqlite3.h>
+#ifdef HAVE_SQLCIPHER_SUBDIR
+  #include <sqlcipher/sqlite3.h>
+#elif defined(HAVE_SQLCIPHER_HEADER)
+  #include <sqlcipher.h>
+#else
+  #include <sqlite3.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
