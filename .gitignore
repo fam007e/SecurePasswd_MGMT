@@ -56,3 +56,5 @@ docs/
 !docs/TESTING.md
 !docs/api/
 
+# Termux error log
+termux-err-log/
