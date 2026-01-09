@@ -48,7 +48,7 @@ else()
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(LIBSODIUM REQUIRED libsodium)
     pkg_check_modules(ARGON2 REQUIRED libargon2)
-    pkg_check_modules(SQLCIPHER REQUIRED sqlcipher)
+    pkg_check_modules(SQLCIPHER REQUIRED IMPORTED_TARGET sqlcipher)
 
     # Find libcsv
     find_path(LIBCSV_INCLUDE_DIRS NAMES csv.h)
