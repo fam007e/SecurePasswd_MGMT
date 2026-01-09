@@ -71,7 +71,26 @@ int database_open(const char *db_path, const char *password) {
         return -1;
     }
 
+    // Diagnostics: Check if this is actually SQLCipher
+    sqlite3_stmt *stmt;
+    if (sqlite3_prepare_v2(db, "PRAGMA cipher_version;", -1, &stmt, NULL) == SQLITE_OK) {
+        if (sqlite3_step(stmt) == SQLITE_ROW) {
+            const unsigned char *ver = sqlite3_column_text(stmt, 0);
+            if (ver) {
+                printf("SQLCipher version: %s\n", ver);
+            } else {
+                printf("SQLCipher version: [Empty]\n");
+            }
+        } else {
+            printf("PRAGMA cipher_version returned no rows (Not SQLCipher?)\n");
+        }
+        sqlite3_finalize(stmt);
+    } else {
+        printf("Failed to execute PRAGMA cipher_version (Not SQLCipher?)\n");
+    }
+
     if (sqlite3_key(db, key, KEY_LEN) != SQLITE_OK) {
+
         fprintf(stderr, "Failed to set database key: %s\n", sqlite3_errmsg(db)); // flawfinder: ignore
         sqlite3_close(db);
         db = NULL;
