@@ -7,6 +7,7 @@ target_include_directories(securepasswd_cli PRIVATE
 target_link_libraries(securepasswd_cli PRIVATE
     core_lib
     ${LIBCSV_LIBRARIES}
+    ${SQLCIPHER_LIBRARIES}
 )
 
 # Windows-specific: link getopt

@@ -14,6 +14,10 @@ target_include_directories(core_lib PUBLIC
 
 # Platform-specific includes (only for non-target based libraries)
 if(NOT WIN32)
+    message(STATUS "SQLCIPHER_INCLUDE_DIRS: ${SQLCIPHER_INCLUDE_DIRS}")
+    message(STATUS "SQLCIPHER_LIBRARIES: ${SQLCIPHER_LIBRARIES}")
+    message(STATUS "SQLCIPHER_LIBRARY_DIRS: ${SQLCIPHER_LIBRARY_DIRS}")
+
     target_include_directories(core_lib PUBLIC
         ${LIBSODIUM_INCLUDE_DIRS}
         ${ARGON2_INCLUDE_DIRS}
@@ -48,7 +52,7 @@ target_link_libraries(core_lib PUBLIC
     ${ARGON2_LIBRARIES}
     ${CURL_LIBRARIES}
     ${OPENSSL_LIBRARIES}
-    PkgConfig::SQLCIPHER
+    ${SQLCIPHER_LIBRARIES}
 )
 
 # Platform-specific link directories
@@ -56,7 +60,7 @@ if(NOT WIN32)
     target_link_directories(core_lib PUBLIC
         ${LIBSODIUM_LIBRARY_DIRS}
         ${ARGON2_LIBRARY_DIRS}
-        # SQLCipher handled via PkgConfig::SQLCIPHER
+        ${SQLCIPHER_LIBRARY_DIRS}
     )
 endif()
 
