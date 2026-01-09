@@ -52,15 +52,26 @@ target_link_libraries(core_lib PUBLIC
     ${ARGON2_LIBRARIES}
     ${CURL_LIBRARIES}
     ${OPENSSL_LIBRARIES}
-    PkgConfig::SQLCIPHER
 )
+
+# Explicitly find and link SQLCipher by absolute path to avoid ambiguity
+find_library(SQLCIPHER_LIBRARY NAMES sqlcipher PATHS ${SQLCIPHER_LIBRARY_DIRS} NO_DEFAULT_PATH)
+find_library(SQLCIPHER_LIBRARY NAMES sqlcipher) # Fallback to default paths
+
+if(SQLCIPHER_LIBRARY)
+    message(STATUS "Found SQLCipher library: ${SQLCIPHER_LIBRARY}")
+    target_link_libraries(core_lib PUBLIC ${SQLCIPHER_LIBRARY})
+else()
+    message(WARNING "Could not find sqlcipher library file, falling back to target")
+    target_link_libraries(core_lib PUBLIC PkgConfig::SQLCIPHER)
+endif()
 
 # Platform-specific link directories
 if(NOT WIN32)
     target_link_directories(core_lib PUBLIC
         ${LIBSODIUM_LIBRARY_DIRS}
         ${ARGON2_LIBRARY_DIRS}
-        # SQLCipher handled via PkgConfig::SQLCIPHER
+        ${SQLCIPHER_LIBRARY_DIRS}
     )
 endif()
 
