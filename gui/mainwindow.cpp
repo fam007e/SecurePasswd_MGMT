@@ -348,49 +348,70 @@ void MainWindow::setupUI() {
     // Menus (Removed for icon-only UI)
 
     addAction = new QAction(QIcon(":/icons/add.svg"), "Add", this);
+    addAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_A));
+    addAction->setToolTip("Add new entry (Alt+A)");
     toolBar->addAction(addAction);
 
     editAction = new QAction(QIcon(":/icons/edit.svg"), "Edit", this);
+    editAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_E));
+    editAction->setToolTip("Edit selected entry (Alt+E)");
     toolBar->addAction(editAction);
 
     deleteAction = new QAction(QIcon(":/icons/delete.svg"), "Delete", this);
+    deleteAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_D));
+    deleteAction->setToolTip("Delete selected entry (Alt+D)");
     toolBar->addAction(deleteAction);
 
     copyUsernameAction = new QAction(QIcon(":/icons/copy_username.svg"), "Copy Username", this);
+    copyUsernameAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_U));
+    copyUsernameAction->setToolTip("Copy username to clipboard (Alt+U)");
     toolBar->addAction(copyUsernameAction);
 
     copyPasswordAction = new QAction(QIcon(":/icons/copy_passwd.svg"), "Copy Password", this);
+    copyPasswordAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_P));
+    copyPasswordAction->setToolTip("Copy password to clipboard (Alt+P)");
     toolBar->addAction(copyPasswordAction);
 
     copyTotpAction = new QAction(QIcon(":/icons/copy_totp.svg"), "Copy TOTP", this);
+    copyTotpAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_T));
+    copyTotpAction->setToolTip("Copy TOTP code to clipboard (Alt+T)");
     toolBar->addAction(copyTotpAction);
 
     toolBar->addSeparator();
 
     healthCheckAction = new QAction(QIcon(":/icons/health-check.svg"), "Health Check", this);
+    healthCheckAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_H));
+    healthCheckAction->setToolTip("Run password health check (Alt+H)");
     toolBar->addAction(healthCheckAction);
 
     toolBar->addSeparator();
 
     importAction = new QAction(QIcon(":/icons/import.svg"), "Import", this);
+    importAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_I));
+    importAction->setToolTip("Import from CSV (Alt+I)");
     toolBar->addAction(importAction);
 
     exportAction = new QAction(QIcon(":/icons/export.svg"), "Export", this);
+    exportAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_X));
+    exportAction->setToolTip("Export to CSV (Alt+X)");
     toolBar->addAction(exportAction);
 
     toolBar->addSeparator();
 
     themeAction = new QAction(this);
+    themeAction->setShortcut(QKeySequence(Qt::ALT | Qt::SHIFT | Qt::Key_T));
     toolBar->addAction(themeAction);
 
     toggleRecoveryCodesAction = new QAction(this);
+    toggleRecoveryCodesAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_R));
     toolBar->addAction(toggleRecoveryCodesAction);
     updateRecoveryCodesIcon();
 
     toolBar->addSeparator();
 
     QAction *exitAction = new QAction(QIcon(":/icons/exit.svg"), "Exit", this);
-    exitAction->setToolTip("Exit Application");
+    exitAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Q));
+    exitAction->setToolTip("Exit Application (Alt+Q)");
     toolBar->addAction(exitAction);
     connect(exitAction, &QAction::triggered, qApp, &QApplication::quit);
 

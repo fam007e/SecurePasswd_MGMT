@@ -5,8 +5,12 @@
 #include "mainwindow.h"
 #include "key_derivation.h"
 #include <sodium.h>
+#include <curl/curl.h>
 
 int main(int argc, char *argv[]) {
+    // Initialize libcurl globally - must be done before any threads use curl
+    curl_global_init(CURL_GLOBAL_DEFAULT);
+
     QApplication app(argc, argv);
     QCoreApplication::setOrganizationName("securepasswd");
     QCoreApplication::setApplicationName("securepasswd");
@@ -22,22 +26,27 @@ int main(int argc, char *argv[]) {
 
         // Key is derived, now we can show the main window
         MainWindow *window = new MainWindow(password);
-        
+
         // Check if database was opened successfully
         if (!window->isDatabaseOpen()) {
             // Database failed to open, error already shown and quit scheduled
             delete window;
-            return app.exec();
+            int result = app.exec();
+            curl_global_cleanup();
+            return result;
         }
-        
+
         // Set window to delete on close to avoid manual deletion
         window->setAttribute(Qt::WA_DeleteOnClose);
         window->show();
 
-        return app.exec();
+        int result = app.exec();
+        curl_global_cleanup();
+        return result;
 
     } else {
         // User cancelled the dialog
+        curl_global_cleanup();
         return 0;
     }
 }
