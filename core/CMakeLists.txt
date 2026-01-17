@@ -12,36 +12,11 @@ target_include_directories(core_lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-# Platform-specific includes (only for non-target based libraries)
-if(NOT WIN32)
-    message(STATUS "SQLCIPHER_INCLUDE_DIRS: ${SQLCIPHER_INCLUDE_DIRS}")
-    message(STATUS "SQLCIPHER_LIBRARIES: ${SQLCIPHER_LIBRARIES}")
-    message(STATUS "SQLCIPHER_LIBRARY_DIRS: ${SQLCIPHER_LIBRARY_DIRS}")
-
-    target_include_directories(core_lib PUBLIC
-        ${LIBSODIUM_INCLUDE_DIRS}
-        ${ARGON2_INCLUDE_DIRS}
-        ${SQLCIPHER_INCLUDE_DIRS}
-    )
-
-    # Check where sqlcipher headers are located
-    include(CheckIncludeFile)
-
-    # Save current includes
-    set(CMAKE_REQUIRED_INCLUDES ${SQLCIPHER_INCLUDE_DIRS})
-
-    check_include_file("sqlcipher/sqlite3.h" HAVE_SQLCIPHER_SUBDIR)
-    check_include_file("sqlcipher.h" HAVE_SQLCIPHER_HEADER)
-
-    if(HAVE_SQLCIPHER_SUBDIR)
-        target_compile_definitions(core_lib PRIVATE HAVE_SQLCIPHER_SUBDIR)
-    elseif(HAVE_SQLCIPHER_HEADER)
-        target_compile_definitions(core_lib PRIVATE HAVE_SQLCIPHER_HEADER)
-    endif()
-endif()
-
-# Always include these (they use traditional find_package)
+# Include directories for dependencies
 target_include_directories(core_lib PUBLIC
+    ${LIBSODIUM_INCLUDE_DIRS}
+    ${ARGON2_INCLUDE_DIRS}
+    ${SQLCIPHER_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
     ${OPENSSL_INCLUDE_DIR}
 )
@@ -54,24 +29,38 @@ target_link_libraries(core_lib PUBLIC
     ${OPENSSL_LIBRARIES}
 )
 
-# Explicitly find and link SQLCipher by absolute path to avoid ambiguity
-find_library(SQLCIPHER_LIBRARY NAMES sqlcipher PATHS ${SQLCIPHER_LIBRARY_DIRS} NO_DEFAULT_PATH)
-find_library(SQLCIPHER_LIBRARY NAMES sqlcipher) # Fallback to default paths
+# SQLCipher handling - Check for header location
+include(CheckIncludeFile)
+set(CMAKE_REQUIRED_INCLUDES ${SQLCIPHER_INCLUDE_DIRS})
+check_include_file("sqlcipher/sqlite3.h" HAVE_SQLCIPHER_SUBDIR)
+check_include_file("sqlcipher.h" HAVE_SQLCIPHER_HEADER)
 
-if(SQLCIPHER_LIBRARY)
-    message(STATUS "Found SQLCipher library: ${SQLCIPHER_LIBRARY}")
-    target_link_libraries(core_lib PUBLIC ${SQLCIPHER_LIBRARY})
-else()
-    message(WARNING "Could not find sqlcipher library file, falling back to target")
-    target_link_libraries(core_lib PUBLIC PkgConfig::SQLCIPHER)
+if(HAVE_SQLCIPHER_SUBDIR)
+    target_compile_definitions(core_lib PRIVATE HAVE_SQLCIPHER_SUBDIR)
+elseif(HAVE_SQLCIPHER_HEADER)
+    target_compile_definitions(core_lib PRIVATE HAVE_SQLCIPHER_HEADER)
 endif()
 
-# Platform-specific link directories
+# Explicitly link SQLCipher
+if(TARGET sqlcipher::sqlcipher)
+    target_link_libraries(core_lib PUBLIC sqlcipher::sqlcipher)
+elseif(SQLCIPHER_LIBRARIES)
+    target_link_libraries(core_lib PUBLIC ${SQLCIPHER_LIBRARIES})
+else()
+    # Fallback for manual linking if neither target nor variable is set correctly
+    find_library(SQLCIPHER_LIBRARY NAMES sqlcipher)
+    if(SQLCIPHER_LIBRARY)
+        target_link_libraries(core_lib PUBLIC ${SQLCIPHER_LIBRARY})
+    else()
+        message(FATAL_ERROR "Could not find sqlcipher library")
+    endif()
+endif()
+
+# Platform-specific link directories (mostly for Linux/macOS)
 if(NOT WIN32)
     target_link_directories(core_lib PUBLIC
         ${LIBSODIUM_LIBRARY_DIRS}
         ${ARGON2_LIBRARY_DIRS}
-        # SQLCipher handled via PkgConfig::SQLCIPHER
     )
 endif()
 
