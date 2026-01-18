@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.21)
-
 # Check if version is provided from command line (for releases)
 # Otherwise use default version for local builds
 if(NOT DEFINED PROJECT_VERSION)
-    set(PROJECT_VERSION "1.0.0")
+    set(PROJECT_VERSION "2026.01.17")
 endif()
+
 
 project(SecurePasswd_MGMT VERSION ${PROJECT_VERSION} LANGUAGES C CXX)
 set(CMAKE_C_STANDARD 11)
