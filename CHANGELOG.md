@@ -30,6 +30,16 @@ and this project adheres to date-based versioning (YYYY.MM.DD).
 - **HIBP Check Hardening:** Added integer overflow protection and robust string handling to the Have I Been Pwned API client.
 - **Improved Build Safety:** Increased default buffer sizes for path construction and improved error reporting in database operations.
 
+## [2026.01.17]
+
+### Fixed
+- **Windows Build:** Resolved MSVC error C1083 (`sqlite3.h` not found) by implementing a robust, multi-layer SQLCipher detection strategy in CMake.
+- **Cross-Platform SQLCipher:** Consolidated SQLCipher linking logic to prioritize `vcpkg` and `pkg-config` targets, ensuring correct header propagation on Windows, macOS, and Linux (including Arch Linux subdirectories).
+
+### Added
+- **Smart Path Derivation:** Implemented automatic include path derivation from library file paths as a fallback for manual build environments.
+- **Improved Build Diagnostics:** Added status messaging during the CMake configuration phase to help debug dependency resolution.
+
 ## [Unreleased]
 
 ## [2025.12.20]

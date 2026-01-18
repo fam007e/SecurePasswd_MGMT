@@ -1,6 +1,6 @@
 {
   "name": "securepasswd-mgmt",
-  "version-string": "1.0.0",
+  "version-string": "2026.01.17",
   "dependencies": [
     "libsodium",
     "argon2",
