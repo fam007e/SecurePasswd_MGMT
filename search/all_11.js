@@ -2,7 +2,7 @@ var searchData=
 [
   ['packages_0',['Pre-built Packages',['../index.html#autotoc_md9',1,'']]],
   ['parallelism_1',['PARALLELISM',['../key__derivation_8c.html#a2a16188c0f8f197e1d720f03740191d0',1,'key_derivation.c']]],
-  ['pass_2',['Build Status: ✓ PASS',['../md_docs_2TESTING.html#autotoc_md86',1,'']]],
+  ['pass_2',['Build Status: ✓ PASS',['../md_docs_2TESTING.html#autotoc_md89',1,'']]],
   ['password_3',['password',['../structPasswordEntry.html#ab21f5f16663a0b37af90bd18d08ab324',1,'PasswordEntry']]],
   ['password_20security_20flow_4',['Master Password Security Flow',['../md_SECURITY.html#autotoc_md34',1,'']]],
   ['password_20strength_20validation_5',['Password Strength Validation',['../md_SECURITY.html#autotoc_md39',1,'']]],

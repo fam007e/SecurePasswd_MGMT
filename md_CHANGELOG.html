@@ -109,10 +109,24 @@ Security</h2>
 <li><b>Improved Build Safety:</b> Increased default buffer sizes for path construction and improved error reporting in database operations.</li>
 </ul>
 <h1><a class="anchor" id="autotoc_md69"></a>
-[Unreleased]</h1>
-<h1><a class="anchor" id="autotoc_md70"></a>
-[2025.12.20]</h1>
+[2026.01.17]</h1>
+<h2><a class="anchor" id="autotoc_md70"></a>
+Fixed</h2>
+<ul>
+<li><b>Windows Build:</b> Resolved MSVC error C1083 (<code>sqlite3.h</code> not found) by implementing a robust, multi-layer SQLCipher detection strategy in CMake.</li>
+<li><b>Cross-Platform SQLCipher:</b> Consolidated SQLCipher linking logic to prioritize <code>vcpkg</code> and <code>pkg-config</code> targets, ensuring correct header propagation on Windows, macOS, and Linux (including Arch Linux subdirectories).</li>
+</ul>
 <h2><a class="anchor" id="autotoc_md71"></a>
+Added</h2>
+<ul>
+<li><b>Smart Path Derivation:</b> Implemented automatic include path derivation from library file paths as a fallback for manual build environments.</li>
+<li><b>Improved Build Diagnostics:</b> Added status messaging during the CMake configuration phase to help debug dependency resolution.</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md72"></a>
+[Unreleased]</h1>
+<h1><a class="anchor" id="autotoc_md73"></a>
+[2025.12.20]</h1>
+<h2><a class="anchor" id="autotoc_md74"></a>
 Added</h2>
 <ul>
 <li><b>2FA Recovery Codes:</b> Added support for managing 2FA recovery codes in both GUI and CLI.</li>
@@ -120,14 +134,14 @@ Added</h2>
 <li><b>Secure Exit:</b> Added a dedicated exit action with a custom SVG icon.</li>
 <li><b>Password Entropy:</b> Guaranteed character diversity in the password generator using a secured Fisher-Yates shuffle.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md72"></a>
+<h2><a class="anchor" id="autotoc_md75"></a>
 Changed</h2>
 <ul>
 <li><b>GUI Refinement:</b> Transitioned to a modern, icon-only toolbar UI; removed text-based menus.</li>
 <li><b>Core Architecture:</b> Relocated password generator to the core library for better modularity.</li>
 <li><b>CLI Parity:</b> Achieved full feature parity with the GUI, including interactive editing and recovery codes.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md73"></a>
+<h2><a class="anchor" id="autotoc_md76"></a>
 Fixed</h2>
 <ul>
 <li><b>GUI Stability:</b> Resolved a segmentation fault caused by uninitialized menu pointers.</li>
@@ -135,21 +149,21 @@ Fixed</h2>
 <li><b>Theme Persistence:</b> Improved the consistency of theme loading and saving.</li>
 </ul>
 <hr  />
-<h1><a class="anchor" id="autotoc_md75"></a>
+<h1><a class="anchor" id="autotoc_md78"></a>
 [2025.10.25]</h1>
-<h2><a class="anchor" id="autotoc_md76"></a>
+<h2><a class="anchor" id="autotoc_md79"></a>
 Added</h2>
 <ul>
 <li><b>Desktop Integration:</b> Added desktop integration for Linux (<code>.desktop</code> file) and improved the Windows installer.</li>
 <li><b>GUI Icon:</b> Added a proper application icon for the Windows GUI executable.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md77"></a>
+<h2><a class="anchor" id="autotoc_md80"></a>
 Changed</h2>
 <ul>
 <li><b>Cross-Platform Compatibility:</b> Enhanced cross-platform path handling, particularly for Windows.</li>
 <li><b>Database Path:</b> Unified the database path for both the CLI and GUI applications to ensure consistency.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md78"></a>
+<h2><a class="anchor" id="autotoc_md81"></a>
 Fixed</h2>
 <ul>
 <li><b>Windows GUI:</b> Removed the console window that appeared when running the GUI application on Windows.</li>
@@ -157,11 +171,11 @@ Fixed</h2>
 <li><b>CI:</b> Addressed a CI issue by reinstalling <code>pcre2</code>.</li>
 </ul>
 <hr  />
-<h1><a class="anchor" id="autotoc_md80"></a>
+<h1><a class="anchor" id="autotoc_md83"></a>
 Version History</h1>
 <p>For releases and version history, see <a href="https://github.com/fam007e/SecurePasswd_MGMT/releases">GitHub Releases</a>.</p>
 <hr  />
-<h1><a class="anchor" id="autotoc_md82"></a>
+<h1><a class="anchor" id="autotoc_md85"></a>
 Categories Legend</h1>
 <ul>
 <li><b>Added:</b> New features</li>

@@ -2,7 +2,7 @@ var searchData=
 [
   ['salt_5flen_0',['SALT_LEN',['../key__derivation_8h.html#a531df3ddc06621690d3ea6e7e05a4e62',1,'key_derivation.h']]],
   ['sanitize_5fpath_1',['sanitize_path',['../platform__paths_8c.html#a5339ed1fb4e7ecf92035c7f251061991',1,'platform_paths.c']]],
-  ['sanitizers_2',['Dynamic Analysis (Sanitizers)',['../md_docs_2TESTING.html#autotoc_md89',1,'']]],
+  ['sanitizers_2',['Dynamic Analysis (Sanitizers)',['../md_docs_2TESTING.html#autotoc_md92',1,'']]],
   ['scope_3',['Scope',['../md_CODE__OF__CONDUCT.html#autotoc_md54',1,'']]],
   ['secure_20build_20process_4',['Secure Build Process',['../md_SECURITY.html#autotoc_md38',1,'']]],
   ['securepasswd_5fmgmt_5',['securepasswd_mgmt',['../md_CONTRIBUTING.html',1,'Contributing to SecurePasswd_MGMT'],['../index.html',1,'SecurePasswd_MGMT']]],
@@ -14,7 +14,7 @@ var searchData=
   ['security_20overview_11',['Security Overview',['../md_SECURITY.html#autotoc_md25',1,'']]],
   ['security_20policy_12',['Security Policy',['../md_SECURITY.html',1,'']]],
   ['security_20validation_13',['Input Security &amp; Validation',['../md_SECURITY.html#autotoc_md32',1,'']]],
-  ['security_20verification_14',['Security Verification',['../md_docs_2TESTING.html#autotoc_md87',1,'']]],
+  ['security_20verification_14',['Security Verification',['../md_docs_2TESTING.html#autotoc_md90',1,'']]],
   ['security_20vulnerabilities_15',['Reporting Security Vulnerabilities',['../md_SECURITY.html#autotoc_md42',1,'']]],
   ['security_2emd_16',['SECURITY.md',['../SECURITY_8md.html',1,'']]],
   ['service_17',['service',['../structPasswordEntry.html#a7efd3f2f980acb7d38669e9074f4a85a',1,'PasswordEntry']]],
@@ -22,12 +22,12 @@ var searchData=
   ['size_19',['size',['../structMemoryStruct.html#a79d6a7ad34b172f766c19d0846688440',1,'MemoryStruct']]],
   ['source_20',['Build from Source',['../index.html#autotoc_md10',1,'']]],
   ['standards_21',['Our Standards',['../md_CODE__OF__CONDUCT.html#autotoc_md52',1,'']]],
-  ['static_20analysis_22',['Static Analysis',['../md_docs_2TESTING.html#autotoc_md88',1,'']]],
-  ['status_3a_20✓_20pass_23',['Build Status: ✓ PASS',['../md_docs_2TESTING.html#autotoc_md86',1,'']]],
+  ['static_20analysis_22',['Static Analysis',['../md_docs_2TESTING.html#autotoc_md91',1,'']]],
+  ['status_3a_20✓_20pass_23',['Build Status: ✓ PASS',['../md_docs_2TESTING.html#autotoc_md89',1,'']]],
   ['storage_20format_24',['Data Storage Format',['../md_SECURITY.html#autotoc_md35',1,'']]],
   ['strength_20validation_25',['Password Strength Validation',['../md_SECURITY.html#autotoc_md39',1,'']]],
   ['structure_26',['Project Structure',['../index.html#autotoc_md19',1,'']]],
   ['style_27',['Coding Style',['../md_CONTRIBUTING.html#autotoc_md46',1,'']]],
-  ['summary_28',['summary',['../md_docs_2TESTING.html#autotoc_md91',1,'Test Summary'],['../md_docs_2TESTING.html',1,'Testing and Verification Summary']]],
+  ['summary_28',['summary',['../md_docs_2TESTING.html#autotoc_md94',1,'Test Summary'],['../md_docs_2TESTING.html',1,'Testing and Verification Summary']]],
   ['system_20security_29',['File System Security',['../md_SECURITY.html#autotoc_md37',1,'']]]
 ];

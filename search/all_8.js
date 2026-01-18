@@ -2,7 +2,7 @@ var searchData=
 [
   ['features_0',['features',['../index.html#autotoc_md2',1,'Features'],['../index.html#autotoc_md1',1,'Key Security Features']]],
   ['file_20system_20security_1',['File System Security',['../md_SECURITY.html#autotoc_md37',1,'']]],
-  ['fixed_2',['fixed',['../md_CHANGELOG.html#autotoc_md73',1,'Fixed'],['../md_CHANGELOG.html#autotoc_md78',1,'Fixed']]],
+  ['fixed_2',['fixed',['../md_CHANGELOG.html#autotoc_md70',1,'Fixed'],['../md_CHANGELOG.html#autotoc_md76',1,'Fixed'],['../md_CHANGELOG.html#autotoc_md81',1,'Fixed']]],
   ['flow_3',['Master Password Security Flow',['../md_SECURITY.html#autotoc_md34',1,'']]],
   ['focused_20development_4',['Security-Focused Development',['../md_CONTRIBUTING.html#autotoc_md44',1,'']]],
   ['for_20external_20services_5',['Hashing for External Services',['../md_SECURITY.html#autotoc_md31',1,'']]],
