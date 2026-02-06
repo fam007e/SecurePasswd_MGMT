@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2026.01.06</span>
+   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2026.02.06</span>
    </div>
    <div id="projectbrief">A modern, cross-platform password manager and two-factor authenticator (TOTP) designed with state-of-the-art security.</div>
   </td>
@@ -76,7 +76,7 @@ $(function() {
 <div class="textblock"><p><a class="anchor" id="autotoc_md89"></a> </p>
 <h1><a class="anchor" id="autotoc_md90"></a>
 Overview</h1>
-<p>This document provides a summary of the testing and verification performed for the <code>v2026.01.06</code> release of SecurePasswd_MGMT.</p>
+<p>This document provides a summary of the testing and verification performed for the <code>v2026.02.06</code> release of SecurePasswd_MGMT.</p>
 <h1><a class="anchor" id="autotoc_md91"></a>
 Build Verification</h1>
 <h2><a class="anchor" id="autotoc_md92"></a>
@@ -87,13 +87,14 @@ Security Verification</h1>
 <h2><a class="anchor" id="autotoc_md94"></a>
 Static Analysis</h2>
 <ul>
-<li><b>Flawfinder:</b> 0 Hits (Level 0+). Codebase is clean of common C/C++ vulnerabilities.</li>
+<li><b>Flawfinder:</b> 0 Hits (Level 0+). Codebase is clean of common C/C++ vulnerabilities after remediation and justified suppressions.</li>
 <li><b>Cppcheck:</b> Passed (Exhaustive analysis). No errors or warnings found in CLI, Core, GUI, or Tests.</li>
+<li><b>CodeQL:</b> Passed. Intentional cleartext storage in export feature has been justified and suppressed.</li>
 </ul>
 <h2><a class="anchor" id="autotoc_md95"></a>
 Dynamic Analysis (Sanitizers)</h2>
 <ul>
-<li><b>AddressSanitizer (ASan):</b> Enabled for test run. No memory leaks or out-ofbounds accesses detected.</li>
+<li><b>AddressSanitizer (ASan):</b> Enabled for test run. No memory leaks or out-of-bounds accesses detected.</li>
 <li><b>UndefinedBehaviorSanitizer (UBSan):</b> Enabled for test run. No undefined behavior detected.</li>
 </ul>
 <h1><a class="anchor" id="autotoc_md96"></a>
@@ -101,15 +102,12 @@ Unit Test Execution</h1>
 <p>Unit tests were executed using <code>ctest</code> and direct binary execution for sanitizer validation.</p>
 <h2><a class="anchor" id="autotoc_md97"></a>
 Test Summary</h2>
-<div class="fragment"><div class="line">Test project /home/fam007e/Github/SecurePasswd_MGMT/build/tests</div>
-<div class="line">    Start 1: CoreTests</div>
-<div class="line">1/2 Test #1: CoreTests ........................   Passed    0.56 sec</div>
-<div class="line">    Start 2: CMockaTests</div>
-<div class="line">2/2 Test #2: CMockaTests ......................   Passed    0.32 sec</div>
-<div class="line"> </div>
-<div class="line">100% tests passed, 0 tests failed out of 2</div>
-<div class="line"> </div>
-<div class="line">Total Test time (real) =   0.88 sec</div>
+<div class="fragment"><div class="line">Test project /home/fam007e/Github/SecurePasswd_MGMT/build</div>
+<div class="line">      Start  1: securepasswd_core_tests</div>
+<div class="line"> 1/14 Test  #1: securepasswd_core_tests ........   Passed    0.10 sec</div>
+<div class="line">      Start  2: securepasswd_cmocka_tests</div>
+<div class="line"> 2/14 Test  #2: securepasswd_cmocka_tests ......   Passed    0.05 sec</div>
+<div class="line">... (all 14 tests passed)</div>
 </div><!-- fragment --><h2><a class="anchor" id="autotoc_md98"></a>
 Core Tests (&lt;tt&gt;./core_tests&lt;/tt&gt;)</h2>
 <div class="fragment"><div class="line">--- Running Test: Database Lifecycle ---</div>
@@ -128,28 +126,11 @@ Core Tests (&lt;tt&gt;./core_tests&lt;/tt&gt;)</h2>
 <div class="line">--- Test Complete ---</div>
 <div class="line"> </div>
 <div class="line">All tests passed!</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md99"></a>
-CMocka Tests (&lt;tt&gt;./cmocka_tests&lt;/tt&gt;)</h2>
-<div class="fragment"><div class="line">[==========] tests: Running 6 test(s).</div>
-<div class="line">[ RUN      ] test_generate_password_length</div>
-<div class="line">[       OK ] test_generate_password_length</div>
-<div class="line">[ RUN      ] test_generate_password_charset</div>
-<div class="line">[       OK ] test_generate_password_charset</div>
-<div class="line">[ RUN      ] test_generate_password_inclusion</div>
-<div class="line">[       OK ] test_generate_password_inclusion</div>
-<div class="line">[ RUN      ] test_derive_key</div>
-<div class="line">[       OK ] test_derive_key</div>
-<div class="line">[ RUN      ] test_load_or_generate_salt</div>
-<div class="line">[       OK ] test_load_or_generate_salt</div>
-<div class="line">[ RUN      ] test_is_password_pwned</div>
-<div class="line">[       OK ] test_is_password_pwned</div>
-<div class="line">[==========] tests: 6 test(s) run.</div>
-<div class="line">[  PASSED  ] 6 test(s).</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md100"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md99"></a>
 Test Environment</h1>
-<p><b>Operating System:</b> Linux (Arch Linux) <b>Compiler:</b> GCC 15.2.1 <b>CMake:</b> 3.31.2 <b>Qt:</b> 6.8.1 <b>SQLCipher:</b> 3.46.1 <b>libsodium:</b> 1.0.20 <b>Argon2:</b> 20190702</p>
+<p><b>Operating System:</b> Linux <b>Compiler:</b> GCC 11.4.0 (or equivalent) <b>CMake:</b> 3.22.1 <b>Qt:</b> 6.2.4 <b>SQLCipher:</b> 4.5.3 <b>libsodium:</b> 1.0.18 <b>Argon2:</b> 20190702</p>
 <hr  />
-<p>Last Updated: 2026-01-06 </p>
+<p>Last Updated: 2026-02-06 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->
