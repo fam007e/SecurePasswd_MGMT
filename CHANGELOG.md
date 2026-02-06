@@ -44,7 +44,8 @@ and this project adheres to date-based versioning (YYYY.MM.DD).
 
 ### Security
 - **Fetch on Demand:** Implemented a more secure data fetching model where sensitive fields (passwords, TOTP secrets, recovery codes) are only retrieved from the database when explicitly viewing or exporting an entry. This prevents secrets from lingering in memory during general navigation and list operations.
-- **Improved Static Analysis:** Achieved 100% pass rate in local CI/CD verification using `cppcheck` and `flawfinder`.
+- **Improved Static Analysis:** Achieved 100% pass rate in local CI/CD verification using `cppcheck` and `flawfinder`. Remediated multiple findings and implemented justified suppressions for false positives (including CWE-134 format strings).
+- **CodeQL Remediation:** Suppressed intentional cleartext storage alerts in the export feature to achieve a clean CodeQL report.
 - **Runtime Verification:** All tests now pass with AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) enabled.
 
 ### Fixed
