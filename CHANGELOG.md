@@ -52,6 +52,7 @@ and this project adheres to date-based versioning (YYYY.MM.DD).
 - **Resource Leak:** Fixed a FILE pointer leak in high-level GUI export functionality (`gui/mainwindow.cpp`).
 - **Core Test Stability:** Fixed a segmentation fault in `core_tests` related to the new secure fetching pattern.
 - **NULL Pointer Safety:** Added proactive NULL checks in database open operations to prevent potential crashes.
+- **Windows Build Fix:** Resolved `MOVEFILE_REPLACE_EXISTING` undeclared identifier error in `core/database.c` by adding missing `<windows.h>` include.
 
 ## [Unreleased]
 
