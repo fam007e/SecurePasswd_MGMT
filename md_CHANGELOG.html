@@ -138,6 +138,7 @@ Fixed</h2>
 <li><b>Resource Leak:</b> Fixed a FILE pointer leak in high-level GUI export functionality (<code>gui/mainwindow.cpp</code>).</li>
 <li><b>Core Test Stability:</b> Fixed a segmentation fault in <code>core_tests</code> related to the new secure fetching pattern.</li>
 <li><b>NULL Pointer Safety:</b> Added proactive NULL checks in database open operations to prevent potential crashes.</li>
+<li><b>Windows Build Fix:</b> Resolved <code>MOVEFILE_REPLACE_EXISTING</code> undeclared identifier error in <code><a class="el" href="database_8c.html">core/database.c</a></code> by adding missing <code>&lt;windows.h&gt;</code> include.</li>
 </ul>
 <h1><a class="anchor" id="autotoc_md75"></a>
 [Unreleased]</h1>
