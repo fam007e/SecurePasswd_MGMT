@@ -1,3 +1,6 @@
+#ifdef _WIN32
+#include <windows.h>
+#endif
 #include "database.h"
 #include "key_derivation.h"
 #ifdef HAVE_SQLCIPHER_SUBDIR
