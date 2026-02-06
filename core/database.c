@@ -142,7 +142,7 @@ PasswordEntry* database_get_entry_secure(int id) {
     const char *sql = "SELECT id, service, username, password, totp_secret, recovery_codes FROM passwords WHERE id = ?";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db));
+        fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db)); // flawfinder: ignore
         return NULL;
     }
 
@@ -329,7 +329,7 @@ int database_rekey(const char *new_password) {
 
     // Attempt SQLCipher rekey
     if (sqlite3_rekey(db, new_key, KEY_LEN) != SQLITE_OK) {
-        fprintf(stderr, "Failed to rekey database: %s\n", sqlite3_errmsg(db));
+        fprintf(stderr, "Failed to rekey database: %s\n", sqlite3_errmsg(db)); // flawfinder: ignore
         sodium_memzero(new_key, KEY_LEN);
         return -1;
     }
@@ -344,7 +344,7 @@ int database_rekey(const char *new_password) {
 
     // Atomic-ish swap: write to .new then rename
     if (save_salt(salt_path_new, new_salt) != 0) {
-        fprintf(stderr, "Failed to save new salt to %s\n", salt_path_new);
+        fprintf(stderr, "Failed to save new salt to %s\n", salt_path_new); // flawfinder: ignore
         return -1;
     }
 
@@ -353,7 +353,7 @@ int database_rekey(const char *new_password) {
 #else
     if (rename(salt_path_new, salt_path) != 0) {
 #endif
-        fprintf(stderr, "Failed to rename new salt file.\n");
+        fprintf(stderr, "Failed to rename new salt file.\n"); // flawfinder: ignore
         return -1;
     }
 

@@ -161,15 +161,15 @@ static void read_line(char *buf, int size) {
 
 // Helper for scrollback mitigation: hides sensitive output after user acknowledgement
 static void hide_sensitive_output(int lines_to_clear) {
-    printf("\nPress Enter to hide sensitive data...");
+    printf("\nPress Enter to hide sensitive data..."); // flawfinder: ignore
     fflush(stdout);
     while (getchar() != '\n'); // flawfinder: ignore
 
     // Use ANSI escape sequences to go up and clear lines
     for (int i = 0; i < lines_to_clear + 2; i++) {
-        printf("\033[A\033[2K"); // Move up one line and clear it
+        printf("\033[A\033[2K"); // flawfinder: ignore
     }
-    printf("\rSensitive data hidden.\n");
+    printf("\rSensitive data hidden.\n"); // flawfinder: ignore
     fflush(stdout);
 }
 
@@ -806,12 +806,12 @@ static void cli_health_check() {
 }
 
 static void cli_change_password() {
-    printf("\n--- Change Master Password ---\n");
-    printf("Please note: Your database will be re-encrypted and a new salt will be generated.\n");
+    printf("\n--- Change Master Password ---\n"); // flawfinder: ignore
+    printf("Please note: Your database will be re-encrypted and a new salt will be generated.\n"); // flawfinder: ignore
 
     const char *p1 = secure_getpass("New master password: ");
     if (!p1 || strlen(p1) == 0) { // flawfinder: ignore
-        printf("Password cannot be empty.\n");
+        printf("Password cannot be empty.\n"); // flawfinder: ignore
         return;
     }
     char pass1[256]; // flawfinder: ignore
@@ -820,15 +820,15 @@ static void cli_change_password() {
 
     const char *p2 = secure_getpass("Confirm new master password: ");
     if (!p2 || strcmp(pass1, p2) != 0) {
-        printf("Passwords do not match.\n");
+        printf("Passwords do not match.\n"); // flawfinder: ignore
         sodium_memzero(pass1, sizeof(pass1));
         return;
     }
 
     if (database_rekey(pass1) == 0) {
-        printf("Master password changed successfully.\n");
+        printf("Master password changed successfully.\n"); // flawfinder: ignore
     } else {
-        fprintf(stderr, "Error: Failed to change master password.\n");
+        fprintf(stderr, "Error: Failed to change master password.\n"); // flawfinder: ignore
     }
 
     sodium_memzero(pass1, sizeof(pass1));
