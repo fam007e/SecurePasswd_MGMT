@@ -123,10 +123,26 @@ Added</h2>
 <li><b>Improved Build Diagnostics:</b> Added status messaging during the CMake configuration phase to help debug dependency resolution.</li>
 </ul>
 <h1><a class="anchor" id="autotoc_md72"></a>
-[Unreleased]</h1>
-<h1><a class="anchor" id="autotoc_md73"></a>
-[2025.12.20]</h1>
+[2026.02.06]</h1>
+<h2><a class="anchor" id="autotoc_md73"></a>
+Security</h2>
+<ul>
+<li><b>Fetch on Demand:</b> Implemented a more secure data fetching model where sensitive fields (passwords, TOTP secrets, recovery codes) are only retrieved from the database when explicitly viewing or exporting an entry. This prevents secrets from lingering in memory during general navigation and list operations.</li>
+<li><b>Improved Static Analysis:</b> Achieved 100% pass rate in local CI/CD verification using <code>cppcheck</code> and <code>flawfinder</code>.</li>
+<li><b>Runtime Verification:</b> All tests now pass with AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) enabled.</li>
+</ul>
 <h2><a class="anchor" id="autotoc_md74"></a>
+Fixed</h2>
+<ul>
+<li><b>Resource Leak:</b> Fixed a FILE pointer leak in high-level GUI export functionality (<code>gui/mainwindow.cpp</code>).</li>
+<li><b>Core Test Stability:</b> Fixed a segmentation fault in <code>core_tests</code> related to the new secure fetching pattern.</li>
+<li><b>NULL Pointer Safety:</b> Added proactive NULL checks in database open operations to prevent potential crashes.</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md75"></a>
+[Unreleased]</h1>
+<h1><a class="anchor" id="autotoc_md76"></a>
+[2025.12.20]</h1>
+<h2><a class="anchor" id="autotoc_md77"></a>
 Added</h2>
 <ul>
 <li><b>2FA Recovery Codes:</b> Added support for managing 2FA recovery codes in both GUI and CLI.</li>
@@ -134,14 +150,14 @@ Added</h2>
 <li><b>Secure Exit:</b> Added a dedicated exit action with a custom SVG icon.</li>
 <li><b>Password Entropy:</b> Guaranteed character diversity in the password generator using a secured Fisher-Yates shuffle.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md75"></a>
+<h2><a class="anchor" id="autotoc_md78"></a>
 Changed</h2>
 <ul>
 <li><b>GUI Refinement:</b> Transitioned to a modern, icon-only toolbar UI; removed text-based menus.</li>
 <li><b>Core Architecture:</b> Relocated password generator to the core library for better modularity.</li>
 <li><b>CLI Parity:</b> Achieved full feature parity with the GUI, including interactive editing and recovery codes.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md76"></a>
+<h2><a class="anchor" id="autotoc_md79"></a>
 Fixed</h2>
 <ul>
 <li><b>GUI Stability:</b> Resolved a segmentation fault caused by uninitialized menu pointers.</li>
@@ -149,21 +165,21 @@ Fixed</h2>
 <li><b>Theme Persistence:</b> Improved the consistency of theme loading and saving.</li>
 </ul>
 <hr  />
-<h1><a class="anchor" id="autotoc_md78"></a>
+<h1><a class="anchor" id="autotoc_md81"></a>
 [2025.10.25]</h1>
-<h2><a class="anchor" id="autotoc_md79"></a>
+<h2><a class="anchor" id="autotoc_md82"></a>
 Added</h2>
 <ul>
 <li><b>Desktop Integration:</b> Added desktop integration for Linux (<code>.desktop</code> file) and improved the Windows installer.</li>
 <li><b>GUI Icon:</b> Added a proper application icon for the Windows GUI executable.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md80"></a>
+<h2><a class="anchor" id="autotoc_md83"></a>
 Changed</h2>
 <ul>
 <li><b>Cross-Platform Compatibility:</b> Enhanced cross-platform path handling, particularly for Windows.</li>
 <li><b>Database Path:</b> Unified the database path for both the CLI and GUI applications to ensure consistency.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md81"></a>
+<h2><a class="anchor" id="autotoc_md84"></a>
 Fixed</h2>
 <ul>
 <li><b>Windows GUI:</b> Removed the console window that appeared when running the GUI application on Windows.</li>
@@ -171,11 +187,11 @@ Fixed</h2>
 <li><b>CI:</b> Addressed a CI issue by reinstalling <code>pcre2</code>.</li>
 </ul>
 <hr  />
-<h1><a class="anchor" id="autotoc_md83"></a>
+<h1><a class="anchor" id="autotoc_md86"></a>
 Version History</h1>
 <p>For releases and version history, see <a href="https://github.com/fam007e/SecurePasswd_MGMT/releases">GitHub Releases</a>.</p>
 <hr  />
-<h1><a class="anchor" id="autotoc_md85"></a>
+<h1><a class="anchor" id="autotoc_md88"></a>
 Categories Legend</h1>
 <ul>
 <li><b>Added:</b> New features</li>

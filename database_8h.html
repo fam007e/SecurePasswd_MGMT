@@ -109,6 +109,12 @@ Functions</h2></td></tr>
 <tr class="memitem:ab02c638ac9d3276e12ed84cfeb92a5e6" id="r_ab02c638ac9d3276e12ed84cfeb92a5e6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structPasswordEntry.html">PasswordEntry</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="database_8h.html#ab02c638ac9d3276e12ed84cfeb92a5e6">database_get_all_entries</a> (int *count)</td></tr>
 <tr class="memdesc:ab02c638ac9d3276e12ed84cfeb92a5e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves all password entries from the database.  <br /></td></tr>
 <tr class="separator:ab02c638ac9d3276e12ed84cfeb92a5e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a978a6d279f09fc39d306b1ee84579eb5" id="r_a978a6d279f09fc39d306b1ee84579eb5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structPasswordEntry.html">PasswordEntry</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="database_8h.html#a978a6d279f09fc39d306b1ee84579eb5">database_get_entry_secure</a> (int id)</td></tr>
+<tr class="memdesc:a978a6d279f09fc39d306b1ee84579eb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves a single password entry with ALL details (including secrets) by ID.  <br /></td></tr>
+<tr class="separator:a978a6d279f09fc39d306b1ee84579eb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4bc5a926ac2d7904c49b7b036fae514f" id="r_a4bc5a926ac2d7904c49b7b036fae514f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="database_8h.html#a4bc5a926ac2d7904c49b7b036fae514f">database_rekey</a> (const char *new_password)</td></tr>
+<tr class="memdesc:a4bc5a926ac2d7904c49b7b036fae514f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Changes the master password of the database.  <br /></td></tr>
+<tr class="separator:a4bc5a926ac2d7904c49b7b036fae514f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a49b60bc340abf21b96b5195b57f902c4" id="r_a49b60bc340abf21b96b5195b57f902c4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="database_8h.html#a49b60bc340abf21b96b5195b57f902c4">database_add_entry</a> (const <a class="el" href="structPasswordEntry.html">PasswordEntry</a> *entry)</td></tr>
 <tr class="memdesc:a49b60bc340abf21b96b5195b57f902c4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a new password entry to the database.  <br /></td></tr>
 <tr class="separator:a49b60bc340abf21b96b5195b57f902c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -223,6 +229,33 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a978a6d279f09fc39d306b1ee84579eb5" name="a978a6d279f09fc39d306b1ee84579eb5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a978a6d279f09fc39d306b1ee84579eb5">&#9670;&#160;</a></span>database_get_entry_secure()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structPasswordEntry.html">PasswordEntry</a> * database_get_entry_secure </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Retrieves a single password entry with ALL details (including secrets) by ID. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">id</td><td>The ID of the entry to retrieve. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A dynamically allocated <a class="el" href="structPasswordEntry.html" title="A struct representing a password entry.">PasswordEntry</a> struct containing full details, or NULL if not found/error. The caller is responsible for freeing this struct using free_password_entry() (to be added) or manual free. </dd></dl>
+
+</div>
+</div>
 <a id="ac727a80b7864ac3b8e30e14bc0164887" name="ac727a80b7864ac3b8e30e14bc0164887"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac727a80b7864ac3b8e30e14bc0164887">&#9670;&#160;</a></span>database_open()</h2>
 
@@ -254,6 +287,33 @@ Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">db_path</td><td>The path to the database file. </td></tr>
     <tr><td class="paramname">password</td><td>The master password for the database. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 on success, -1 on error. </dd></dl>
+
+</div>
+</div>
+<a id="a4bc5a926ac2d7904c49b7b036fae514f" name="a4bc5a926ac2d7904c49b7b036fae514f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4bc5a926ac2d7904c49b7b036fae514f">&#9670;&#160;</a></span>database_rekey()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int database_rekey </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>new_password</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Changes the master password of the database. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">new_password</td><td>The new master password. </td></tr>
   </table>
   </dd>
 </dl>

@@ -108,6 +108,9 @@ Functions</h2></td></tr>
 <tr class="memitem:adacd10ab933416227758a3702aa43ec8" id="r_adacd10ab933416227758a3702aa43ec8"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="key__derivation_8c.html#adacd10ab933416227758a3702aa43ec8">load_or_generate_salt</a> (const char *path, uint8_t *salt)</td></tr>
 <tr class="memdesc:adacd10ab933416227758a3702aa43ec8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Loads the salt from the specified path, or generates a new one if it doesn't exist.  <br /></td></tr>
 <tr class="separator:adacd10ab933416227758a3702aa43ec8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64c3fb401d2807bb3f207e7c60f150c1" id="r_a64c3fb401d2807bb3f207e7c60f150c1"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="key__derivation_8c.html#a64c3fb401d2807bb3f207e7c60f150c1">save_salt</a> (const char *path, const uint8_t *salt)</td></tr>
+<tr class="memdesc:a64c3fb401d2807bb3f207e7c60f150c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Saves the salt to the specified path.  <br /></td></tr>
+<tr class="separator:a64c3fb401d2807bb3f207e7c60f150c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
 <a id="abbe36b544024ce52b9fb316584e06996" name="abbe36b544024ce52b9fb316584e06996"></a>
@@ -229,6 +232,44 @@ Functions</h2></td></tr>
   <table class="params">
     <tr><td class="paramname">path</td><td>The path to the salt file. </td></tr>
     <tr><td class="paramname">salt</td><td>The buffer to store the loaded or generated salt in. Must be SALT_LEN bytes. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 on success, -1 on error. </dd></dl>
+
+</div>
+</div>
+<a id="a64c3fb401d2807bb3f207e7c60f150c1" name="a64c3fb401d2807bb3f207e7c60f150c1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a64c3fb401d2807bb3f207e7c60f150c1">&#9670;&#160;</a></span>save_salt()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int save_salt </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>path</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint8_t *&#160;</td>
+          <td class="paramname"><em>salt</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Saves the salt to the specified path. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">path</td><td>The path to the salt file. </td></tr>
+    <tr><td class="paramname">salt</td><td>The salt to save. Must be SALT_LEN bytes. </td></tr>
   </table>
   </dd>
 </dl>

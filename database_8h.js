@@ -5,7 +5,9 @@ var database_8h =
     [ "database_close", "database_8h.html#a87a371db10ba025e787c86c407b52419", null ],
     [ "database_delete_entry", "database_8h.html#a0e3e8a52eb56707ad33ea6a1c47ff028", null ],
     [ "database_get_all_entries", "database_8h.html#ab02c638ac9d3276e12ed84cfeb92a5e6", null ],
+    [ "database_get_entry_secure", "database_8h.html#a978a6d279f09fc39d306b1ee84579eb5", null ],
     [ "database_open", "database_8h.html#ac727a80b7864ac3b8e30e14bc0164887", null ],
+    [ "database_rekey", "database_8h.html#a4bc5a926ac2d7904c49b7b036fae514f", null ],
     [ "database_update_entry", "database_8h.html#a3c5e8e2581663e90084591b7e2590615", null ],
     [ "free_password_entries", "database_8h.html#a77a357353e4cf3b50bc41fb6727485dc", null ]
 ];

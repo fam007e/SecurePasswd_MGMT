@@ -83,6 +83,7 @@ Key Security Features</h1>
 <li><b>State-of-the-Art Key Derivation:</b> <b>Argon2id</b>, the winner of the Password Hashing Competition, is used to derive the encryption key from your master password, providing maximum resistance against brute-force attacks.</li>
 <li><b>Secure Password Generator:</b> A built-in, cryptographically secure password generator to create strong, unique passwords.</li>
 <li><b>Memory Safety:</b> Sensitive data is explicitly cleared from memory after use.</li>
+<li><b>Fetch on Demand:</b> Secrets are only retrieved from the database when specifically needed, preventing them from lingering in memory.</li>
 <li><b>Hardened C Codebase:</b> Regularly audited using modern static analysis tools (<code>cppcheck</code>, <code>flawfinder</code>) to proactively prevent common C vulnerabilities like buffer overflows and race conditions.</li>
 <li><b>Secure Storage:</b> All data is stored locally, encrypted, in a secure directory.</li>
 </ul>
