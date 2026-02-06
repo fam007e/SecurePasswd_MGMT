@@ -42,6 +42,23 @@ void database_close();
 PasswordEntry* database_get_all_entries(int *count);
 
 /**
+ * @brief Retrieves a single password entry with ALL details (including secrets) by ID.
+ *
+ * @param id The ID of the entry to retrieve.
+ * @return A dynamically allocated PasswordEntry struct containing full details, or NULL if not found/error.
+ *         The caller is responsible for freeing this struct using free_password_entry() (to be added) or manual free.
+ */
+PasswordEntry* database_get_entry_secure(int id);
+
+/**
+ * @brief Changes the master password of the database.
+ *
+ * @param new_password The new master password.
+ * @return 0 on success, -1 on error.
+ */
+int database_rekey(const char *new_password);
+
+/**
  * @brief Adds a new password entry to the database.
  *
  * @param entry A pointer to the PasswordEntry to add.

@@ -25,6 +25,7 @@ extern "C" {
 #include <QSettings>
 #include <QStyleFactory>
 #include <QMessageBox>
+#include <QInputDialog>
 #include <QStandardPaths>
 #include <QStatusBar>
 #include <QTimer>
@@ -39,6 +40,15 @@ extern "C" {
 void import_field_cb(void *s, size_t len, void *data) {
     static_cast<QStringList*>(data)->append(QString::fromUtf8((char*)s, len));
 }
+
+// Sanitize fields against CSV injection (Formula Injection)
+static QString sanitize_csv_field(QString field) {
+    if (field.startsWith('=') || field.startsWith('+') || field.startsWith('-') || field.startsWith('@')) {
+        return "'" + field;
+    }
+    return field;
+}
+
 void import_row_cb(int c, void *data) {
     QStringList *fields = static_cast<QStringList*>(data);
     if (fields->size() >= 3) { // service,username,password are required
@@ -73,8 +83,6 @@ MainWindow::MainWindow(const QString& password, QWidget *parent) : QMainWindow(p
     QString dbPath = dbDirPath + "/vault.db";
 
     if (database_open(dbPath.toUtf8().constData(), password.toUtf8().constData()) != 0) {
-        QMessageBox::critical(nullptr, "Database Error", "Failed to open database. Check master password or file permissions.\n\nThe application will now exit.");
-        QTimer::singleShot(0, qApp, &QApplication::quit);
         return;
     }
 
@@ -130,6 +138,7 @@ void MainWindow::onImport() {
     statusBar()->showMessage(QString("Import from %1 complete.").arg(filePath), 5000);
 }
 
+
 void MainWindow::onExport() {
     QString filePath = QFileDialog::getSaveFileName(this, "Export to CSV", QDir::homePath() + "/export.csv", "CSV Files (*.csv)");
     if (filePath.isEmpty()) return;
@@ -141,13 +150,19 @@ void MainWindow::onExport() {
     }
 
     fputs("service,username,password,totp_secret,recovery_codes\n", fp);
-    for (const auto& entry : m_entries) {
-        fprintf(fp, "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", // flawfinder: ignore
-                entry.service.toUtf8().constData(),
-                entry.username.toUtf8().constData(),
-                entry.password.toUtf8().constData(),
-                entry.totpSecret.toUtf8().constData(),
-                entry.recoveryCodes.toUtf8().constData());
+
+    for (const auto& entry_meta : m_entries) {
+        // Fetch full entry for export
+        PasswordEntry *db_entry = database_get_entry_secure(entry_meta.id);
+        if (db_entry) {
+            fprintf(fp, "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", // flawfinder: ignore
+                    sanitize_csv_field(QString::fromUtf8(db_entry->service)).toUtf8().constData(),
+                    sanitize_csv_field(QString::fromUtf8(db_entry->username)).toUtf8().constData(),
+                    sanitize_csv_field(QString::fromUtf8(db_entry->password)).toUtf8().constData(),
+                    sanitize_csv_field(QString::fromUtf8(db_entry->totp_secret)).toUtf8().constData(),
+                    sanitize_csv_field(QString::fromUtf8(db_entry->recovery_codes)).toUtf8().constData());
+            free_password_entries(db_entry, 1);
+        }
     }
 
     fclose(fp);
@@ -172,9 +187,7 @@ void MainWindow::refreshEntryList() {
         qt_entry.id = db_entries[i].id;
         qt_entry.service = QString::fromUtf8(db_entries[i].service);
         qt_entry.username = QString::fromUtf8(db_entries[i].username);
-        qt_entry.password = QString::fromUtf8(db_entries[i].password);
-        qt_entry.totpSecret = QString::fromUtf8(db_entries[i].totp_secret);
-        qt_entry.recoveryCodes = QString::fromUtf8(db_entries[i].recovery_codes);
+        // Sensitive fields are no longer stored in the m_entries cache
         m_entries.append(qt_entry);
     }
 
@@ -191,19 +204,26 @@ void MainWindow::onCurrentRowChanged(int currentRow) {
         totpLabel->setText("------");
         totpProgressBar->setValue(0);
         recoveryCodesList->clear();
-        QString codesStr = m_entries[currentRow].recoveryCodes;
-        if (!codesStr.isEmpty()) {
-            QStringList codes = codesStr.split("\n", Qt::SkipEmptyParts);
-            for (const QString& code : codes) {
-                QListWidgetItem* item = new QListWidgetItem(code, recoveryCodesList);
-                if (code.startsWith("*")) {
-                    QFont font = item->font();
-                    font.setStrikeOut(true);
-                    item->setFont(font);
-                    item->setForeground(Qt::gray);
+
+        // Fetch full entry for recovery codes display
+        PasswordEntry *db_entry = database_get_entry_secure(m_entries[currentRow].id);
+        if (db_entry) {
+            QString codesStr = QString::fromUtf8(db_entry->recovery_codes);
+            if (!codesStr.isEmpty()) {
+                QStringList codes = codesStr.split("\n", Qt::SkipEmptyParts);
+                for (const QString& code : codes) {
+                    QListWidgetItem* item = new QListWidgetItem(code, recoveryCodesList);
+                    if (code.startsWith("*")) {
+                        QFont font = item->font();
+                        font.setStrikeOut(true);
+                        item->setFont(font);
+                        item->setForeground(Qt::gray);
+                    }
                 }
             }
+            free_password_entries(db_entry, 1);
         }
+
         updateTotpDisplay();
         totpTimer->start(1000);
     }
@@ -213,10 +233,15 @@ void MainWindow::updateTotpDisplay() {
     int currentRow = listWidget->currentRow();
     if (currentRow < 0 || currentRow >= m_entries.size()) return;
 
-    const QString secret = m_entries[currentRow].totpSecret;
+    // Fetch full entry for TOTP secret
+    PasswordEntry *db_entry = database_get_entry_secure(m_entries[currentRow].id);
+    if (!db_entry) return;
+
+    const QString secret = QString::fromUtf8(db_entry->totp_secret);
     if (secret.isEmpty()) {
         totpLabel->setText("------");
         totpProgressBar->setValue(0);
+        free_password_entries(db_entry, 1);
         return;
     }
 
@@ -231,6 +256,8 @@ void MainWindow::updateTotpDisplay() {
             free(code);
         }
     }
+
+    free_password_entries(db_entry, 1);
 }
 
 void MainWindow::onCopyTotp() {
@@ -277,8 +304,20 @@ void MainWindow::onEdit() {
     QListWidgetItem *item = listWidget->item(currentRow);
     int entry_id = item->data(Qt::UserRole).toInt();
 
+    // Fetch full entry for editing
+    PasswordEntry *db_entry = database_get_entry_secure(entry_id);
+    if (!db_entry) {
+        QMessageBox::critical(this, "Error", "Failed to fetch entry details from database.");
+        return;
+    }
+
     EntryDialog dialog(this);
-    dialog.setData(m_entries[currentRow]); // Use the cache to populate dialog
+    dialog.setData(db_entry->id,
+                   QString::fromUtf8(db_entry->service),
+                   QString::fromUtf8(db_entry->username),
+                   QString::fromUtf8(db_entry->password),
+                   QString::fromUtf8(db_entry->totp_secret),
+                   QString::fromUtf8(db_entry->recovery_codes));
 
     if (dialog.exec() == QDialog::Accepted) {
         PasswordEntry updated_entry;
@@ -301,6 +340,8 @@ void MainWindow::onEdit() {
             refreshEntryList();
         }
     }
+
+    free_password_entries(db_entry, 1);
 }
 
 void MainWindow::onCopyUsername() {
@@ -319,14 +360,25 @@ void MainWindow::onCopyPassword() {
         statusBar()->showMessage("Please select an entry to copy from.", 3000);
         return;
     }
-    QString password = m_entries[currentRow].password;
+
+    // Fetch full entry for password
+    PasswordEntry *db_entry = database_get_entry_secure(m_entries[currentRow].id);
+    if (!db_entry) {
+        statusBar()->showMessage("Failed to fetch password from database.", 3000);
+        return;
+    }
+
+    QString password = QString::fromUtf8(db_entry->password);
     QApplication::clipboard()->setText(password);
+
     statusBar()->showMessage("Password copied to clipboard. It will be cleared in 30 seconds.", 3000);
     QTimer::singleShot(30000, this, [password]() {
         if (QApplication::clipboard()->text() == password) {
             QApplication::clipboard()->clear();
         }
     });
+
+    free_password_entries(db_entry, 1);
 }
 
 void MainWindow::setupUI() {
@@ -347,6 +399,7 @@ void MainWindow::setupUI() {
 
     // Menus (Removed for icon-only UI)
 
+    // --- Group 1: Entry Management ---
     addAction = new QAction(QIcon(":/icons/add.svg"), "Add", this);
     addAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_A));
     addAction->setToolTip("Add new entry (Alt+A)");
@@ -362,6 +415,9 @@ void MainWindow::setupUI() {
     deleteAction->setToolTip("Delete selected entry (Alt+D)");
     toolBar->addAction(deleteAction);
 
+    toolBar->addSeparator();
+
+    // --- Group 2: Copy Actions ---
     copyUsernameAction = new QAction(QIcon(":/icons/copy_username.svg"), "Copy Username", this);
     copyUsernameAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_U));
     copyUsernameAction->setToolTip("Copy username to clipboard (Alt+U)");
@@ -379,13 +435,20 @@ void MainWindow::setupUI() {
 
     toolBar->addSeparator();
 
+    // --- Group 3: Security Tools ---
     healthCheckAction = new QAction(QIcon(":/icons/health-check.svg"), "Health Check", this);
     healthCheckAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_H));
     healthCheckAction->setToolTip("Run password health check (Alt+H)");
     toolBar->addAction(healthCheckAction);
 
+    changePasswordAction = new QAction(QIcon(":/icons/settings.svg"), "Change Master Password", this);
+    changePasswordAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_S));
+    changePasswordAction->setToolTip("Change Master Password (Alt+S)");
+    toolBar->addAction(changePasswordAction);
+
     toolBar->addSeparator();
 
+    // --- Group 4: Data Operations ---
     importAction = new QAction(QIcon(":/icons/import.svg"), "Import", this);
     importAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_I));
     importAction->setToolTip("Import from CSV (Alt+I)");
@@ -398,6 +461,7 @@ void MainWindow::setupUI() {
 
     toolBar->addSeparator();
 
+    // --- Group 5: UI & Settings ---
     themeAction = new QAction(this);
     themeAction->setShortcut(QKeySequence(Qt::ALT | Qt::SHIFT | Qt::Key_T));
     toolBar->addAction(themeAction);
@@ -409,6 +473,7 @@ void MainWindow::setupUI() {
 
     toolBar->addSeparator();
 
+    // --- Group 6: System ---
     QAction *exitAction = new QAction(QIcon(":/icons/exit.svg"), "Exit", this);
     exitAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_Q));
     exitAction->setToolTip("Exit Application (Alt+Q)");
@@ -458,6 +523,7 @@ void MainWindow::setupUI() {
     connect(importAction, &QAction::triggered, this, &MainWindow::onImport);
     connect(exportAction, &QAction::triggered, this, &MainWindow::onExport);
     connect(healthCheckAction, &QAction::triggered, this, &MainWindow::onHealthCheck);
+    connect(changePasswordAction, &QAction::triggered, this, &MainWindow::onChangePassword);
     connect(listWidget, &QListWidget::currentRowChanged, this, &MainWindow::onCurrentRowChanged);
     connect(themeAction, &QAction::triggered, this, &MainWindow::onToggleTheme);
     connect(toggleRecoveryCodesAction, &QAction::triggered, this, &MainWindow::onToggleRecoveryCodes);
@@ -466,6 +532,11 @@ void MainWindow::setupUI() {
     // TOTP timer
     totpTimer = new QTimer(this);
     connect(totpTimer, &QTimer::timeout, this, &MainWindow::updateTotpDisplay);
+
+    // Security: Clear clipboard on exit
+    connect(qApp, &QApplication::aboutToQuit, this, []() {
+        QApplication::clipboard()->clear();
+    });
 }
 
 void MainWindow::onHealthCheck() {
@@ -518,6 +589,30 @@ void MainWindow::loadTheme(const QString& theme) {
     updateThemeIcon();
 }
 
+void MainWindow::onChangePassword() {
+    bool ok;
+    QString newPass = QInputDialog::getText(this, "Change Master Password",
+                                            "Enter new master password:", QLineEdit::Password,
+                                            "", &ok);
+    if (!ok || newPass.isEmpty()) return;
+
+    QString confirmPass = QInputDialog::getText(this, "Change Master Password",
+                                                "Confirm new master password:", QLineEdit::Password,
+                                                "", &ok);
+    if (!ok) return;
+
+    if (newPass != confirmPass) {
+        QMessageBox::warning(this, "Error", "Passwords do not match.");
+        return;
+    }
+
+    if (database_rekey(newPass.toUtf8().constData()) == 0) {
+        QMessageBox::information(this, "Success", "Master password changed successfully.");
+    } else {
+        QMessageBox::critical(this, "Error", "Failed to change master password.");
+    }
+}
+
 void MainWindow::onToggleRecoveryCodes() {
     recoveryCodesEnabled = !recoveryCodesEnabled;
     QSettings settings("SecurePasswd_MGMT", "SecurePasswd_MGMT");
@@ -557,8 +652,11 @@ void MainWindow::onMarkAsUsed() {
         return; // Already used
     }
 
-    // Mark as used in UI Cache
-    QString originalCodes = m_entries[currentRow].recoveryCodes;
+    // Fetch full entry to update recovery codes
+    PasswordEntry *db_entry = database_get_entry_secure(m_entries[currentRow].id);
+    if (!db_entry) return;
+
+    QString originalCodes = QString::fromUtf8(db_entry->recovery_codes);
     QStringList codesList = originalCodes.split("\n", Qt::SkipEmptyParts);
     for (int i = 0; i < codesList.size(); ++i) {
         if (codesList[i] == code) {
@@ -566,22 +664,22 @@ void MainWindow::onMarkAsUsed() {
             break;
         }
     }
-    m_entries[currentRow].recoveryCodes = codesList.join("\n");
+    QString newCodes = codesList.join("\n");
 
     // Update database
     PasswordEntry updated_entry;
-    updated_entry.id = m_entries[currentRow].id;
-    QByteArray service = m_entries[currentRow].service.toUtf8();
-    QByteArray username = m_entries[currentRow].username.toUtf8();
-    QByteArray password = m_entries[currentRow].password.toUtf8();
-    QByteArray totpSecret = m_entries[currentRow].totpSecret.toUtf8();
-    QByteArray recoveryCodes = m_entries[currentRow].recoveryCodes.toUtf8();
+    updated_entry.id = db_entry->id;
+    QByteArray service = QString::fromUtf8(db_entry->service).toUtf8();
+    QByteArray username = QString::fromUtf8(db_entry->username).toUtf8();
+    QByteArray password = QString::fromUtf8(db_entry->password).toUtf8();
+    QByteArray totpSecret = QString::fromUtf8(db_entry->totp_secret).toUtf8();
+    QByteArray recoveryCodesByte = newCodes.toUtf8();
 
     updated_entry.service = (char*)service.constData();
     updated_entry.username = (char*)username.constData();
     updated_entry.password = (char*)password.constData();
     updated_entry.totp_secret = (char*)totpSecret.constData();
-    updated_entry.recovery_codes = (char*)recoveryCodes.constData();
+    updated_entry.recovery_codes = (char*)recoveryCodesByte.constData();
 
     if (database_update_entry(&updated_entry) != 0) {
         QMessageBox::critical(this, "Database Error", "Failed to update the entry in the database.");
@@ -594,6 +692,8 @@ void MainWindow::onMarkAsUsed() {
         selectedItem->setForeground(Qt::gray);
         statusBar()->showMessage("Recovery code marked as used.", 3000);
     }
+
+    free_password_entries(db_entry, 1);
 }
 
 void MainWindow::updateThemeIcon() {

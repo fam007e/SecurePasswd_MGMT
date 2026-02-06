@@ -1,13 +1,13 @@
 var searchData=
 [
-  ['categories_20legend_0',['Categories Legend',['../md_CHANGELOG.html#autotoc_md82',1,'']]],
-  ['changed_1',['Changed',['../md_CHANGELOG.html#autotoc_md72',1,'Changed'],['../md_CHANGELOG.html#autotoc_md77',1,'Changed']]],
+  ['categories_20legend_0',['Categories Legend',['../md_CHANGELOG.html#autotoc_md85',1,'']]],
+  ['changed_1',['Changed',['../md_CHANGELOG.html#autotoc_md75',1,'Changed'],['../md_CHANGELOG.html#autotoc_md80',1,'Changed']]],
   ['changelog_2',['Changelog',['../md_CHANGELOG.html',1,'']]],
   ['check_20requirements_3',['Health Check Requirements',['../md_SECURITY.html#autotoc_md40',1,'']]],
   ['cli_4',['Command-Line Interface (CLI)',['../index.html#autotoc_md3',1,'']]],
   ['cli_20only_20build_20no_20gui_5',['CLI-Only Build (No GUI)',['../index.html#autotoc_md12',1,'']]],
-  ['cmocka_20tests_20cmocka_5ftests_6',['CMocka Tests (&lt;span class=&quot;tt&quot;&gt;./cmocka_tests&lt;/span&gt;)',['../md_docs_2TESTING.html#autotoc_md93',1,'']]],
-  ['cmocka_5ftests_7',['CMocka Tests (&lt;span class=&quot;tt&quot;&gt;./cmocka_tests&lt;/span&gt;)',['../md_docs_2TESTING.html#autotoc_md93',1,'']]],
+  ['cmocka_20tests_20cmocka_5ftests_6',['CMocka Tests (&lt;span class=&quot;tt&quot;&gt;./cmocka_tests&lt;/span&gt;)',['../md_docs_2TESTING.html#autotoc_md96',1,'']]],
+  ['cmocka_5ftests_7',['CMocka Tests (&lt;span class=&quot;tt&quot;&gt;./cmocka_tests&lt;/span&gt;)',['../md_docs_2TESTING.html#autotoc_md96',1,'']]],
   ['code_20of_20conduct_8',['Code of Conduct',['../index.html#autotoc_md22',1,'Code of Conduct'],['../md_CODE__OF__CONDUCT.html',1,'Contributor Covenant Code of Conduct']]],
   ['code_20review_9',['Code Review',['../md_CONTRIBUTING.html#autotoc_md45',1,'']]],
   ['coding_20style_10',['Coding Style',['../md_CONTRIBUTING.html#autotoc_md46',1,'']]],
@@ -21,8 +21,8 @@ var searchData=
   ['contributor_20covenant_20code_20of_20conduct_18',['Contributor Covenant Code of Conduct',['../md_CODE__OF__CONDUCT.html',1,'']]],
   ['contributors_19',['Contributors',['../md_AUTHORS.html#autotoc_md59',1,'']]],
   ['core_20team_20',['Core Team',['../md_AUTHORS.html#autotoc_md58',1,'']]],
-  ['core_20tests_20core_5ftests_21',['Core Tests (&lt;span class=&quot;tt&quot;&gt;./core_tests&lt;/span&gt;)',['../md_docs_2TESTING.html#autotoc_md92',1,'']]],
-  ['core_5ftests_22',['Core Tests (&lt;span class=&quot;tt&quot;&gt;./core_tests&lt;/span&gt;)',['../md_docs_2TESTING.html#autotoc_md92',1,'']]],
+  ['core_20tests_20core_5ftests_21',['Core Tests (&lt;span class=&quot;tt&quot;&gt;./core_tests&lt;/span&gt;)',['../md_docs_2TESTING.html#autotoc_md95',1,'']]],
+  ['core_5ftests_22',['Core Tests (&lt;span class=&quot;tt&quot;&gt;./core_tests&lt;/span&gt;)',['../md_docs_2TESTING.html#autotoc_md95',1,'']]],
   ['covenant_20code_20of_20conduct_23',['Contributor Covenant Code of Conduct',['../md_CODE__OF__CONDUCT.html',1,'']]],
   ['cryptographic_20implementation_24',['Cryptographic Implementation',['../md_SECURITY.html#autotoc_md27',1,'']]]
 ];

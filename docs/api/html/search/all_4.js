@@ -4,7 +4,7 @@ var searchData=
   ['build_20from_20source_1',['Build from Source',['../index.html#autotoc_md10',1,'']]],
   ['build_20no_20gui_2',['CLI-Only Build (No GUI)',['../index.html#autotoc_md12',1,'']]],
   ['build_20process_3',['Secure Build Process',['../md_SECURITY.html#autotoc_md38',1,'']]],
-  ['build_20status_3a_20✓_20pass_4',['Build Status: ✓ PASS',['../md_docs_2TESTING.html#autotoc_md86',1,'']]],
-  ['build_20verification_5',['Build Verification',['../md_docs_2TESTING.html#autotoc_md85',1,'']]],
+  ['build_20status_3a_20✓_20pass_4',['Build Status: ✓ PASS',['../md_docs_2TESTING.html#autotoc_md89',1,'']]],
+  ['build_20verification_5',['Build Verification',['../md_docs_2TESTING.html#autotoc_md88',1,'']]],
   ['built_20packages_6',['Pre-built Packages',['../index.html#autotoc_md9',1,'']]]
 ];

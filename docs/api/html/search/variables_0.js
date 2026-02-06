@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['db_0',['db',['../database_8c.html#ad6e663497d2c934364b3bcf07496b30b',1,'database.c']]]
+  ['current_5fdb_5fpath_0',['current_db_path',['../database_8c.html#a98d73fa89d982dfc8d1461333d94f668',1,'database.c']]]
 ];

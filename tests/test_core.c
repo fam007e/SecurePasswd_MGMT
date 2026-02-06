@@ -29,26 +29,37 @@ static void test_database_lifecycle() {
     assert(new_id > 0);
     fputs("  [PASSED] database_add_entry\n", stdout);
 
-    // 3. Test retrieving the entry
+    // 3. Test retrieving the entry (metadata only)
     int count = 0;
     PasswordEntry *entries = database_get_all_entries(&count);
     assert(count == 1);
     assert(entries != NULL);
     assert(entries[0].id == new_id);
     assert(strcmp(entries[0].service, "TestService") == 0);
-    assert(strcmp(entries[0].recovery_codes, "CODE1\nCODE2") == 0);
+    assert(entries[0].password == NULL);
+    assert(entries[0].totp_secret == NULL);
+    assert(entries[0].recovery_codes == NULL);
     free_password_entries(entries, count);
-    fputs("  [PASSED] database_get_all_entries\n", stdout);
+    fputs("  [PASSED] database_get_all_entries (metadata only)\n", stdout);
+
+    // 3b. Test retrieving full entry securely
+    PasswordEntry *secure_entry = database_get_entry_secure(new_id);
+    assert(secure_entry != NULL);
+    assert(strcmp(secure_entry->password, "TestPass") == 0);
+    assert(strcmp(secure_entry->totp_secret, "JBSWY3DPEHPK3PXP") == 0);
+    assert(strcmp(secure_entry->recovery_codes, "CODE1\nCODE2") == 0);
+    free_password_entries(secure_entry, 1);
+    fputs("  [PASSED] database_get_entry_secure\n", stdout);
 
     // 4. Test updating the entry
     PasswordEntry updated_entry = { .id = new_id, .service = "UpdatedService", .username = "UpdatedUser", .password = "UpdatedPass", .totp_secret = "", .recovery_codes = "NEWCODE" };
     assert(database_update_entry(&updated_entry) == 0);
-    entries = database_get_all_entries(&count);
-    assert(count == 1);
-    assert(entries != NULL);
-    assert(strcmp(entries[0].service, "UpdatedService") == 0);
-    assert(strcmp(entries[0].recovery_codes, "NEWCODE") == 0);
-    free_password_entries(entries, count);
+
+    secure_entry = database_get_entry_secure(new_id);
+    assert(secure_entry != NULL);
+    assert(strcmp(secure_entry->service, "UpdatedService") == 0);
+    assert(strcmp(secure_entry->recovery_codes, "NEWCODE") == 0);
+    free_password_entries(secure_entry, 1);
     fputs("  [PASSED] database_update_entry\n", stdout);
 
     // 5. Test deleting the entry

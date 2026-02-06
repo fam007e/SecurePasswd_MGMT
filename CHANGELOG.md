@@ -40,6 +40,18 @@ and this project adheres to date-based versioning (YYYY.MM.DD).
 - **Smart Path Derivation:** Implemented automatic include path derivation from library file paths as a fallback for manual build environments.
 - **Improved Build Diagnostics:** Added status messaging during the CMake configuration phase to help debug dependency resolution.
 
+## [2026.02.06]
+
+### Security
+- **Fetch on Demand:** Implemented a more secure data fetching model where sensitive fields (passwords, TOTP secrets, recovery codes) are only retrieved from the database when explicitly viewing or exporting an entry. This prevents secrets from lingering in memory during general navigation and list operations.
+- **Improved Static Analysis:** Achieved 100% pass rate in local CI/CD verification using `cppcheck` and `flawfinder`.
+- **Runtime Verification:** All tests now pass with AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) enabled.
+
+### Fixed
+- **Resource Leak:** Fixed a FILE pointer leak in high-level GUI export functionality (`gui/mainwindow.cpp`).
+- **Core Test Stability:** Fixed a segmentation fault in `core_tests` related to the new secure fetching pattern.
+- **NULL Pointer Safety:** Added proactive NULL checks in database open operations to prevent potential crashes.
+
 ## [Unreleased]
 
 ## [2025.12.20]
