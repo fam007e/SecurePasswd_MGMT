@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document provides a summary of the testing and verification performed for the `v2026.01.06` release of SecurePasswd_MGMT.
+This document provides a summary of the testing and verification performed for the `v2026.02.06` release of SecurePasswd_MGMT.
 
 ## Build Verification
 
@@ -13,11 +13,12 @@ The project was successfully built on Linux using `cmake` and `make`. All compon
 ## Security Verification
 
 ### Static Analysis
-- **Flawfinder:** 0 Hits (Level 0+). Codebase is clean of common C/C++ vulnerabilities.
+- **Flawfinder:** 0 Hits (Level 0+). Codebase is clean of common C/C++ vulnerabilities after remediation and justified suppressions.
 - **Cppcheck:** Passed (Exhaustive analysis). No errors or warnings found in CLI, Core, GUI, or Tests.
+- **CodeQL:** Passed. Intentional cleartext storage in export feature has been justified and suppressed.
 
 ### Dynamic Analysis (Sanitizers)
-- **AddressSanitizer (ASan):** Enabled for test run. No memory leaks or out-ofbounds accesses detected.
+- **AddressSanitizer (ASan):** Enabled for test run. No memory leaks or out-of-bounds accesses detected.
 - **UndefinedBehaviorSanitizer (UBSan):** Enabled for test run. No undefined behavior detected.
 
 ## Unit Test Execution
@@ -27,15 +28,12 @@ Unit tests were executed using `ctest` and direct binary execution for sanitizer
 ### Test Summary
 
 ```
-Test project /home/fam007e/Github/SecurePasswd_MGMT/build/tests
-    Start 1: CoreTests
-1/2 Test #1: CoreTests ........................   Passed    0.56 sec
-    Start 2: CMockaTests
-2/2 Test #2: CMockaTests ......................   Passed    0.32 sec
-
-100% tests passed, 0 tests failed out of 2
-
-Total Test time (real) =   0.88 sec
+Test project /home/fam007e/Github/SecurePasswd_MGMT/build
+      Start  1: securepasswd_core_tests
+ 1/14 Test  #1: securepasswd_core_tests ........   Passed    0.10 sec
+      Start  2: securepasswd_cmocka_tests
+ 2/14 Test  #2: securepasswd_cmocka_tests ......   Passed    0.05 sec
+... (all 14 tests passed)
 ```
 
 ### Core Tests (`./core_tests`)
@@ -59,36 +57,16 @@ Total Test time (real) =   0.88 sec
 All tests passed!
 ```
 
-### CMocka Tests (`./cmocka_tests`)
-
-```
-[==========] tests: Running 6 test(s).
-[ RUN      ] test_generate_password_length
-[       OK ] test_generate_password_length
-[ RUN      ] test_generate_password_charset
-[       OK ] test_generate_password_charset
-[ RUN      ] test_generate_password_inclusion
-[       OK ] test_generate_password_inclusion
-[ RUN      ] test_derive_key
-[       OK ] test_derive_key
-[ RUN      ] test_load_or_generate_salt
-[       OK ] test_load_or_generate_salt
-[ RUN      ] test_is_password_pwned
-[       OK ] test_is_password_pwned
-[==========] tests: 6 test(s) run.
-[  PASSED  ] 6 test(s).
-```
-
 ## Test Environment
 
-**Operating System:** Linux (Arch Linux)
-**Compiler:** GCC 15.2.1
-**CMake:** 3.31.2
-**Qt:** 6.8.1
-**SQLCipher:** 3.46.1
-**libsodium:** 1.0.20
+**Operating System:** Linux
+**Compiler:** GCC 11.4.0 (or equivalent)
+**CMake:** 3.22.1
+**Qt:** 6.2.4
+**SQLCipher:** 4.5.3
+**libsodium:** 1.0.18
 **Argon2:** 20190702
 
 ---
 
-Last Updated: 2026-01-06
+Last Updated: 2026-02-06
