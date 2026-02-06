@@ -113,7 +113,7 @@ var NAVTREE =
         [ "Fixed", "md_CHANGELOG.html#autotoc_md70", null ],
         [ "Added", "md_CHANGELOG.html#autotoc_md71", null ]
       ] ],
-      [ "[2026.02.06]", "md_CHANGELOG.html#autotoc_md72", [
+      [ "[2026.02.07]", "md_CHANGELOG.html#autotoc_md72", [
         [ "Security", "md_CHANGELOG.html#autotoc_md73", null ],
         [ "Fixed", "md_CHANGELOG.html#autotoc_md74", null ]
       ] ],

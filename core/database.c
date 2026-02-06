@@ -30,7 +30,7 @@ int database_open(const char *db_path, const char *password) {
     uint8_t key[KEY_LEN];
 
     // Construct salt path
-    char salt_path[4100]; // flawfinder: ignore
+    char salt_path[4128]; // flawfinder: ignore
     snprintf(salt_path, sizeof(salt_path), "%s.salt", db_path); // flawfinder: ignore
 
     // Load or generate salt
@@ -337,8 +337,8 @@ int database_rekey(const char *new_password) {
     sodium_memzero(new_key, KEY_LEN);
 
     // SQLCipher rekey succeeded, now update the salt file
-    char salt_path[4100]; // flawfinder: ignore
-    char salt_path_new[4100]; // flawfinder: ignore
+    char salt_path[4128]; // flawfinder: ignore
+    char salt_path_new[4128]; // flawfinder: ignore
     snprintf(salt_path, sizeof(salt_path), "%s.salt", current_db_path); // flawfinder: ignore
     snprintf(salt_path_new, sizeof(salt_path_new), "%s.salt.new", current_db_path); // flawfinder: ignore
 

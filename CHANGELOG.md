@@ -40,7 +40,7 @@ and this project adheres to date-based versioning (YYYY.MM.DD).
 - **Smart Path Derivation:** Implemented automatic include path derivation from library file paths as a fallback for manual build environments.
 - **Improved Build Diagnostics:** Added status messaging during the CMake configuration phase to help debug dependency resolution.
 
-## [2026.02.06]
+## [2026.02.07]
 
 ### Security
 - **Fetch on Demand:** Implemented a more secure data fetching model where sensitive fields (passwords, TOTP secrets, recovery codes) are only retrieved from the database when explicitly viewing or exporting an entry. This prevents secrets from lingering in memory during general navigation and list operations.
