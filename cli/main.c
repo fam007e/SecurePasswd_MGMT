@@ -167,7 +167,7 @@ static void hide_sensitive_output(int lines_to_clear) {
 
     // Use ANSI escape sequences to go up and clear lines
     for (int i = 0; i < lines_to_clear + 2; i++) {
-        printf("\033[A\033[2K"); // Move up one line and clear it // flawfinder: ignore
+        printf("\033[A\033[2K"); // flawfinder: ignore
     }
     printf("\rSensitive data hidden.\n"); // flawfinder: ignore
     fflush(stdout);
