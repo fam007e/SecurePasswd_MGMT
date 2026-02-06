@@ -42,6 +42,7 @@ private slots:
     void onToggleTheme();
     void onToggleRecoveryCodes();
     void onMarkAsUsed();
+    void onChangePassword();
 
 private:
     void setupUI();
@@ -66,6 +67,7 @@ private:
     QAction *healthCheckAction;
     QAction *themeAction;
     QAction *toggleRecoveryCodesAction;
+    QAction *changePasswordAction;
     QString currentTheme;
 
     // TOTP Display

@@ -14,12 +14,17 @@
 #include <stdbool.h>
 
 static sqlite3 *db = NULL;
+static char current_db_path[4096] = {0}; // flawfinder: ignore
 
 // Forward declaration for internal function
 static int initialize_schema();
 
 
 int database_open(const char *db_path, const char *password) {
+    if (!db_path) {
+        return -1;
+    }
+    strncpy(current_db_path, db_path, sizeof(current_db_path) - 1); // flawfinder: ignore
 
     uint8_t salt[SALT_LEN];
     uint8_t key[KEY_LEN];
@@ -102,8 +107,9 @@ PasswordEntry* database_get_all_entries(int *count) {
         return NULL;
     }
 
-    // Then, get all the data
-    if (sqlite3_prepare_v2(db, "SELECT id, service, username, password, totp_secret, recovery_codes FROM passwords", -1, &stmt, NULL) != SQLITE_OK) {
+    // Then, get ONLY metadata (id, service, username)
+    // Sensitive fields (password, totp, recovery) are intentionally NOT retrieved here.
+    if (sqlite3_prepare_v2(db, "SELECT id, service, username FROM passwords", -1, &stmt, NULL) != SQLITE_OK) {
         fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db)); // flawfinder: ignore
         free(entries);
         return NULL;
@@ -114,20 +120,60 @@ PasswordEntry* database_get_all_entries(int *count) {
         entries[i].id = sqlite3_column_int(stmt, 0);
         const unsigned char *service = sqlite3_column_text(stmt, 1);
         const unsigned char *username = sqlite3_column_text(stmt, 2);
-        const unsigned char *password = sqlite3_column_text(stmt, 3);
-        const unsigned char *totp_secret = sqlite3_column_text(stmt, 4);
-        const unsigned char *recovery_codes = sqlite3_column_text(stmt, 5);
 
         entries[i].service = service ? strdup((const char *)service) : strdup("");
         entries[i].username = username ? strdup((const char *)username) : strdup("");
-        entries[i].password = password ? strdup((const char *)password) : strdup("");
-        entries[i].totp_secret = totp_secret ? strdup((const char *)totp_secret) : strdup("");
-        entries[i].recovery_codes = recovery_codes ? strdup((const char *)recovery_codes) : strdup("");
+
+        // Initialize sensitive fields to NULL/Empty since we didn't fetch them
+        entries[i].password = NULL;
+        entries[i].totp_secret = NULL;
+        entries[i].recovery_codes = NULL;
         i++;
     }
 
     sqlite3_finalize(stmt);
     return entries;
+}
+
+PasswordEntry* database_get_entry_secure(int id) {
+    if (!db) return NULL;
+
+    sqlite3_stmt *stmt;
+    const char *sql = "SELECT id, service, username, password, totp_secret, recovery_codes FROM passwords WHERE id = ?";
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db));
+        return NULL;
+    }
+
+    sqlite3_bind_int(stmt, 1, id);
+
+    if (sqlite3_step(stmt) != SQLITE_ROW) {
+        sqlite3_finalize(stmt);
+        return NULL; // Not found
+    }
+
+    PasswordEntry *entry = malloc(sizeof(PasswordEntry));
+    if (!entry) {
+        sqlite3_finalize(stmt);
+        return NULL;
+    }
+
+    entry->id = sqlite3_column_int(stmt, 0);
+    const unsigned char *service = sqlite3_column_text(stmt, 1);
+    const unsigned char *username = sqlite3_column_text(stmt, 2);
+    const unsigned char *password = sqlite3_column_text(stmt, 3);
+    const unsigned char *totp_secret = sqlite3_column_text(stmt, 4);
+    const unsigned char *recovery_codes = sqlite3_column_text(stmt, 5);
+
+    entry->service = service ? strdup((const char *)service) : strdup("");
+    entry->username = username ? strdup((const char *)username) : strdup("");
+    entry->password = password ? strdup((const char *)password) : strdup("");
+    entry->totp_secret = totp_secret ? strdup((const char *)totp_secret) : strdup("");
+    entry->recovery_codes = recovery_codes ? strdup((const char *)recovery_codes) : strdup("");
+
+    sqlite3_finalize(stmt);
+    return entry;
 }
 
 int database_add_entry(const PasswordEntry *entry) {
@@ -259,6 +305,56 @@ static int initialize_schema() {
             fprintf(stderr, "Migration error adding recovery_codes: %s\n", err_msg); // flawfinder: ignore
             sqlite3_free(err_msg);
         }
+    }
+
+    return 0;
+}
+
+int database_rekey(const char *new_password) {
+    if (!db || current_db_path[0] == '\0') {
+        return -1;
+    }
+
+    uint8_t new_salt[SALT_LEN];
+    uint8_t new_key[KEY_LEN];
+
+    // Generate new salt
+    if (sodium_init() < 0) return -1;
+    randombytes_buf(new_salt, SALT_LEN);
+
+    // Derive new key
+    if (derive_key(new_password, new_salt, new_key) != 0) {
+        return -1;
+    }
+
+    // Attempt SQLCipher rekey
+    if (sqlite3_rekey(db, new_key, KEY_LEN) != SQLITE_OK) {
+        fprintf(stderr, "Failed to rekey database: %s\n", sqlite3_errmsg(db));
+        sodium_memzero(new_key, KEY_LEN);
+        return -1;
+    }
+
+    sodium_memzero(new_key, KEY_LEN);
+
+    // SQLCipher rekey succeeded, now update the salt file
+    char salt_path[4100]; // flawfinder: ignore
+    char salt_path_new[4100]; // flawfinder: ignore
+    snprintf(salt_path, sizeof(salt_path), "%s.salt", current_db_path); // flawfinder: ignore
+    snprintf(salt_path_new, sizeof(salt_path_new), "%s.salt.new", current_db_path); // flawfinder: ignore
+
+    // Atomic-ish swap: write to .new then rename
+    if (save_salt(salt_path_new, new_salt) != 0) {
+        fprintf(stderr, "Failed to save new salt to %s\n", salt_path_new);
+        return -1;
+    }
+
+#ifdef _WIN32
+    if (!MoveFileExA(salt_path_new, salt_path, MOVEFILE_REPLACE_EXISTING)) {
+#else
+    if (rename(salt_path_new, salt_path) != 0) {
+#endif
+        fprintf(stderr, "Failed to rename new salt file.\n");
+        return -1;
     }
 
     return 0;

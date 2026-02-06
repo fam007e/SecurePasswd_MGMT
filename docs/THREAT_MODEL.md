@@ -47,6 +47,7 @@ STRIDE is a threat modeling methodology that helps to identify and categorize th
 - **Encryption at Rest:** The entire database is encrypted at rest using AES-256. The encryption key is derived from the user's master password using Argon2id, a strong and slow key derivation function.
 - **Master Password Not Stored:** The master password is never stored on disk.
 - **Secure Memory Handling:** The derived encryption key is cleared from memory after use with the `sodium_memzero()` function to prevent it from being exposed in a memory dump.
+- **Fetch on Demand:** Sensitive fields (passwords, TOTP secrets, recovery codes) are only fetched from the database when specifically requested for viewing or exporting. This minimizes the risk of secrets lingering in memory during general application use.
 - **Restrictive File Permissions:** The application data directory is created with restrictive permissions (`0700` on Unix-like systems) to prevent other users on the system from accessing the database file.
 
 ---

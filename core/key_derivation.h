@@ -29,6 +29,15 @@ int derive_key(const char *password, const uint8_t *salt, uint8_t *key);
  */
 int load_or_generate_salt(const char *path, uint8_t *salt);
 
+/**
+ * @brief Saves the salt to the specified path.
+ *
+ * @param path The path to the salt file.
+ * @param salt The salt to save. Must be SALT_LEN bytes.
+ * @return 0 on success, -1 on error.
+ */
+int save_salt(const char *path, const uint8_t *salt);
+
 #ifdef __cplusplus
 }
 #endif

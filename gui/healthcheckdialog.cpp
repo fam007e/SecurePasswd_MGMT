@@ -9,6 +9,7 @@
 
 extern "C" {
 #include "pwned_check.h"
+#include "database.h"
 }
 
 HealthCheckDialog::HealthCheckDialog(const QVector<GUIPasswordEntry> &entries, QWidget *parent)
@@ -43,41 +44,46 @@ HealthCheckDialog::HealthCheckDialog(const QVector<GUIPasswordEntry> &entries, Q
 
 void HealthCheckDialog::runLocalChecks()
 {
-    // Check for reused passwords
+    // Check for reused passwords, short passwords, and low entropy
     QMap<QString, QStringList> passwordMap;
     for (const auto &entry : m_entries) {
-        if (!entry.password.isEmpty()) {
-            passwordMap[entry.password].append(entry.service);
+        PasswordEntry *db_entry = database_get_entry_secure(entry.id);
+        if (db_entry) {
+            QString password = QString::fromUtf8(db_entry->password);
+            if (!password.isEmpty()) {
+                // Reuse check
+                passwordMap[password].append(entry.service);
+
+                // Length check
+                if (password.length() < 16) {
+                    addIssue("Short Passwords", entry.service, QString("Password is only %1 characters (recommended: 16+ for high security).").arg(password.length()));
+                }
+
+                // Entropy check
+                bool hasUpper = false, hasLower = false, hasNumber = false, hasSpecial = false;
+                for (const QChar &ch : password) {
+                    if (ch.isUpper()) hasUpper = true;
+                    else if (ch.isLower()) hasLower = true;
+                    else if (ch.isDigit()) hasNumber = true;
+                    else if (!ch.isLetterOrNumber()) hasSpecial = true;
+                }
+
+                if (!hasUpper || !hasLower || !hasNumber || !hasSpecial) {
+                    QStringList missing;
+                    if (!hasUpper) missing << "uppercase";
+                    if (!hasLower) missing << "lowercase";
+                    if (!hasNumber) missing << "numbers";
+                    if (!hasSpecial) missing << "symbols";
+                    addIssue("Low Entropy", entry.service, QString("Missing: %1").arg(missing.join(", ")));
+                }
+            }
+            free_password_entries(db_entry, 1);
         }
     }
+
     for (auto it = passwordMap.constBegin(); it != passwordMap.constEnd(); ++it) {
         if (it.value().size() > 1) {
             addIssue("Reused Passwords", it.value().join(", "), QString("Password is used for %1 services").arg(it.value().size()));
-        }
-    }
-
-    // Check for weak passwords (less than 16 characters for high security)
-    for (const auto &entry : m_entries) {
-        const QString &password = entry.password;
-        if (password.length() > 0 && password.length() < 16) {
-            addIssue("Short Passwords", entry.service, QString("Password is only %1 characters (recommended: 16+ for high security).").arg(password.length()));
-        }
-
-        bool hasUpper = false, hasLower = false, hasNumber = false, hasSpecial = false;
-        for (const QChar &ch : password) {
-            if (ch.isUpper()) hasUpper = true;
-            else if (ch.isLower()) hasLower = true;
-            else if (ch.isDigit()) hasNumber = true;
-            else if (!ch.isLetterOrNumber()) hasSpecial = true;
-        }
-
-        if (password.length() > 0 && (!hasUpper || !hasLower || !hasNumber || !hasSpecial)) {
-            QStringList missing;
-            if (!hasUpper) missing << "uppercase";
-            if (!hasLower) missing << "lowercase";
-            if (!hasNumber) missing << "numbers";
-            if (!hasSpecial) missing << "symbols";
-            addIssue("Low Entropy", entry.service, QString("Missing: %1").arg(missing.join(", ")));
         }
     }
     treeWidget->expandAll();
@@ -87,16 +93,24 @@ void HealthCheckDialog::startHibpChecks() {
     // Copy entries to pass to the thread
     QVector<GUIPasswordEntry> entriesCopy = m_entries;
 
+    // Use a copy of the database context or ensure thread-safe access
+    // Note: SQLCipher/SQLite is usually built with threadsafe=1
     QFuture<void> future = QtConcurrent::run([entriesCopy, this]() {
         for (const auto &entry : entriesCopy) {
             if (m_hibpWatcher.isCanceled()) break;
-            if (entry.password.isEmpty()) continue;
 
-            int pwnCount = is_password_pwned(entry.password.toUtf8().constData());
-            if (pwnCount > 0) {
-                PwnedResult result = {entry.service, pwnCount};
-                // This is thread-safe because handlePwnedResult is invoked via a queued connection
-                QMetaObject::invokeMethod(this, "handlePwnedResult", Qt::QueuedConnection, Q_ARG(PwnedResult, result));
+            PasswordEntry *db_entry = database_get_entry_secure(entry.id);
+            if (db_entry) {
+                const char* password = db_entry->password;
+                if (password && password[0] != '\0') {
+                    int pwnCount = is_password_pwned(password);
+                    if (pwnCount > 0) {
+                        PwnedResult result = {entry.service, pwnCount};
+                        // This is thread-safe because handlePwnedResult is invoked via a queued connection
+                        QMetaObject::invokeMethod(this, "handlePwnedResult", Qt::QueuedConnection, Q_ARG(PwnedResult, result));
+                    }
+                }
+                free_password_entries(db_entry, 1);
             }
         }
     });

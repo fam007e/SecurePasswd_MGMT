@@ -7,9 +7,8 @@ struct GUIPasswordEntry {
     int id;
     QString service;
     QString username;
-    QString password;
-    QString totpSecret;
-    QString recoveryCodes;
+    // Sensitive fields (password, totpSecret, recoveryCodes)
+    // are now fetched on-demand from the database to improve memory security.
 };
 
 #endif // GUIPASSWORDENTRY_H

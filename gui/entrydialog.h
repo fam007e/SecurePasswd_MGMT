@@ -25,7 +25,9 @@ public:
     QString getTotpSecret() const;
     QString getRecoveryCodes() const;
 
-    void setData(const GUIPasswordEntry &entry);
+    void setData(int id, const QString &service, const QString &username,
+                 const QString &password, const QString &totpSecret,
+                 const QString &recoveryCodes);
 
 private slots:
     void onGenerateClicked();

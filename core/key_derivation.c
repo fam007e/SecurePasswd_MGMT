@@ -46,3 +46,16 @@ int load_or_generate_salt(const char *path, uint8_t *salt) {
         return 0;
     }
 }
+
+int save_salt(const char *path, const uint8_t *salt) {
+    FILE *f = fopen(path, "wb"); // flawfinder: ignore
+    if (!f) {
+        return -1;
+    }
+    size_t n = fwrite(salt, 1, SALT_LEN, f);
+    fclose(f);
+    if (n != SALT_LEN) {
+        return -1;
+    }
+    return 0;
+}

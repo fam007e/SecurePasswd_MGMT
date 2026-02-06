@@ -118,11 +118,14 @@ QString EntryDialog::getRecoveryCodes() const
     return recoveryCodesEdit->toPlainText();
 }
 
-void EntryDialog::setData(const GUIPasswordEntry &entry)
+void EntryDialog::setData(int id, const QString &service, const QString &username,
+                          const QString &password, const QString &totpSecret,
+                          const QString &recoveryCodes)
 {
-    serviceEdit->setText(entry.service);
-    usernameEdit->setText(entry.username);
-    passwordEdit->setText(entry.password);
-    totpSecretEdit->setText(entry.totpSecret);
-    recoveryCodesEdit->setPlainText(entry.recoveryCodes);
+    Q_UNUSED(id); // ID is not edited in the dialog
+    serviceEdit->setText(service);
+    usernameEdit->setText(username);
+    passwordEdit->setText(password);
+    totpSecretEdit->setText(totpSecret);
+    recoveryCodesEdit->setPlainText(recoveryCodes);
 }

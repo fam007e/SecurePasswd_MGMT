@@ -144,6 +144,7 @@ static void cli_export_csv(const char* filepath); // flawfinder: ignore
 static void print_help();
 
 static void cli_health_check();
+static void cli_change_password();
 
 #include "pwned_check.h"
 #include "platform_paths.h"
@@ -156,6 +157,20 @@ static void read_line(char *buf, int size) {
         return;
     }
     buf[strcspn(buf, "\r\n")] = 0; // Remove trailing newline
+}
+
+// Helper for scrollback mitigation: hides sensitive output after user acknowledgement
+static void hide_sensitive_output(int lines_to_clear) {
+    printf("\nPress Enter to hide sensitive data...");
+    fflush(stdout);
+    while (getchar() != '\n'); // flawfinder: ignore
+
+    // Use ANSI escape sequences to go up and clear lines
+    for (int i = 0; i < lines_to_clear + 2; i++) {
+        printf("\033[A\033[2K"); // Move up one line and clear it
+    }
+    printf("\rSensitive data hidden.\n");
+    fflush(stdout);
 }
 
 // --- CLI Implementation ---
@@ -226,24 +241,13 @@ static void cli_view_entry() {
     if (scanf("%d", &id) != 1) { id = -1; } // flawfinder: ignore
     while(getchar() != '\n'); // flawfinder: ignore (Empty loop)
 
-    // This is inefficient, but we'll add a get_by_id function later if needed.
-    int count = 0;
-    PasswordEntry *entries = database_get_all_entries(&count);
-    if (!entries) {
+    PasswordEntry *target = database_get_entry_secure(id);
+    if (!target) {
         fprintf(stderr, "Could not find entry with ID %d\n", id); // flawfinder: ignore
         return;
     }
 
-    PasswordEntry *target = NULL;
-    for(int i=0; i<count; ++i) {
-        if(entries[i].id == id) {
-            target = &entries[i];
-            break;
-        }
-    }
-
-    if (target) {
-        printf("\n--- Entry %d ---\n", target->id); // flawfinder: ignore
+    printf("\n--- Entry %d ---\n", target->id); // flawfinder: ignore
         printf("Service:  %s\n", target->service ? target->service : ""); // flawfinder: ignore
         printf("Username: %s\n", target->username ? target->username : ""); // flawfinder: ignore
         printf("Password: %s\n", target->password ? target->password : ""); // flawfinder: ignore
@@ -254,11 +258,11 @@ static void cli_view_entry() {
         } else {
             fputs("TOTP:     (none)\n", stdout);
         }
+        int line_count = 0;
         if (target->recovery_codes && strlen(target->recovery_codes) > 0) { // flawfinder: ignore
             printf("%s", "Recovery Codes:\n"); // flawfinder: ignore
             char *codes_copy = strdup(target->recovery_codes);
             char *line = strtok(codes_copy, "\n");
-            int line_count = 0;
             char *lines[100]; // flawfinder: ignore
             while (line && line_count < 100) { // flawfinder: ignore
                 lines[line_count++] = line;
@@ -327,11 +331,14 @@ static void cli_view_entry() {
             printf("%s", "Recovery Codes: (none)\n"); // flawfinder: ignore
         }
         printf("%s", "----------------\n"); // flawfinder: ignore
-    } else {
-        fprintf(stderr, "Could not find entry with ID %d\n", id); // flawfinder: ignore
-    }
 
-    free_password_entries(entries, count);
+        // Mitigation for terminal scrollback: prompt to hide the password/secret
+        // We clear the output we just printed.
+        // Header(1)+Service(1)+User(1)+Pass(1)+TOTP(1)+RecoveryTitle(1)+line_count+Sep(1) = 7 + line_count
+        // If we prompt for recovery code: +2 lines (prompt + used message)
+        hide_sensitive_output(10 + line_count);
+
+    free_password_entries(target, 1);
 }
 
 static void cli_delete_entry() {
@@ -350,7 +357,7 @@ static void cli_delete_entry() {
 static void interactive_mode() {
     char choice;
     while (true) {
-        printf("%s", "\n[l]ist, [a]dd, [v]iew, [e]dit, [d]elete, [g]enerate, [h]ealth-check, [i]mport, e[x]port, [q]uit\n"); // flawfinder: ignore
+        printf("%s", "\n[l]ist, [a]dd, [v]iew, [e]dit, [d]elete, [g]enerate, [h]ealth-check, [c]hange-pass, [i]mport, e[x]port, [q]uit\n"); // flawfinder: ignore
         printf("%s", "> "); // flawfinder: ignore
         if (scanf(" %c", &choice) != 1) { choice = 0; } // flawfinder: ignore
         while(getchar() != '\n'); // flawfinder: ignore
@@ -360,6 +367,7 @@ static void interactive_mode() {
             case 'a': cli_add_entry(); break;
             case 'v': cli_view_entry(); break;
             case 'd': cli_delete_entry(); break;
+            case 'c': cli_change_password(); break;
             case 'g': {
                 char* pw = generate_password(16, true, true, true);
                 printf("Generated password: %s\n", pw); // flawfinder: ignore
@@ -613,8 +621,27 @@ static void cli_export_csv(const char* filepath) {
 
     fprintf(fp, "%s", "service,username,password,totp_secret,recovery_codes\n"); // flawfinder: ignore
     for (int i = 0; i < count; i++) {
-        fprintf(fp, "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", // flawfinder: ignore
-                entries[i].service, entries[i].username, entries[i].password, entries[i].totp_secret, entries[i].recovery_codes);
+        PasswordEntry *full = database_get_entry_secure(entries[i].id);
+        if (full) {
+            // Basic sanitization for CSV Injection
+            const char *s = full->service;
+            const char *u = full->username;
+            const char *p = full->password;
+            const char *ts = full->totp_secret;
+            const char *rc = full->recovery_codes;
+
+            // Simple sanitization lambda-like logic for C
+#define SANITIZE(field) ((field && (field[0] == '=' || field[0] == '+' || field[0] == '-' || field[0] == '@')) ? "'" : "")
+
+            fprintf(fp, "\"%s%s\",\"%s%s\",\"%s%s\",\"%s%s\",\"%s%s\"\n", // flawfinder: ignore
+                    SANITIZE(s), s ? s : "",
+                    SANITIZE(u), u ? u : "",
+                    SANITIZE(p), p ? p : "",
+                    SANITIZE(ts), ts ? ts : "",
+                    SANITIZE(rc), rc ? rc : "");
+
+            free_password_entries(full, 1);
+        }
     }
 
     fclose(fp);
@@ -631,14 +658,36 @@ static void cli_health_check() {
         return;
     }
 
+    // Load all full entries into memory for health check
+    PasswordEntry *full_entries = malloc(count * sizeof(PasswordEntry));
+    if (!full_entries) {
+        free_password_entries(entries, count);
+        return;
+    }
+    for (int i = 0; i < count; i++) {
+        PasswordEntry *e = database_get_entry_secure(entries[i].id);
+        if (e) {
+            full_entries[i] = *e;
+            free(e); // Free the container but keep the strings
+        } else {
+            // Fill with metadata if secure fetch fails
+            full_entries[i].id = entries[i].id;
+            full_entries[i].service = strdup(entries[i].service);
+            full_entries[i].username = strdup(entries[i].username);
+            full_entries[i].password = strdup("");
+            full_entries[i].totp_secret = strdup("");
+            full_entries[i].recovery_codes = strdup("");
+        }
+    }
+
     // Check for short passwords (less than 16 characters for high security)
     printf("\n--- Short Passwords (less than 16 characters) ---\n"); // flawfinder: ignore
     bool short_found = false;
     for (int i = 0; i < count; i++) {
-        size_t len = strlen(entries[i].password); // flawfinder: ignore
+        size_t len = strlen(full_entries[i].password); // flawfinder: ignore
         if (len < 16) {
             printf("  [ID %d] %s - %s: Password is only %zu characters (recommended: 16+)\n", // flawfinder: ignore
-                   entries[i].id, entries[i].service, entries[i].username, len);
+                   full_entries[i].id, full_entries[i].service, full_entries[i].username, len);
             short_found = true;
         }
     }
@@ -650,7 +699,7 @@ static void cli_health_check() {
     printf("\n--- Low Entropy Passwords (missing character types) ---\n"); // flawfinder: ignore
     bool low_entropy_found = false;
     for (int i = 0; i < count; i++) {
-        const char *pwd = entries[i].password;
+        const char *pwd = full_entries[i].password;
         bool has_upper = false, has_lower = false, has_digit = false, has_special = false;
 
         size_t pwd_len = strlen(pwd); // flawfinder: ignore
@@ -662,7 +711,7 @@ static void cli_health_check() {
         }
 
         if (!has_upper || !has_lower || !has_digit || !has_special) {
-            printf("  [ID %d] %s - %s: Missing ", entries[i].id, entries[i].service, entries[i].username); // flawfinder: ignore
+            printf("  [ID %d] %s - %s: Missing ", full_entries[i].id, full_entries[i].service, full_entries[i].username); // flawfinder: ignore
             bool first = true;
             if (!has_upper) { printf("uppercase"); first = false; } // flawfinder: ignore
             if (!has_lower) { printf("%slowercase", first ? "" : ", "); first = false; } // flawfinder: ignore
@@ -684,11 +733,11 @@ static void cli_health_check() {
         int reused_ids[256];  // Store IDs of entries with same password
 
         for (int j = 0; j < count; j++) {
-            if (i != j && strcmp(entries[i].password, entries[j].password) == 0) {
+            if (i != j && strcmp(full_entries[i].password, full_entries[j].password) == 0) {
                 if (reuse_count == 0) {
-                    reused_ids[reuse_count++] = entries[i].id;
+                    reused_ids[reuse_count++] = full_entries[i].id;
                 }
-                reused_ids[reuse_count++] = entries[j].id;
+                reused_ids[reuse_count++] = full_entries[j].id;
             }
         }
 
@@ -696,7 +745,7 @@ static void cli_health_check() {
             // Only print once per unique password (check if this is the first occurrence)
             bool is_first = true;
             for (int k = 0; k < i; k++) {
-                if (strcmp(entries[i].password, entries[k].password) == 0) {
+                if (strcmp(full_entries[i].password, full_entries[k].password) == 0) {
                     is_first = false;
                     break;
                 }
@@ -706,8 +755,8 @@ static void cli_health_check() {
                 printf("  Password reused across %d services: ", reuse_count); // flawfinder: ignore
                 for (int k = 0; k < reuse_count; k++) {
                     for (int m = 0; m < count; m++) {
-                        if (entries[m].id == reused_ids[k]) {
-                            printf("[ID %d] %s", reused_ids[k], entries[m].service); // flawfinder: ignore
+                        if (full_entries[m].id == reused_ids[k]) {
+                            printf("[ID %d] %s", reused_ids[k], full_entries[m].service); // flawfinder: ignore
                             if (k < reuse_count - 1) printf(", "); // flawfinder: ignore
                             break;
                         }
@@ -725,11 +774,11 @@ static void cli_health_check() {
     printf("\n--- Pwned Passwords (checking via HIBP API) ---\n"); // flawfinder: ignore
     bool pwned_found = false;
     for (int i = 0; i < count; i++) {
-        printf("Checking password for ID %d... \r", entries[i].id); // flawfinder: ignore
+        printf("Checking password for ID %d... \r", full_entries[i].id); // flawfinder: ignore
         fflush(stdout);
-        int pwned_count = is_password_pwned(entries[i].password);
+        int pwned_count = is_password_pwned(full_entries[i].password);
         if (pwned_count > 0) {
-            printf("\n  [ID %d] %s - %s: Found in %d breaches!\n", entries[i].id, entries[i].service, entries[i].username, pwned_count); // flawfinder: ignore
+            printf("\n  [ID %d] %s - %s: Found in %d breaches!\n", full_entries[i].id, full_entries[i].service, full_entries[i].username, pwned_count); // flawfinder: ignore
             pwned_found = true;
         }
     }
@@ -738,8 +787,50 @@ static void cli_health_check() {
         printf("%s", "No pwned passwords found.\n"); // flawfinder: ignore
     }
 
+    // Securely wipe and free all full entries
+    for (int i = 0; i < count; i++) {
+        if (full_entries[i].password) sodium_memzero(full_entries[i].password, strlen(full_entries[i].password)); // flawfinder: ignore
+        if (full_entries[i].totp_secret) sodium_memzero(full_entries[i].totp_secret, strlen(full_entries[i].totp_secret)); // flawfinder: ignore
+        if (full_entries[i].recovery_codes) sodium_memzero(full_entries[i].recovery_codes, strlen(full_entries[i].recovery_codes)); // flawfinder: ignore
+    }
+    free_password_entries(full_entries, count);
     free_password_entries(entries, count);
+
     printf("\nHealth check complete.\n"); // flawfinder: ignore
+
+    // Mitigation for terminal scrollback: clear the health check findings as they contain results of analysis
+    // Estimate lines: (Short+Entropy+Reused+Pwned Title) + findings per check.
+    // We'll use a safer fixed amount or clear enough.
+    hide_sensitive_output(30 + (count * 2));
+}
+
+static void cli_change_password() {
+    printf("\n--- Change Master Password ---\n");
+    printf("Please note: Your database will be re-encrypted and a new salt will be generated.\n");
+
+    const char *p1 = secure_getpass("New master password: ");
+    if (!p1 || strlen(p1) == 0) { // flawfinder: ignore
+        printf("Password cannot be empty.\n");
+        return;
+    }
+    char pass1[256]; // flawfinder: ignore
+    strncpy(pass1, p1, sizeof(pass1)-1); // flawfinder: ignore
+    pass1[sizeof(pass1)-1] = '\0';
+
+    const char *p2 = secure_getpass("Confirm new master password: ");
+    if (!p2 || strcmp(pass1, p2) != 0) {
+        printf("Passwords do not match.\n");
+        sodium_memzero(pass1, sizeof(pass1));
+        return;
+    }
+
+    if (database_rekey(pass1) == 0) {
+        printf("Master password changed successfully.\n");
+    } else {
+        fprintf(stderr, "Error: Failed to change master password.\n");
+    }
+
+    sodium_memzero(pass1, sizeof(pass1));
 }
 
 static void print_help() {
