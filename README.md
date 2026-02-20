@@ -1,14 +1,13 @@
 # SecurePasswd_MGMT
 
-<p align="center">
+<div align="center">
   <img src="gui/icons/app_icon.svg" alt="SecurePasswd_MGMT icon" width="128"/><br/>
-  <a href="https://github.com/fam007e/SecurePasswd_MGMT/actions/workflows/ci.yml">
-    <img src="https://github.com/fam007e/SecurePasswd_MGMT/actions/workflows/ci.yml/badge.svg" alt="Build Status"/>
-  </a>
-  <a href="https://aur.archlinux.org/packages/securepasswd_mgmt">
-    <img src="https://img.shields.io/aur/version/securepasswd_mgmt" alt="AUR Version"/>
-  </a>
-</p>
+
+[![Build Status](https://github.com/fam007e/SecurePasswd_MGMT/actions/workflows/ci.yml/badge.svg)](https://github.com/fam007e/SecurePasswd_MGMT/actions/workflows/ci.yml)
+[![AUR Version](https://img.shields.io/aur/version/securepasswd_mgmt)](https://aur.archlinux.org/packages/securepasswd_mgmt)
+[![Packaging status](https://repology.org/badge/vertical-allrepos/securepasswd_mgmt.svg)](https://repology.org/project/securepasswd_mgmt/versions)
+
+</div>
 
 **SecurePasswd_MGMT** is a modern, cross-platform password manager and two-factor authenticator (TOTP) designed with state-of-the-art security. It provides a secure solution for managing passwords and 2FA tokens locally, with both a fast command-line interface (CLI) and a user-friendly graphical user interface (GUI).
 
