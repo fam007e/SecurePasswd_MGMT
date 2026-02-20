@@ -5,7 +5,6 @@
 
 [![Build Status](https://github.com/fam007e/SecurePasswd_MGMT/actions/workflows/ci.yml/badge.svg)](https://github.com/fam007e/SecurePasswd_MGMT/actions/workflows/ci.yml)
 [![AUR Version](https://img.shields.io/aur/version/securepasswd_mgmt)](https://aur.archlinux.org/packages/securepasswd_mgmt)
-[![Packaging status](https://repology.org/badge/vertical-allrepos/securepasswd_mgmt.svg)](https://repology.org/project/securepasswd_mgmt/versions)
 
 </div>
 
