@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2026.02.07</span>
+   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2026.03.14</span>
    </div>
    <div id="projectbrief">A modern, cross-platform password manager and two-factor authenticator (TOTP) designed with state-of-the-art security.</div>
   </td>
@@ -73,34 +73,34 @@ $(function() {
   <div class="headertitle"><div class="title">Testing and Verification Summary</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md89"></a> </p>
-<h1><a class="anchor" id="autotoc_md90"></a>
+<div class="textblock"><p><a class="anchor" id="autotoc_md94"></a> </p>
+<h1><a class="anchor" id="autotoc_md95"></a>
 Overview</h1>
 <p>This document provides a summary of the testing and verification performed for the <code>v2026.02.07</code> release of SecurePasswd_MGMT.</p>
-<h1><a class="anchor" id="autotoc_md91"></a>
+<h1><a class="anchor" id="autotoc_md96"></a>
 Build Verification</h1>
-<h2><a class="anchor" id="autotoc_md92"></a>
+<h2><a class="anchor" id="autotoc_md97"></a>
 Build Status: ✓ PASS</h2>
 <p>The project was successfully built on Linux using <code>cmake</code> and <code>make</code>. All components, including libraries, CLI, GUI, and tests, compiled without errors.</p>
-<h1><a class="anchor" id="autotoc_md93"></a>
+<h1><a class="anchor" id="autotoc_md98"></a>
 Security Verification</h1>
-<h2><a class="anchor" id="autotoc_md94"></a>
+<h2><a class="anchor" id="autotoc_md99"></a>
 Static Analysis</h2>
 <ul>
 <li><b>Flawfinder:</b> 0 Hits (Level 0+). Codebase is clean of common C/C++ vulnerabilities after remediation and justified suppressions.</li>
 <li><b>Cppcheck:</b> Passed (Exhaustive analysis). No errors or warnings found in CLI, Core, GUI, or Tests.</li>
 <li><b>CodeQL:</b> Passed. Intentional cleartext storage in export feature has been justified and suppressed.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md95"></a>
+<h2><a class="anchor" id="autotoc_md100"></a>
 Dynamic Analysis (Sanitizers)</h2>
 <ul>
 <li><b>AddressSanitizer (ASan):</b> Enabled for test run. No memory leaks or out-of-bounds accesses detected.</li>
 <li><b>UndefinedBehaviorSanitizer (UBSan):</b> Enabled for test run. No undefined behavior detected.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md96"></a>
+<h1><a class="anchor" id="autotoc_md101"></a>
 Unit Test Execution</h1>
 <p>Unit tests were executed using <code>ctest</code> and direct binary execution for sanitizer validation.</p>
-<h2><a class="anchor" id="autotoc_md97"></a>
+<h2><a class="anchor" id="autotoc_md102"></a>
 Test Summary</h2>
 <div class="fragment"><div class="line">Test project /home/fam007e/Github/SecurePasswd_MGMT/build</div>
 <div class="line">      Start  1: securepasswd_core_tests</div>
@@ -108,7 +108,7 @@ Test Summary</h2>
 <div class="line">      Start  2: securepasswd_cmocka_tests</div>
 <div class="line"> 2/14 Test  #2: securepasswd_cmocka_tests ......   Passed    0.05 sec</div>
 <div class="line">... (all 14 tests passed)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md98"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md103"></a>
 Core Tests (&lt;tt&gt;./core_tests&lt;/tt&gt;)</h2>
 <div class="fragment"><div class="line">--- Running Test: Database Lifecycle ---</div>
 <div class="line">  [PASSED] database_open with correct key</div>
@@ -126,7 +126,7 @@ Core Tests (&lt;tt&gt;./core_tests&lt;/tt&gt;)</h2>
 <div class="line">--- Test Complete ---</div>
 <div class="line"> </div>
 <div class="line">All tests passed!</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md99"></a>
+</div><!-- fragment --><h1><a class="anchor" id="autotoc_md104"></a>
 Test Environment</h1>
 <p><b>Operating System:</b> Linux <b>Compiler:</b> GCC 11.4.0 (or equivalent) <b>CMake:</b> 3.22.1 <b>Qt:</b> 6.2.4 <b>SQLCipher:</b> 4.5.3 <b>libsodium:</b> 1.0.18 <b>Argon2:</b> 20190702</p>
 <hr  />

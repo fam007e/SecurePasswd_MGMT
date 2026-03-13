@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2026.02.07</span>
+   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2026.03.14</span>
    </div>
    <div id="projectbrief">A modern, cross-platform password manager and two-factor authenticator (TOTP) designed with state-of-the-art security.</div>
   </td>
@@ -73,32 +73,56 @@ $(function() {
   <div class="headertitle"><div class="title">Changelog</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md61"></a> All notable changes to SecurePasswd_MGMT will be documented in this file.</p>
+<div class="textblock"><p><a class="anchor" id="autotoc_md62"></a> All notable changes to SecurePasswd_MGMT will be documented in this file.</p>
 <p>The format is based on <a href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>, and this project adheres to date-based versioning (YYYY.MM.DD).</p>
-<h1><a class="anchor" id="autotoc_md62"></a>
+<h1><a class="anchor" id="autotoc_md63"></a>
+[2026.03.14]</h1>
+<h2><a class="anchor" id="autotoc_md64"></a>
+Added</h2>
+<ul>
+<li><b>Mobile Sync:</b> Introduced <code><a class="el" href="sync__service_8c.html">sync_service.c</a></code> for secure mobile synchronization using Chacha20-Poly1305 encryption for vault and salt.</li>
+<li><b>Pwned Password Check:</b> Integrated <code><a class="el" href="pwned__check_8c.html">pwned_check.c</a></code> to verify password safety against the Have I Been Pwned (HIBP) API.</li>
+<li><b>Badge Documentation:</b> Added CI build status, AUR version, and Repology badges to the README for better project status visibility.</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md65"></a>
+Changed</h2>
+<ul>
+<li><b>Argon2 Security:</b> Increased Argon2 <code>MEMORY_COST</code> from 64MB (<code>1 &lt;&lt; 16</code>) to 128MB (<code>1 &lt;&lt; 17</code>) to enhance resistance against hardware-accelerated brute-force attacks.</li>
+<li><b>QR Code Refactoring:</b> Improved QR code generation logic in <code>qrcodegen</code> using <code>std::accumulate</code> for more idiomatic and efficient module counting.</li>
+</ul>
+<h2><a class="anchor" id="autotoc_md66"></a>
+Fixed</h2>
+<ul>
+<li><b>Static Analysis:</b> Addressed multiple findings from <code>cppcheck</code> to improve overall code quality and security.</li>
+<li><b>CI Reliability:</b> Updated include paths in GitHub Actions workflows to ensure consistent build environments.</li>
+<li><b>Win32 Compatibility:</b> Added missing <code>windows.h</code> include for improved Windows API support.</li>
+<li><b>Compiler Warnings:</b> Increased salt path buffer sizes to resolve <code>-Wformat-truncation</code> warnings during build.</li>
+<li><b>Header Fixes:</b> Included <code>&lt;numeric&gt;</code> in <code>qrcodegen</code> to resolve missing symbol errors for <code>std::accumulate</code>.</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md67"></a>
 [2026.01.06]</h1>
-<h2><a class="anchor" id="autotoc_md63"></a>
+<h2><a class="anchor" id="autotoc_md68"></a>
 Security</h2>
 <ul>
 <li><b>Thread Safety:</b> Replaced non-thread-safe <code>strtok</code> with <code>strtok_r</code> in the pwned password check to prevent race conditions during concurrent validation.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md64"></a>
+<h1><a class="anchor" id="autotoc_md69"></a>
 [2025.12.28]</h1>
-<h2><a class="anchor" id="autotoc_md65"></a>
+<h2><a class="anchor" id="autotoc_md70"></a>
 Added</h2>
 <ul>
 <li><b>CLI-Only Build Option:</b> Added a <code>BUILD_GUI</code> CMake option (default ON) to allow building the application without Qt6 dependencies. Use <code>-DBUILD_GUI=OFF</code> for CLI-only environments.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md66"></a>
+<h2><a class="anchor" id="autotoc_md71"></a>
 Security</h2>
 <ul>
 <li><b>0 Flawfinder Hits:</b> Achieved a clean security audit report with 0 hits from <code>flawfinder</code> across the entire project.</li>
 <li><b>Strict Format String Safety:</b> Implemented explicit suppression of safe format string literals to satisfy high-sensitivity security scanners (GitHub Code Scanning).</li>
 <li><b>Buffer Truncation Fix:</b> Resolved <code>-Wformat-truncation</code> warnings by increasing path buffer sizes for database and salt files.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md67"></a>
+<h1><a class="anchor" id="autotoc_md72"></a>
 [2025.12.26]</h1>
-<h2><a class="anchor" id="autotoc_md68"></a>
+<h2><a class="anchor" id="autotoc_md73"></a>
 Security</h2>
 <ul>
 <li><b>Hardened C Codebase:</b> Remediated over 50 potential security flaws identified by <code>flawfinder</code> across all components.</li>
@@ -108,23 +132,23 @@ Security</h2>
 <li><b>HIBP Check Hardening:</b> Added integer overflow protection and robust string handling to the Have I Been Pwned API client.</li>
 <li><b>Improved Build Safety:</b> Increased default buffer sizes for path construction and improved error reporting in database operations.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md69"></a>
+<h1><a class="anchor" id="autotoc_md74"></a>
 [2026.01.17]</h1>
-<h2><a class="anchor" id="autotoc_md70"></a>
+<h2><a class="anchor" id="autotoc_md75"></a>
 Fixed</h2>
 <ul>
 <li><b>Windows Build:</b> Resolved MSVC error C1083 (<code>sqlite3.h</code> not found) by implementing a robust, multi-layer SQLCipher detection strategy in CMake.</li>
 <li><b>Cross-Platform SQLCipher:</b> Consolidated SQLCipher linking logic to prioritize <code>vcpkg</code> and <code>pkg-config</code> targets, ensuring correct header propagation on Windows, macOS, and Linux (including Arch Linux subdirectories).</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md71"></a>
+<h2><a class="anchor" id="autotoc_md76"></a>
 Added</h2>
 <ul>
 <li><b>Smart Path Derivation:</b> Implemented automatic include path derivation from library file paths as a fallback for manual build environments.</li>
 <li><b>Improved Build Diagnostics:</b> Added status messaging during the CMake configuration phase to help debug dependency resolution.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md72"></a>
+<h1><a class="anchor" id="autotoc_md77"></a>
 [2026.02.07]</h1>
-<h2><a class="anchor" id="autotoc_md73"></a>
+<h2><a class="anchor" id="autotoc_md78"></a>
 Security</h2>
 <ul>
 <li><b>Fetch on Demand:</b> Implemented a more secure data fetching model where sensitive fields (passwords, TOTP secrets, recovery codes) are only retrieved from the database when explicitly viewing or exporting an entry. This prevents secrets from lingering in memory during general navigation and list operations.</li>
@@ -132,7 +156,7 @@ Security</h2>
 <li><b>CodeQL Remediation:</b> Suppressed intentional cleartext storage alerts in the export feature to achieve a clean CodeQL report.</li>
 <li><b>Runtime Verification:</b> All tests now pass with AddressSanitizer (ASan) and UndefinedBehaviorSanitizer (UBSan) enabled.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md74"></a>
+<h2><a class="anchor" id="autotoc_md79"></a>
 Fixed</h2>
 <ul>
 <li><b>Resource Leak:</b> Fixed a FILE pointer leak in high-level GUI export functionality (<code>gui/mainwindow.cpp</code>).</li>
@@ -140,11 +164,11 @@ Fixed</h2>
 <li><b>NULL Pointer Safety:</b> Added proactive NULL checks in database open operations to prevent potential crashes.</li>
 <li><b>Windows Build Fix:</b> Resolved <code>MOVEFILE_REPLACE_EXISTING</code> undeclared identifier error in <code><a class="el" href="database_8c.html">core/database.c</a></code> by adding missing <code>&lt;windows.h&gt;</code> include.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md75"></a>
+<h1><a class="anchor" id="autotoc_md80"></a>
 [Unreleased]</h1>
-<h1><a class="anchor" id="autotoc_md76"></a>
+<h1><a class="anchor" id="autotoc_md81"></a>
 [2025.12.20]</h1>
-<h2><a class="anchor" id="autotoc_md77"></a>
+<h2><a class="anchor" id="autotoc_md82"></a>
 Added</h2>
 <ul>
 <li><b>2FA Recovery Codes:</b> Added support for managing 2FA recovery codes in both GUI and CLI.</li>
@@ -152,14 +176,14 @@ Added</h2>
 <li><b>Secure Exit:</b> Added a dedicated exit action with a custom SVG icon.</li>
 <li><b>Password Entropy:</b> Guaranteed character diversity in the password generator using a secured Fisher-Yates shuffle.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md78"></a>
+<h2><a class="anchor" id="autotoc_md83"></a>
 Changed</h2>
 <ul>
 <li><b>GUI Refinement:</b> Transitioned to a modern, icon-only toolbar UI; removed text-based menus.</li>
 <li><b>Core Architecture:</b> Relocated password generator to the core library for better modularity.</li>
 <li><b>CLI Parity:</b> Achieved full feature parity with the GUI, including interactive editing and recovery codes.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md79"></a>
+<h2><a class="anchor" id="autotoc_md84"></a>
 Fixed</h2>
 <ul>
 <li><b>GUI Stability:</b> Resolved a segmentation fault caused by uninitialized menu pointers.</li>
@@ -167,21 +191,21 @@ Fixed</h2>
 <li><b>Theme Persistence:</b> Improved the consistency of theme loading and saving.</li>
 </ul>
 <hr  />
-<h1><a class="anchor" id="autotoc_md81"></a>
+<h1><a class="anchor" id="autotoc_md86"></a>
 [2025.10.25]</h1>
-<h2><a class="anchor" id="autotoc_md82"></a>
+<h2><a class="anchor" id="autotoc_md87"></a>
 Added</h2>
 <ul>
 <li><b>Desktop Integration:</b> Added desktop integration for Linux (<code>.desktop</code> file) and improved the Windows installer.</li>
 <li><b>GUI Icon:</b> Added a proper application icon for the Windows GUI executable.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md83"></a>
+<h2><a class="anchor" id="autotoc_md88"></a>
 Changed</h2>
 <ul>
 <li><b>Cross-Platform Compatibility:</b> Enhanced cross-platform path handling, particularly for Windows.</li>
 <li><b>Database Path:</b> Unified the database path for both the CLI and GUI applications to ensure consistency.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md84"></a>
+<h2><a class="anchor" id="autotoc_md89"></a>
 Fixed</h2>
 <ul>
 <li><b>Windows GUI:</b> Removed the console window that appeared when running the GUI application on Windows.</li>
@@ -189,11 +213,11 @@ Fixed</h2>
 <li><b>CI:</b> Addressed a CI issue by reinstalling <code>pcre2</code>.</li>
 </ul>
 <hr  />
-<h1><a class="anchor" id="autotoc_md86"></a>
+<h1><a class="anchor" id="autotoc_md91"></a>
 Version History</h1>
 <p>For releases and version history, see <a href="https://github.com/fam007e/SecurePasswd_MGMT/releases">GitHub Releases</a>.</p>
 <hr  />
-<h1><a class="anchor" id="autotoc_md88"></a>
+<h1><a class="anchor" id="autotoc_md93"></a>
 Categories Legend</h1>
 <ul>
 <li><b>Added:</b> New features</li>
