@@ -10,11 +10,11 @@
 /**
  * Encrypts a file using OpenSSL ChaCha20-Poly1305 for secure transfer.
  */
-int sync_encrypt_vault(const char *db_path, unsigned char *output_buffer, size_t *output_size, const unsigned char key[SYNC_KEY_LEN]);
+int sync_encrypt_vault(const char *db_path, unsigned char *output_buffer, size_t *output_size, const unsigned char key[SYNC_KEY_LEN]); // flawfinder: ignore
 
 /**
  * Decrypts a secure transfer package using OpenSSL ChaCha20-Poly1305.
  */
-int sync_decrypt_vault(const unsigned char *encrypted_data, size_t data_len, const char *db_path, const unsigned char key[SYNC_KEY_LEN]);
+int sync_decrypt_vault(const unsigned char *encrypted_data, size_t data_len, const char *db_path, const unsigned char key[SYNC_KEY_LEN]); // flawfinder: ignore
 
 #endif

@@ -13,9 +13,10 @@
 ## Key Security Features
 
 - **End-to-End Encryption:** All sensitive data is encrypted at rest in a SQLCipher encrypted database.
-- **State-of-the-Art Key Derivation:** **Argon2id**, the winner of the Password Hashing Competition, is used to derive the encryption key from your master password, providing maximum resistance against brute-force attacks.
+- **State-of-the-Art Key Derivation:** **Argon2id**, the winner of the Password Hashing Competition, is used to derive the encryption key from your master password, providing maximum resistance against brute-force attacks. **Current memory cost: 128MB.**
 - **Secure Password Generator:** A built-in, cryptographically secure password generator to create strong, unique passwords.
 - **Memory Safety:** Sensitive data is explicitly cleared from memory after use.
+- **Pwned Password Check:** Integrated check against the Have I Been Pwned (HIBP) API to ensure your passwords haven't been compromised in known data breaches.
 - **Fetch on Demand:** Secrets are only retrieved from the database when specifically needed, preventing them from lingering in memory.
 - **Hardened C Codebase:** Regularly audited using modern static analysis tools (`cppcheck`, `flawfinder`) to proactively prevent common C vulnerabilities like buffer overflows and race conditions.
 - **Secure Storage:** All data is stored locally, encrypted, in a secure directory.
@@ -34,6 +35,10 @@
 - **Secure Clipboard:** Automatically clears copied passwords and TOTP codes from the clipboard after 30 seconds.
 - **Real-time TOTP:** Displays TOTP codes with a progress bar indicating the time until the next code is generated.
 - **Password Health Check:** Analyzes your passwords for weaknesses (e.g., reuse, short length) and provides recommendations.
+- **Integrated Pwned Check:** Check the status of your passwords against public breach databases directly from the GUI.
+
+### Cross-Platform Sync
+- **Secure Mobile Sync:** Synchronize your vault securely between desktop and mobile devices using Chacha20-Poly1305 authenticated encryption.
 
 ### Desktop Integration
 - **Linux:** Provides a `.desktop` file for better integration with desktop environments.

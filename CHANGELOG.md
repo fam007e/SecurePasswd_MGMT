@@ -5,6 +5,24 @@ All notable changes to SecurePasswd_MGMT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to date-based versioning (YYYY.MM.DD).
 
+## [2026.03.14]
+
+### Added
+- **Mobile Sync:** Introduced `sync_service.c` for secure mobile synchronization using Chacha20-Poly1305 encryption for vault and salt.
+- **Pwned Password Check:** Integrated `pwned_check.c` to verify password safety against the Have I Been Pwned (HIBP) API.
+- **Badge Documentation:** Added CI build status, AUR version, and Repology badges to the README for better project status visibility.
+
+### Changed
+- **Argon2 Security:** Increased Argon2 `MEMORY_COST` from 64MB (`1 << 16`) to 128MB (`1 << 17`) to enhance resistance against hardware-accelerated brute-force attacks.
+- **QR Code Refactoring:** Improved QR code generation logic in `qrcodegen` using `std::accumulate` for more idiomatic and efficient module counting.
+
+### Fixed
+- **Static Analysis:** Addressed multiple findings from `cppcheck` to improve overall code quality and security.
+- **CI Reliability:** Updated include paths in GitHub Actions workflows to ensure consistent build environments.
+- **Win32 Compatibility:** Added missing `windows.h` include for improved Windows API support.
+- **Compiler Warnings:** Increased salt path buffer sizes to resolve `-Wformat-truncation` warnings during build.
+- **Header Fixes:** Included `<numeric>` in `qrcodegen` to resolve missing symbol errors for `std::accumulate`.
+
 ## [2026.01.06]
 
 ### Security
