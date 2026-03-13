@@ -10,6 +10,8 @@ var dir_4270bfced15e0e73154b13468c7c9ad9 =
     [ "platform_paths.h", "platform__paths_8h.html", "platform__paths_8h" ],
     [ "pwned_check.c", "pwned__check_8c.html", "pwned__check_8c" ],
     [ "pwned_check.h", "pwned__check_8h.html", "pwned__check_8h" ],
+    [ "sync_service.c", "sync__service_8c.html", "sync__service_8c" ],
+    [ "sync_service.h", "sync__service_8h.html", "sync__service_8h" ],
     [ "totp.c", "totp_8c.html", "totp_8c" ],
     [ "totp.h", "totp_8h.html", "totp_8h" ]
 ];

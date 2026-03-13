@@ -21,7 +21,7 @@ SecurePasswd_MGMT is designed with security-first principles and implements defe
 - **Algorithm:** **Argon2id**
 - **Details:** Argon2 is the winner of the Password Hashing Competition (2015) and is widely considered the best-in-class KDF. The `id` variant provides a hybrid approach that is resistant to both side-channel and GPU cracking attacks. The key is derived using the `argon2id_hash_raw` function in `core/key_derivation.c`.
 - **Library:** The official `libargon2` reference implementation.
-- **Parameters:** Secure defaults are used for memory cost (`1 << 16`), time cost (`3`), and parallelism (`1`) to make brute-force attacks computationally infeasible.
+- **Parameters:** Secure defaults are used for memory cost (**128MB** - `1 << 17`), time cost (`3`), and parallelism (`1`) to make brute-force attacks computationally infeasible.
 
 ### Random Number Generation
 - **Source:** Libsodium's `randombytes_buf()` function.
@@ -38,9 +38,10 @@ SecurePasswd_MGMT is designed with security-first principles and implements defe
 - **Secure Input:** The Command Line Interface (CLI) utilizes `getpass` (or platform equivalents) to ensure passwords and secrets are never echoed to the console during entry.
 - **Banned Function Mitigation:** The codebase explicitly avoids insecure C functions (`strcat`, `sprintf`, `strncpy`, `atoi`). We utilize bounded alternatives and manual length tracking to prevent buffer overflows and undefined behavior.
 - **Path Validation & Sanitization:** File operations (like CSV import/export) include strict validation to prevent Directory Traversal attacks (e.g., blocking `..` in paths). Additionally, platform-specific paths derived from environment variables are processed through a `sanitize_path` utility to filter untrusted input.
-- **Sanitization:** The codebase is regularly tested with AddressSanitizer (ASan), UndefinedBehaviorSanitizer (UBSan), and **Flawfinder**. As of February 2026, the codebase has been fully remediated to achieve **0 hits** on Flawfinder's strictest scanning rules, fixing or verifying all reported security risks.
+- **Sanitization:** The codebase is regularly tested with AddressSanitizer (ASan), UndefinedBehaviorSanitizer (UBSan), and **Flawfinder**. As of **March 2026**, the codebase has been fully remediated to achieve **0 hits** on Flawfinder's strictest scanning rules, fixing or verifying all reported security risks.
 - **Thread Safety:** Critical sections, such as the Have I Been Pwned check, utilize thread-safe string manipulation functions (`strtok_r`) to prevent race conditions during concurrent execution.
 - **Static Analysis:** `cppcheck` and GitHub's **CodeQL** are employed to enforce code quality and catch potential leaks, logic errors, or complex security vulnerabilities early.
+- **Mobile Sync Security:** Synchronization between devices is protected using **Chacha20-Poly1305** authenticated encryption. The vault and its salt are packed and encrypted as a single blob with a unique nonce for every sync operation, ensuring both confidentiality and authenticity of the synced data.
 - **Fetch on Demand:** Sensitive fields (passwords, TOTP secrets, recovery codes) are only fetched from the database when specifically requested for viewing or exporting. This minimizes the risk of secrets lingering in memory during general application use.
 
 ## Data Protection

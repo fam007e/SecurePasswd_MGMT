@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['data_20protection_0',['Data Protection',['../md_SECURITY.html#autotoc_md33',1,'']]],
-  ['data_20storage_20format_1',['Data Storage Format',['../md_SECURITY.html#autotoc_md35',1,'']]],
+  ['data_20protection_0',['Data Protection',['../md_SECURITY.html#autotoc_md34',1,'']]],
+  ['data_20storage_20format_1',['Data Storage Format',['../md_SECURITY.html#autotoc_md36',1,'']]],
   ['database_2ec_2',['database.c',['../database_8c.html',1,'']]],
   ['database_2eh_3',['database.h',['../database_8h.html',1,'']]],
   ['database_5fadd_5fentry_4',['database_add_entry',['../database_8c.html#a49b60bc340abf21b96b5195b57f902c4',1,'database_add_entry(const PasswordEntry *entry):&#160;database.c'],['../database_8h.html#a49b60bc340abf21b96b5195b57f902c4',1,'database_add_entry(const PasswordEntry *entry):&#160;database.c']]],
@@ -13,11 +13,11 @@ var searchData=
   ['database_5frekey_10',['database_rekey',['../database_8c.html#a4bc5a926ac2d7904c49b7b036fae514f',1,'database_rekey(const char *new_password):&#160;database.c'],['../database_8h.html#a4bc5a926ac2d7904c49b7b036fae514f',1,'database_rekey(const char *new_password):&#160;database.c']]],
   ['database_5fupdate_5fentry_11',['database_update_entry',['../database_8c.html#a3c5e8e2581663e90084591b7e2590615',1,'database_update_entry(const PasswordEntry *entry):&#160;database.c'],['../database_8h.html#a3c5e8e2581663e90084591b7e2590615',1,'database_update_entry(const PasswordEntry *entry):&#160;database.c']]],
   ['db_12',['db',['../database_8c.html#ad6e663497d2c934364b3bcf07496b30b',1,'database.c']]],
-  ['dependencies_13',['Installation of Dependencies',['../index.html#autotoc_md7',1,'']]],
-  ['derivation_20function_20kdf_14',['Key Derivation Function (KDF)',['../md_SECURITY.html#autotoc_md29',1,'']]],
+  ['dependencies_13',['Installation of Dependencies',['../index.html#autotoc_md8',1,'']]],
+  ['derivation_20function_20kdf_14',['Key Derivation Function (KDF)',['../md_SECURITY.html#autotoc_md30',1,'']]],
   ['derive_5fkey_15',['derive_key',['../key__derivation_8c.html#a54ef4e1a1ee65f727df0a38518d1c540',1,'derive_key(const char *password, const uint8_t *salt, uint8_t *key):&#160;key_derivation.c'],['../key__derivation_8h.html#a54ef4e1a1ee65f727df0a38518d1c540',1,'derive_key(const char *password, const uint8_t *salt, uint8_t *key):&#160;key_derivation.c']]],
-  ['desktop_20integration_16',['Desktop Integration',['../index.html#autotoc_md5',1,'']]],
-  ['development_17',['Security-Focused Development',['../md_CONTRIBUTING.html#autotoc_md44',1,'']]],
-  ['documentation_18',['API Documentation',['../index.html#autotoc_md20',1,'']]],
-  ['dynamic_20analysis_20sanitizers_19',['Dynamic Analysis (Sanitizers)',['../md_docs_2TESTING.html#autotoc_md95',1,'']]]
+  ['desktop_20integration_16',['Desktop Integration',['../index.html#autotoc_md6',1,'']]],
+  ['development_17',['Security-Focused Development',['../md_CONTRIBUTING.html#autotoc_md45',1,'']]],
+  ['documentation_18',['API Documentation',['../index.html#autotoc_md21',1,'']]],
+  ['dynamic_20analysis_20sanitizers_19',['Dynamic Analysis (Sanitizers)',['../md_docs_2TESTING.html#autotoc_md100',1,'']]]
 ];
