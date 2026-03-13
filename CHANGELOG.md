@@ -17,6 +17,7 @@ and this project adheres to date-based versioning (YYYY.MM.DD).
 - **QR Code Refactoring:** Improved QR code generation logic in `qrcodegen` using `std::accumulate` for more idiomatic and efficient module counting.
 
 ### Fixed
+- **Windows CI:** Updated vcpkg baseline to resolve `getopt-win32` download failure (404 Not Found).
 - **Static Analysis:** Addressed multiple findings from `cppcheck` to improve overall code quality and security.
 - **CI Reliability:** Updated include paths in GitHub Actions workflows to ensure consistent build environments.
 - **Win32 Compatibility:** Added missing `windows.h` include for improved Windows API support.
