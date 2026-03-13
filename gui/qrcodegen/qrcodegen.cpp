@@ -645,9 +645,9 @@ long QrCode::getPenaltyScore() const {
 	}
 	
 	// Balance of dark and light modules
-	int dark = 0;
-	for (const vector<bool> &row : modules)
-		dark += static_cast<int>(std::count(row.begin(), row.end(), true));
+	int dark = std::accumulate(modules.begin(), modules.end(), 0, [](int sum, const vector<bool> &row) {
+		return sum + static_cast<int>(std::count(row.begin(), row.end(), true));
+	});
 	int total = size * size;  // Note that size is odd, so dark/total != 1/2
 	// Compute the smallest integer k >= 0 such that (45-5k)% <= dark/total <= (55+5k)%
 	int k = static_cast<int>((std::abs(dark * 20L - total * 10L) + total - 1) / total) - 1;
