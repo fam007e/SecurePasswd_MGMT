@@ -22,6 +22,7 @@
  */
 
 #include <algorithm>
+#include <numeric>
 #include <cassert>
 #include <climits>
 #include <cstddef>
