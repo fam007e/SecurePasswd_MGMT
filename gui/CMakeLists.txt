@@ -15,6 +15,7 @@ set(ICONS
     icons/health-check.svg
     icons/import.svg
     icons/exit.svg
+    icons/sync.svg
     icons/darkmode.svg
     icons/lightmode.svg
     icons/recovery-enabled.svg
@@ -37,7 +38,10 @@ qt_add_executable(securepasswd_gui
     passwordgeneratordialog.cpp
     healthcheckdialog.h
     healthcheckdialog.cpp
+    syncdialog.h
+    syncdialog.cpp
     icons.qrc
+    qrcodegen/qrcodegen.cpp
 )
 
 # Embed Windows icon into executable
@@ -48,6 +52,7 @@ endif()
 # Include directories
 target_include_directories(securepasswd_gui PRIVATE
     ${CMAKE_SOURCE_DIR}/core
+    ${CMAKE_CURRENT_SOURCE_DIR}/qrcodegen
 )
 
 # Only add LIBCSV_INCLUDE_DIRS if it's not empty (to avoid warnings)
@@ -59,6 +64,7 @@ endif()
 target_link_libraries(securepasswd_gui PRIVATE
     Qt6::Widgets
     Qt6::Svg
+    Qt6::Network
     core_lib
     ${LIBCSV_LIBRARIES}
 )

@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#define MEMORY_COST (1 << 16) // 64MB
+#define MEMORY_COST (1 << 17) // 128MB
 #define TIME_COST 3
 #define PARALLELISM 1
 

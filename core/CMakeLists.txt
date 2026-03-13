@@ -1,6 +1,7 @@
 add_library(core_lib STATIC
     key_derivation.c
     database.c
+    sync_service.c
     totp.c
     pwned_check.c
     platform_paths.c

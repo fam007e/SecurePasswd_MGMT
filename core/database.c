@@ -281,7 +281,8 @@ static int initialize_schema() {
                         "username TEXT NOT NULL, "
                         "password TEXT NOT NULL, "
                         "totp_secret TEXT, "
-                        "recovery_codes TEXT);";
+                        "recovery_codes TEXT,"
+                        "pwned_count INTEGER DEFAULT -1);";
     if (sqlite3_exec(db, sql, 0, 0, &err_msg) != SQLITE_OK) {
         fprintf(stderr, "SQL error: %s\n", err_msg); // flawfinder: ignore
         sqlite3_free(err_msg);
@@ -306,6 +307,28 @@ static int initialize_schema() {
         const char *alter_sql = "ALTER TABLE passwords ADD COLUMN recovery_codes TEXT;";
         if (sqlite3_exec(db, alter_sql, 0, 0, &err_msg) != SQLITE_OK) {
             fprintf(stderr, "Migration error adding recovery_codes: %s\n", err_msg); // flawfinder: ignore
+            sqlite3_free(err_msg);
+        }
+    }
+
+    // Migration: Check if pwned_count column exists
+    sqlite3_stmt *stmt2;
+    bool has_pwned_count = false;
+    if (sqlite3_prepare_v2(db, "PRAGMA table_info(passwords)", -1, &stmt2, NULL) == SQLITE_OK) {
+        while (sqlite3_step(stmt2) == SQLITE_ROW) {
+            const unsigned char *name = sqlite3_column_text(stmt2, 1);
+            if (name && strcmp((const char *)name, "pwned_count") == 0) {
+                has_pwned_count = true;
+                break;
+            }
+        }
+        sqlite3_finalize(stmt2);
+    }
+
+    if (!has_pwned_count) {
+        const char *alter_sql = "ALTER TABLE passwords ADD COLUMN pwned_count INTEGER DEFAULT -1;";
+        if (sqlite3_exec(db, alter_sql, 0, 0, &err_msg) != SQLITE_OK) {
+            fprintf(stderr, "Migration error adding pwned_count: %s\n", err_msg); // flawfinder: ignore
             sqlite3_free(err_msg);
         }
     }
