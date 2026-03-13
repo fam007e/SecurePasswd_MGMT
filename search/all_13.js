@@ -3,11 +3,11 @@ var searchData=
   ['salt_5flen_0',['SALT_LEN',['../key__derivation_8h.html#a531df3ddc06621690d3ea6e7e05a4e62',1,'key_derivation.h']]],
   ['sanitize_5fpath_1',['sanitize_path',['../platform__paths_8c.html#a5339ed1fb4e7ecf92035c7f251061991',1,'platform_paths.c']]],
   ['sanitizers_2',['Dynamic Analysis (Sanitizers)',['../md_docs_2TESTING.html#autotoc_md95',1,'']]],
-  ['save_5fsalt_3',['save_salt',['../key__derivation_8c.html#a64c3fb401d2807bb3f207e7c60f150c1',1,'save_salt(const char *path, const uint8_t *salt):&#160;key_derivation.c'],['../key__derivation_8h.html#a64c3fb401d2807bb3f207e7c60f150c1',1,'save_salt(const char *path, const uint8_t *salt):&#160;key_derivation.c']]],
+  ['save_5fsalt_3',['save_salt',['../key__derivation_8h.html#a64c3fb401d2807bb3f207e7c60f150c1',1,'save_salt(const char *path, const uint8_t *salt):&#160;key_derivation.c'],['../key__derivation_8c.html#a64c3fb401d2807bb3f207e7c60f150c1',1,'save_salt(const char *path, const uint8_t *salt):&#160;key_derivation.c']]],
   ['scope_4',['Scope',['../md_CODE__OF__CONDUCT.html#autotoc_md54',1,'']]],
   ['secure_20build_20process_5',['Secure Build Process',['../md_SECURITY.html#autotoc_md38',1,'']]],
   ['securepasswd_5fmgmt_6',['securepasswd_mgmt',['../md_CONTRIBUTING.html',1,'Contributing to SecurePasswd_MGMT'],['../index.html',1,'SecurePasswd_MGMT']]],
-  ['security_7',['security',['../md_SECURITY.html#autotoc_md37',1,'File System Security'],['../md_CHANGELOG.html#autotoc_md73',1,'Security'],['../md_CHANGELOG.html#autotoc_md63',1,'Security'],['../md_CHANGELOG.html#autotoc_md66',1,'Security'],['../md_CHANGELOG.html#autotoc_md68',1,'Security'],['../index.html#autotoc_md18',1,'Security']]],
+  ['security_7',['security',['../md_SECURITY.html#autotoc_md37',1,'File System Security'],['../index.html#autotoc_md18',1,'Security'],['../md_CHANGELOG.html#autotoc_md73',1,'Security'],['../md_CHANGELOG.html#autotoc_md68',1,'Security'],['../md_CHANGELOG.html#autotoc_md66',1,'Security'],['../md_CHANGELOG.html#autotoc_md63',1,'Security']]],
   ['security_20features_8',['Key Security Features',['../index.html#autotoc_md1',1,'']]],
   ['security_20flow_9',['Master Password Security Flow',['../md_SECURITY.html#autotoc_md34',1,'']]],
   ['security_20focused_20development_10',['Security-Focused Development',['../md_CONTRIBUTING.html#autotoc_md44',1,'']]],
@@ -30,5 +30,12 @@ var searchData=
   ['structure_27',['Project Structure',['../index.html#autotoc_md19',1,'']]],
   ['style_28',['Coding Style',['../md_CONTRIBUTING.html#autotoc_md46',1,'']]],
   ['summary_29',['summary',['../md_docs_2TESTING.html#autotoc_md97',1,'Test Summary'],['../md_docs_2TESTING.html',1,'Testing and Verification Summary']]],
-  ['system_20security_30',['File System Security',['../md_SECURITY.html#autotoc_md37',1,'']]]
+  ['sync_5fdecrypt_5fvault_30',['sync_decrypt_vault',['../sync__service_8h.html#abce18545611bf6817b55518f3ea649b9',1,'sync_decrypt_vault(const unsigned char *encrypted_data, size_t data_len, const char *db_path, const unsigned char key[SYNC_KEY_LEN]):&#160;sync_service.c'],['../sync__service_8c.html#abce18545611bf6817b55518f3ea649b9',1,'sync_decrypt_vault(const unsigned char *encrypted_data, size_t data_len, const char *db_path, const unsigned char key[SYNC_KEY_LEN]):&#160;sync_service.c']]],
+  ['sync_5fencrypt_5fvault_31',['sync_encrypt_vault',['../sync__service_8h.html#a282c8efccb953d64e16e3394af1a1f98',1,'sync_encrypt_vault(const char *db_path, unsigned char *output_buffer, size_t *output_size, const unsigned char key[SYNC_KEY_LEN]):&#160;sync_service.c'],['../sync__service_8c.html#a282c8efccb953d64e16e3394af1a1f98',1,'sync_encrypt_vault(const char *db_path, unsigned char *output_buffer, size_t *output_size, const unsigned char key[SYNC_KEY_LEN]):&#160;sync_service.c']]],
+  ['sync_5fkey_5flen_32',['SYNC_KEY_LEN',['../sync__service_8h.html#ae08a140233b2de8b24e4ba7967c4bf2a',1,'sync_service.h']]],
+  ['sync_5fnonce_5flen_33',['SYNC_NONCE_LEN',['../sync__service_8h.html#aa441e9db64dff745c3e1fd3b94a47606',1,'sync_service.h']]],
+  ['sync_5fservice_2ec_34',['sync_service.c',['../sync__service_8c.html',1,'']]],
+  ['sync_5fservice_2eh_35',['sync_service.h',['../sync__service_8h.html',1,'']]],
+  ['sync_5ftag_5flen_36',['SYNC_TAG_LEN',['../sync__service_8h.html#a77cb9ae25ecd65b46d6e3f24abd18869',1,'sync_service.h']]],
+  ['system_20security_37',['File System Security',['../md_SECURITY.html#autotoc_md37',1,'']]]
 ];
