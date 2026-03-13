@@ -13,7 +13,7 @@
     {
       "name": "qtbase",
       "default-features": false,
-      "features": ["widgets", "concurrent"]
+      "features": ["widgets", "concurrent", "network"]
     },
     "qtsvg"
   ],

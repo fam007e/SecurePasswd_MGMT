@@ -68,7 +68,7 @@ endif()
 
 # Find Qt6
 if(BUILD_GUI)
-    find_package(Qt6 COMPONENTS Widgets Svg REQUIRED)
+    find_package(Qt6 COMPONENTS Widgets Svg Network REQUIRED)
 endif()
 
 # Find OpenSSL and CURL

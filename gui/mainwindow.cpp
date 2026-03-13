@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "entrydialog.h"
 #include "healthcheckdialog.h"
+#include "syncdialog.h"
 #include <csv.h>
 
 extern "C" {
@@ -167,6 +168,11 @@ void MainWindow::onExport() {
 
     fclose(fp);
     statusBar()->showMessage(QString("Exported %1 entries to %2").arg(m_entries.size()).arg(filePath), 5000);
+}
+
+void MainWindow::onSync() {
+    SyncDialog dialog(this);
+    dialog.exec();
 }
 
 void MainWindow::refreshEntryList() {
@@ -459,6 +465,11 @@ void MainWindow::setupUI() {
     exportAction->setToolTip("Export to CSV (Alt+X)");
     toolBar->addAction(exportAction);
 
+    syncAction = new QAction(QIcon(":/icons/sync.svg"), "Sync to Mobile", this);
+    syncAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_M));
+    syncAction->setToolTip("Sync to Mobile (Alt+M)");
+    toolBar->addAction(syncAction);
+
     toolBar->addSeparator();
 
     // --- Group 5: UI & Settings ---
@@ -522,6 +533,7 @@ void MainWindow::setupUI() {
     connect(copyTotpAction, &QAction::triggered, this, &MainWindow::onCopyTotp);
     connect(importAction, &QAction::triggered, this, &MainWindow::onImport);
     connect(exportAction, &QAction::triggered, this, &MainWindow::onExport);
+    connect(syncAction, &QAction::triggered, this, &MainWindow::onSync);
     connect(healthCheckAction, &QAction::triggered, this, &MainWindow::onHealthCheck);
     connect(changePasswordAction, &QAction::triggered, this, &MainWindow::onChangePassword);
     connect(listWidget, &QListWidget::currentRowChanged, this, &MainWindow::onCurrentRowChanged);
