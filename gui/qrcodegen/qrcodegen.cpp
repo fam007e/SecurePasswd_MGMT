@@ -465,10 +465,11 @@ void QrCode::drawVersion() {
 void QrCode::drawFinderPattern(int x, int y) {
 	for (int dy = -4; dy <= 4; dy++) {
 		for (int dx = -4; dx <= 4; dx++) {
-			int dist = std::max(std::abs(dx), std::abs(dy));  // Chebyshev/infinity norm
 			int xx = x + dx, yy = y + dy;
-			if (0 <= xx && xx < size && 0 <= yy && yy < size)
+			if (0 <= xx && xx < size && 0 <= yy && yy < size) {
+				int dist = std::max(std::abs(dx), std::abs(dy));  // Chebyshev/infinity norm
 				setFunctionModule(xx, yy, dist != 2 && dist != 4);
+			}
 		}
 	}
 }
@@ -578,7 +579,7 @@ void QrCode::applyMask(int msk) {
 				case 7:  invert = ((x + y) % 2 + x * y % 3) % 2 == 0;  break;
 				default:  throw std::logic_error("Unreachable");
 			}
-			modules.at(y).at(x) = modules.at(y).at(x) ^ (invert & !isFunction.at(y).at(x));
+			modules.at(y).at(x) = modules.at(y).at(x) ^ (invert && !isFunction.at(y).at(x));
 		}
 	}
 }
@@ -645,12 +646,8 @@ long QrCode::getPenaltyScore() const {
 	
 	// Balance of dark and light modules
 	int dark = 0;
-	for (const vector<bool> &row : modules) {
-		for (bool color : row) {
-			if (color)
-				dark++;
-		}
-	}
+	for (const vector<bool> &row : modules)
+		dark += static_cast<int>(std::count(row.begin(), row.end(), true));
 	int total = size * size;  // Note that size is odd, so dark/total != 1/2
 	// Compute the smallest integer k >= 0 such that (45-5k)% <= dark/total <= (55+5k)%
 	int k = static_cast<int>((std::abs(dark * 20L - total * 10L) + total - 1) / total) - 1;
