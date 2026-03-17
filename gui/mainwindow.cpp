@@ -21,6 +21,7 @@ extern "C" {
 #include <QFontDatabase>
 #include <QIcon>
 #include <QHBoxLayout>
+#include <QLineEdit>
 #include <QListWidget>
 #include <QMenuBar>
 #include <QSettings>
@@ -52,26 +53,64 @@ static QString sanitize_csv_field(QString field) {
 
 void import_row_cb(int c, void *data) {
     QStringList *fields = static_cast<QStringList*>(data);
-    if (fields->size() >= 3) { // service,username,password are required
-        PasswordEntry entry;
-        QByteArray service = fields->at(0).toUtf8();
-        QByteArray username = fields->at(1).toUtf8();
-        QByteArray password = fields->at(2).toUtf8();
-        QByteArray totpSecret = (fields->size() >= 4) ? fields->at(3).toUtf8() : QByteArray();
-        QByteArray recoveryCodes = (fields->size() >= 5) ? fields->at(4).toUtf8() : QByteArray();
+    if (fields->size() >= 3) {
+        QString service = fields->at(0);
+        QString username = fields->at(1);
+        QString password = fields->at(2);
+        QString totp = (fields->size() >= 4) ? fields->at(3) : "";
+        QString recovery = (fields->size() >= 5) ? fields->at(4) : "";
 
-        entry.service = (char*)service.constData();
-        entry.username = (char*)username.constData();
-        entry.password = (char*)password.constData();
-        entry.totp_secret = (char*)totpSecret.constData();
-        entry.recovery_codes = (char*)recoveryCodes.constData();
+        // Check if entry exists
+        PasswordEntry *existing = database_get_entry_by_identity(service.toUtf8().constData(), username.toUtf8().constData());
+        if (existing) {
+            bool identical = (QString::fromUtf8(existing->password) == password &&
+                             QString::fromUtf8(existing->totp_secret) == totp &&
+                             QString::fromUtf8(existing->recovery_codes) == recovery);
 
-        database_add_entry(&entry);
+            if (!identical) {
+                QMessageBox::StandardButton reply;
+                reply = QMessageBox::question(nullptr, "Import Conflict",
+                                              QString("Account '%1' (%2) already exists but the data is different.\n\n"
+                                                      "Do you want to overwrite the local entry with the CSV data?").arg(service, username),
+                                              QMessageBox::Yes|QMessageBox::No);
+                if (reply == QMessageBox::Yes) {
+                    PasswordEntry updated;
+                    updated.id = existing->id;
+                    QByteArray s_bytes = service.toUtf8();
+                    QByteArray u_bytes = username.toUtf8();
+                    QByteArray p_bytes = password.toUtf8();
+                    QByteArray t_bytes = totp.toUtf8();
+                    QByteArray r_bytes = recovery.toUtf8();
+
+                    updated.service = (char*)s_bytes.constData();
+                    updated.username = (char*)u_bytes.constData();
+                    updated.password = (char*)p_bytes.constData();
+                    updated.totp_secret = (char*)t_bytes.constData();
+                    updated.recovery_codes = (char*)r_bytes.constData();
+                    database_update_entry(&updated);
+                }
+            }
+            free_password_entries(existing, 1);
+        } else {
+            PasswordEntry entry;
+            QByteArray s_bytes = service.toUtf8();
+            QByteArray u_bytes = username.toUtf8();
+            QByteArray p_bytes = password.toUtf8();
+            QByteArray t_bytes = totp.toUtf8();
+            QByteArray r_bytes = recovery.toUtf8();
+
+            entry.service = (char*)s_bytes.constData();
+            entry.username = (char*)u_bytes.constData();
+            entry.password = (char*)p_bytes.constData();
+            entry.totp_secret = (char*)t_bytes.constData();
+            entry.recovery_codes = (char*)r_bytes.constData();
+            database_add_entry(&entry);
+        }
     }
     fields->clear();
 }
 
-MainWindow::MainWindow(const QString& password, QWidget *parent) : QMainWindow(parent), m_databaseOpen(false) {
+MainWindow::MainWindow(const QString& password, QWidget *parent) : QMainWindow(parent), m_databaseOpen(false), searchBar(nullptr) {
     // Use shared platform_paths function
     char dirPath[2048]; // flawfinder: ignore
     get_config_path(dirPath, sizeof(dirPath));
@@ -175,7 +214,40 @@ void MainWindow::onSync() {
     dialog.exec();
 }
 
+void MainWindow::onSearchChanged(const QString &text) {
+    if (text.isEmpty()) {
+        refreshEntryList();
+        return;
+    }
+
+    listWidget->clear();
+    m_entries.clear();
+
+    int count = 0;
+    PasswordEntry *db_entries = database_search(text.toUtf8().constData(), &count);
+
+    if (!db_entries) return;
+
+    for (int i = 0; i < count; i++) {
+        QListWidgetItem *item = new QListWidgetItem(QString::fromUtf8(db_entries[i].service));
+        item->setData(Qt::UserRole, db_entries[i].id);
+        listWidget->addItem(item);
+
+        GUIPasswordEntry qt_entry;
+        qt_entry.id = db_entries[i].id;
+        qt_entry.service = QString::fromUtf8(db_entries[i].service);
+        qt_entry.username = QString::fromUtf8(db_entries[i].username);
+        m_entries.append(qt_entry);
+    }
+
+    free_password_entries(db_entries, count);
+}
+
 void MainWindow::refreshEntryList() {
+    if (searchBar && !searchBar->text().isEmpty()) {
+        onSearchChanged(searchBar->text());
+        return;
+    }
     listWidget->clear();
     m_entries.clear();
 
@@ -398,6 +470,13 @@ void MainWindow::setupUI() {
     // Layout
     QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);
 
+    // Search Bar
+    searchBar = new QLineEdit(this);
+    searchBar->setPlaceholderText("Search services or usernames...");
+    searchBar->setClearButtonEnabled(true);
+    searchBar->addAction(QIcon(":/icons/search.svg"), QLineEdit::LeadingPosition);
+    mainLayout->addWidget(searchBar);
+
     // Toolbar
     toolBar = new QToolBar(this);
     toolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -406,10 +485,10 @@ void MainWindow::setupUI() {
     // Menus (Removed for icon-only UI)
 
     // --- Group 1: Entry Management ---
-    addAction = new QAction(QIcon(":/icons/add.svg"), "Add", this);
-    addAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_A));
-    addAction->setToolTip("Add new entry (Alt+A)");
-    toolBar->addAction(addAction);
+    m_addAction = new QAction(QIcon(":/icons/add.svg"), "Add", this);
+    m_addAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_A));
+    m_addAction->setToolTip("Add new entry (Alt+A)");
+    toolBar->addAction(m_addAction);
 
     editAction = new QAction(QIcon(":/icons/edit.svg"), "Edit", this);
     editAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_E));
@@ -473,6 +552,14 @@ void MainWindow::setupUI() {
     toolBar->addSeparator();
 
     // --- Group 5: UI & Settings ---
+    QAction *findAction = new QAction("Find", this);
+    findAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F));
+    connect(findAction, &QAction::triggered, this, [this]() {
+        searchBar->setFocus();
+        searchBar->selectAll();
+    });
+    addAction(findAction);
+
     themeAction = new QAction(this);
     themeAction->setShortcut(QKeySequence(Qt::ALT | Qt::SHIFT | Qt::Key_T));
     toolBar->addAction(themeAction);
@@ -525,7 +612,7 @@ void MainWindow::setupUI() {
     statusBar();
 
     // Connections
-    connect(addAction, &QAction::triggered, this, &MainWindow::onAdd);
+    connect(m_addAction, &QAction::triggered, this, &MainWindow::onAdd);
     connect(editAction, &QAction::triggered, this, &MainWindow::onEdit);
     connect(deleteAction, &QAction::triggered, this, &MainWindow::onDelete);
     connect(copyUsernameAction, &QAction::triggered, this, &MainWindow::onCopyUsername);
@@ -540,6 +627,7 @@ void MainWindow::setupUI() {
     connect(themeAction, &QAction::triggered, this, &MainWindow::onToggleTheme);
     connect(toggleRecoveryCodesAction, &QAction::triggered, this, &MainWindow::onToggleRecoveryCodes);
     connect(markUsedButton, &QPushButton::clicked, this, &MainWindow::onMarkAsUsed);
+    connect(searchBar, &QLineEdit::textChanged, this, &MainWindow::onSearchChanged);
 
     // TOTP timer
     totpTimer = new QTimer(this);

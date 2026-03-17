@@ -42,6 +42,24 @@ void database_close();
 PasswordEntry* database_get_all_entries(int *count);
 
 /**
+ * @brief Searches for password entries by service or username.
+ *
+ * @param query The search query string.
+ * @param count A pointer to an integer that will be filled with the number of entries.
+ * @return A dynamically allocated array of PasswordEntry structs. The caller is responsible for freeing this array and its contents using free_password_entries().
+ */
+PasswordEntry* database_search(const char *query, int *count);
+
+/**
+ * @brief Retrieves a password entry by its identity (Service + Username).
+ *
+ * @param service The name of the service.
+ * @param username The username for the service.
+ * @return A dynamically allocated PasswordEntry struct containing full details, or NULL if not found.
+ */
+PasswordEntry* database_get_entry_by_identity(const char *service, const char *username);
+
+/**
  * @brief Retrieves a single password entry with ALL details (including secrets) by ID.
  *
  * @param id The ID of the entry to retrieve.

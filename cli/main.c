@@ -98,6 +98,9 @@ char *secure_getpass(const char *prompt) {
 #include "totp.h"
 #include "pwned_check.h"
 
+// Forward declaration
+static void read_line(char *buf, int size);
+
 // --- Struct and Callbacks for CSV Import ---
 typedef struct {
     char **fields;
@@ -114,15 +117,59 @@ static void cli_import_field_cb(void *s, size_t len, void *data) {
 static void cli_import_row_cb(int c, void *data) {
     CsvRow *row = (CsvRow*)data;
     if (row->count >= 3) {
-        PasswordEntry entry;
-        entry.service = row->fields[0];
-        entry.username = row->fields[1];
-        entry.password = row->fields[2];
-        entry.totp_secret = (row->count >= 4) ? row->fields[3] : "";
-        entry.recovery_codes = (row->count >= 5) ? row->fields[4] : "";
+        const char *service = row->fields[0];
+        const char *username = row->fields[1];
+        const char *password = row->fields[2];
+        const char *totp = (row->count >= 4) ? row->fields[3] : "";
+        const char *recovery = (row->count >= 5) ? row->fields[4] : "";
 
-        if(database_add_entry(&entry) < 0) {
-            fprintf(stderr, "Failed to import row for service: %s\n", entry.service); // flawfinder: ignore
+        // Check if entry exists
+        PasswordEntry *existing = database_get_entry_by_identity(service, username);
+        if (existing) {
+            bool identical = (strcmp(existing->password, password) == 0 &&
+                             strcmp(existing->totp_secret, totp) == 0 &&
+                             strcmp(existing->recovery_codes, recovery) == 0);
+
+            if (identical) {
+                printf("[SKIP] '%s' (%s) is already in the vault and matches CSV.\n", service, username);
+            } else {
+                printf("[CONFLICT] '%s' (%s) already exists but data differs.\n", service, username);
+                printf("  Existing: %s | Incoming: %s\n", existing->password, password);
+                printf("  Overwrite local entry? (y/N): ");
+                char choice[16];
+                read_line(choice, sizeof(choice));
+                if (choice[0] == 'y' || choice[0] == 'Y') {
+                    PasswordEntry updated;
+                    updated.id = existing->id;
+                    updated.service = (char*)service;
+                    updated.username = (char*)username;
+                    updated.password = (char*)password;
+                    updated.totp_secret = (char*)totp;
+                    updated.recovery_codes = (char*)recovery;
+
+                    if (database_update_entry(&updated) == 0) {
+                        printf("[OK] Updated '%s'.\n", service);
+                    } else {
+                        fprintf(stderr, "[ERROR] Failed to update '%s'.\n", service);
+                    }
+                } else {
+                    printf("[SKIP] Kept local version of '%s'.\n", service);
+                }
+            }
+            free_password_entries(existing, 1);
+        } else {
+            PasswordEntry entry;
+            entry.service = (char*)service;
+            entry.username = (char*)username;
+            entry.password = (char*)password;
+            entry.totp_secret = (char*)totp;
+            entry.recovery_codes = (char*)recovery;
+
+            if (database_add_entry(&entry) < 0) {
+                fprintf(stderr, "[ERROR] Failed to import '%s'.\n", service);
+            } else {
+                printf("[ADD] Imported '%s' (%s).\n", service, username);
+            }
         }
     }
     for (int i = 0; i < row->count; i++) {
@@ -134,7 +181,9 @@ static void cli_import_row_cb(int c, void *data) {
 }
 
 // --- Forward Declarations for CLI functions ---
+static void read_line(char *buf, int size);
 static void cli_list_entries();
+static void cli_search_entries();
 static void cli_add_entry();
 static void cli_view_entry();
 static void cli_edit_entry();
@@ -187,6 +236,33 @@ static void cli_list_entries() {
     printf("%s", "--------------------------------------------------------\n"); // flawfinder: ignore
     for (int i = 0; i < count; i++) {
         printf("%-5d %-25s %-25s\n", entries[i].id, entries[i].service, entries[i].username); // flawfinder: ignore
+    }
+
+    free_password_entries(entries, count);
+}
+
+static void cli_search_entries() {
+    char query[256];
+    printf("Enter search query (service or username): ");
+    read_line(query, sizeof(query));
+
+    if (strlen(query) == 0) {
+        printf("Search query cannot be empty.\n");
+        return;
+    }
+
+    int count = 0;
+    PasswordEntry *entries = database_search(query, &count);
+    if (!entries || count == 0) {
+        printf("No entries matching '%s' found.\n", query);
+        return;
+    }
+
+    printf("\nFound %d matching entries:\n", count);
+    printf("%-5s %-25s %-25s\n", "ID", "Service", "Username");
+    printf("%s", "--------------------------------------------------------\n");
+    for (int i = 0; i < count; i++) {
+        printf("%-5d %-25s %-25s\n", entries[i].id, entries[i].service, entries[i].username);
     }
 
     free_password_entries(entries, count);
@@ -357,13 +433,14 @@ static void cli_delete_entry() {
 static void interactive_mode() {
     char choice;
     while (true) {
-        printf("%s", "\n[l]ist, [a]dd, [v]iew, [e]dit, [d]elete, [g]enerate, [h]ealth-check, [c]hange-pass, [i]mport, e[x]port, [q]uit\n"); // flawfinder: ignore
+        printf("%s", "\n[l]ist, [s]earch, [a]dd, [v]iew, [e]dit, [d]elete, [g]enerate, [h]ealth-check, [c]hange-pass, [i]mport, e[x]port, [q]uit\n"); // flawfinder: ignore
         printf("%s", "> "); // flawfinder: ignore
         if (scanf(" %c", &choice) != 1) { choice = 0; } // flawfinder: ignore
         while(getchar() != '\n'); // flawfinder: ignore
 
         switch (choice) {
             case 'l': cli_list_entries(); break;
+            case 's': cli_search_entries(); break;
             case 'a': cli_add_entry(); break;
             case 'v': cli_view_entry(); break;
             case 'd': cli_delete_entry(); break;
@@ -397,9 +474,26 @@ static void interactive_mode() {
 }
 
 int main(int argc, char *argv[]) {
-    if (argc > 1) { // Non-interactive for now, can be expanded
-        print_help();
-        return 0;
+    const char *search_query = NULL;
+
+    // --- Parse Arguments ---
+    static struct option long_options[] = {
+        {"search", required_argument, 0, 's'},
+        {"help",   no_argument,       0, 'h'},
+        {0, 0, 0, 0}
+    };
+
+    int opt;
+    while ((opt = getopt_long(argc, argv, "s:h", long_options, NULL)) != -1) {
+        switch (opt) {
+            case 's':
+                search_query = optarg;
+                break;
+            case 'h':
+            default:
+                print_help();
+                return 0;
+        }
     }
 
     // --- Get Master Password ---
@@ -484,7 +578,23 @@ int main(int argc, char *argv[]) {
     printf("%s", "Database opened successfully.\n\n"); // flawfinder: ignore
 
     // --- Main Application Logic ---
-    interactive_mode();
+    if (search_query) {
+        int count = 0;
+        PasswordEntry *entries = database_search(search_query, &count);
+        if (!entries || count == 0) {
+            printf("No entries matching '%s' found.\n", search_query);
+        } else {
+            printf("Found %d matching entries:\n", count);
+            printf("%-5s %-25s %-25s\n", "ID", "Service", "Username");
+            printf("%s", "--------------------------------------------------------\n");
+            for (int i = 0; i < count; i++) {
+                printf("%-5d %-25s %-25s\n", entries[i].id, entries[i].service, entries[i].username);
+            }
+            free_password_entries(entries, count);
+        }
+    } else {
+        interactive_mode();
+    }
 
     // --- Cleanup ---
     database_close();
@@ -835,6 +945,9 @@ static void cli_change_password() {
 }
 
 static void print_help() {
-    printf("%s", "Usage: securepasswd_cli\n"); // flawfinder: ignore
-    printf("%s", "The application runs in interactive mode.\n"); // flawfinder: ignore
+    printf("Usage: securepasswd_cli [options]\n\n");
+    printf("Options:\n");
+    printf("  -s, --search <query>  Search for entries by service or username and exit.\n");
+    printf("  -h, --help            Show this help message.\n\n");
+    printf("If no options are provided, the application runs in interactive mode.\n");
 }

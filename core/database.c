@@ -112,7 +112,7 @@ PasswordEntry* database_get_all_entries(int *count) {
 
     // Then, get ONLY metadata (id, service, username)
     // Sensitive fields (password, totp, recovery) are intentionally NOT retrieved here.
-    if (sqlite3_prepare_v2(db, "SELECT id, service, username FROM passwords", -1, &stmt, NULL) != SQLITE_OK) {
+    if (sqlite3_prepare_v2(db, "SELECT id, service, username FROM passwords ORDER BY service COLLATE NOCASE ASC, username COLLATE NOCASE ASC", -1, &stmt, NULL) != SQLITE_OK) {
         fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db)); // flawfinder: ignore
         free(entries);
         return NULL;
@@ -136,6 +136,110 @@ PasswordEntry* database_get_all_entries(int *count) {
 
     sqlite3_finalize(stmt);
     return entries;
+}
+
+PasswordEntry* database_search(const char *query, int *count) {
+    if (!db || !query) return NULL;
+
+    sqlite3_stmt *stmt;
+    char like_query[1024];
+    snprintf(like_query, sizeof(like_query), "%%%s%%", query);
+
+    // Count matching entries
+    const char *count_sql = "SELECT COUNT(*) FROM passwords WHERE service LIKE ? OR username LIKE ?";
+    if (sqlite3_prepare_v2(db, count_sql, -1, &stmt, NULL) != SQLITE_OK) {
+        fprintf(stderr, "Failed to prepare search count statement: %s\n", sqlite3_errmsg(db));
+        return NULL;
+    }
+    sqlite3_bind_text(stmt, 1, like_query, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 2, like_query, -1, SQLITE_TRANSIENT);
+
+    if (sqlite3_step(stmt) != SQLITE_ROW) {
+        *count = 0;
+        sqlite3_finalize(stmt);
+        return NULL;
+    }
+    *count = sqlite3_column_int(stmt, 0);
+    sqlite3_finalize(stmt);
+
+    if (*count == 0) {
+        return NULL;
+    }
+
+    PasswordEntry *entries = malloc(*count * sizeof(PasswordEntry));
+    if (!entries) {
+        fputs("Failed to allocate memory for search results\n", stderr);
+        return NULL;
+    }
+
+    // Get matching metadata
+    const char *search_sql = "SELECT id, service, username FROM passwords WHERE service LIKE ? OR username LIKE ? ORDER BY service COLLATE NOCASE ASC";
+    if (sqlite3_prepare_v2(db, search_sql, -1, &stmt, NULL) != SQLITE_OK) {
+        fprintf(stderr, "Failed to prepare search statement: %s\n", sqlite3_errmsg(db));
+        free(entries);
+        return NULL;
+    }
+    sqlite3_bind_text(stmt, 1, like_query, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 2, like_query, -1, SQLITE_TRANSIENT);
+
+    int i = 0;
+    while (sqlite3_step(stmt) == SQLITE_ROW && i < *count) {
+        entries[i].id = sqlite3_column_int(stmt, 0);
+        const unsigned char *service = sqlite3_column_text(stmt, 1);
+        const unsigned char *username = sqlite3_column_text(stmt, 2);
+
+        entries[i].service = service ? strdup((const char *)service) : strdup("");
+        entries[i].username = username ? strdup((const char *)username) : strdup("");
+
+        entries[i].password = NULL;
+        entries[i].totp_secret = NULL;
+        entries[i].recovery_codes = NULL;
+        i++;
+    }
+
+    sqlite3_finalize(stmt);
+    return entries;
+}
+
+PasswordEntry* database_get_entry_by_identity(const char *service, const char *username) {
+    if (!db || !service || !username) return NULL;
+
+    sqlite3_stmt *stmt;
+    const char *sql = "SELECT id, service, username, password, totp_secret, recovery_codes FROM passwords WHERE LOWER(service) = LOWER(?) AND LOWER(username) = LOWER(?)";
+
+    if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
+        return NULL;
+    }
+
+    sqlite3_bind_text(stmt, 1, service, -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 2, username, -1, SQLITE_TRANSIENT);
+
+    if (sqlite3_step(stmt) != SQLITE_ROW) {
+        sqlite3_finalize(stmt);
+        return NULL;
+    }
+
+    PasswordEntry *entry = malloc(sizeof(PasswordEntry));
+    if (!entry) {
+        sqlite3_finalize(stmt);
+        return NULL;
+    }
+
+    entry->id = sqlite3_column_int(stmt, 0);
+    const unsigned char *s = sqlite3_column_text(stmt, 1);
+    const unsigned char *u = sqlite3_column_text(stmt, 2);
+    const unsigned char *p = sqlite3_column_text(stmt, 3);
+    const unsigned char *ts = sqlite3_column_text(stmt, 4);
+    const unsigned char *rc = sqlite3_column_text(stmt, 5);
+
+    entry->service = s ? strdup((const char *)s) : strdup("");
+    entry->username = u ? strdup((const char *)u) : strdup("");
+    entry->password = p ? strdup((const char *)p) : strdup("");
+    entry->totp_secret = ts ? strdup((const char *)ts) : strdup("");
+    entry->recovery_codes = rc ? strdup((const char *)rc) : strdup("");
+
+    sqlite3_finalize(stmt);
+    return entry;
 }
 
 PasswordEntry* database_get_entry_secure(int id) {
