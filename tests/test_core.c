@@ -17,7 +17,7 @@
 const char* TEST_DB = "test_vault.db";
 
 static void test_database_lifecycle() {
-    printf("%s", "--- Running Test: Database Lifecycle ---\n"); // flawfinder: ignore
+    fputs("--- Running Test: Database Lifecycle ---\n", stdout);
 
     // 1. Test opening and creating the database
     assert(database_open(TEST_DB, "test_password") == 0);
@@ -87,8 +87,56 @@ static void test_database_lifecycle() {
     fputs("--- Test Complete ---\n\n", stdout);
 }
 
+static void test_database_search_and_identity() {
+    fputs("--- Running Test: Database Search and Identity ---\n", stdout);
+
+    unlink(TEST_DB);
+    assert(database_open(TEST_DB, "test_password") == 0);
+
+    // 1. Add multiple entries
+    PasswordEntry e1 = { .service = "GitHub", .username = "user1", .password = "pass1", .totp_secret = "", .recovery_codes = "" };
+    PasswordEntry e2 = { .service = "GitLab", .username = "user2", .password = "pass2", .totp_secret = "", .recovery_codes = "" };
+    PasswordEntry e3 = { .service = "Google", .username = "admin", .password = "pass3", .totp_secret = "", .recovery_codes = "" };
+
+    assert(database_add_entry(&e1) > 0);
+    assert(database_add_entry(&e2) > 0);
+    assert(database_add_entry(&e3) > 0);
+
+    // 2. Test identity retrieval
+    PasswordEntry *res = database_get_entry_by_identity("GitHub", "user1");
+    assert(res != NULL);
+    assert(strcmp(res->password, "pass1") == 0);
+    free_password_entries(res, 1);
+    fputs("  [PASSED] database_get_entry_by_identity (exact match)\n", stdout);
+
+    // 3. Test identity retrieval (case-insensitive)
+    res = database_get_entry_by_identity("github", "USER1");
+    assert(res != NULL);
+    assert(strcmp(res->service, "GitHub") == 0);
+    free_password_entries(res, 1);
+    fputs("  [PASSED] database_get_entry_by_identity (case-insensitive)\n", stdout);
+
+    // 4. Test search (partial match)
+    int count = 0;
+    PasswordEntry *search_results = database_search("Git", &count);
+    assert(count == 2); // GitHub and GitLab
+    assert(search_results != NULL);
+    free_password_entries(search_results, count);
+    fputs("  [PASSED] database_search (partial match)\n", stdout);
+
+    // 5. Test search (no match)
+    search_results = database_search("NonExistent", &count);
+    assert(count == 0);
+    assert(search_results == NULL);
+    fputs("  [PASSED] database_search (no match)\n", stdout);
+
+    database_close();
+    unlink(TEST_DB);
+    fputs("--- Test Complete ---\n\n", stdout);
+}
+
 static void test_totp_generation() {
-    printf("%s", "--- Running Test: TOTP Generation ---\n"); // flawfinder: ignore
+    fputs("--- Running Test: TOTP Generation ---\n", stdout);
     // Test vector from RFC 6238 for SHA1
     // Secret: "12345678901234567890"
     // Time: 59
@@ -103,8 +151,9 @@ static void test_totp_generation() {
 
 int main() {
     test_database_lifecycle();
+    test_database_search_and_identity();
     test_totp_generation();
 
-    printf("%s", "All tests passed!\n"); // flawfinder: ignore
+    fputs("All tests passed!\n", stdout);
     return 0;
 }

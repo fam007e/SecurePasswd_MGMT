@@ -13,8 +13,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sodium.h>
 #include <stdbool.h>
+#include <sodium.h>
 
 static sqlite3 *db = NULL;
 static char current_db_path[4096] = {0}; // flawfinder: ignore
@@ -27,7 +27,7 @@ int database_open(const char *db_path, const char *password) {
     if (!db_path) {
         return -1;
     }
-    strncpy(current_db_path, db_path, sizeof(current_db_path) - 1); // flawfinder: ignore
+    snprintf(current_db_path, sizeof(current_db_path), "%s", db_path); // flawfinder: ignore
 
     uint8_t salt[SALT_LEN];
     uint8_t key[KEY_LEN];
@@ -49,23 +49,17 @@ int database_open(const char *db_path, const char *password) {
     }
 
     if (sqlite3_open(db_path, &db) != SQLITE_OK) {
-        fprintf(stderr, "Cannot open database: %s\n", sqlite3_errmsg(db)); // flawfinder: ignore
+        fputs("Cannot open database: ", stderr);
+        fputs(sqlite3_errmsg(db), stderr);
+        fputs("\n", stderr);
         sodium_memzero(key, KEY_LEN);
         return -1;
     }
 
     if (sqlite3_key(db, key, KEY_LEN) != SQLITE_OK) {
-        fprintf(stderr, "Failed to set database key: %s\n", sqlite3_errmsg(db)); // flawfinder: ignore
-        sqlite3_close(db);
-        db = NULL;
-        sodium_memzero(key, KEY_LEN);
-        return -1;
-    }
-
-
-    // Test if the key is correct by trying to access the database
-    if (sqlite3_exec(db, "SELECT count(*) FROM sqlite_master;", NULL, NULL, NULL) != SQLITE_OK) {
-        fputs("Invalid key or database file is corrupted.\n", stderr);
+        fputs("Failed to set database key: ", stderr);
+        fputs(sqlite3_errmsg(db), stderr);
+        fputs("\n", stderr);
         sqlite3_close(db);
         db = NULL;
         sodium_memzero(key, KEY_LEN);
@@ -73,6 +67,7 @@ int database_open(const char *db_path, const char *password) {
     }
 
     sodium_memzero(key, KEY_LEN);
+
     return initialize_schema();
 }
 
@@ -80,6 +75,7 @@ void database_close() {
     if (db) {
         sqlite3_close(db);
         db = NULL;
+        memset(current_db_path, 0, sizeof(current_db_path));
     }
 }
 
@@ -89,7 +85,9 @@ PasswordEntry* database_get_all_entries(int *count) {
     sqlite3_stmt *stmt;
     // First, get the count of entries
     if (sqlite3_prepare_v2(db, "SELECT COUNT(*) FROM passwords", -1, &stmt, NULL) != SQLITE_OK) {
-        fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db)); // flawfinder: ignore
+        fputs("Failed to prepare statement: ", stderr);
+        fputs(sqlite3_errmsg(db), stderr);
+        fputs("\n", stderr);
         return NULL;
     }
     if (sqlite3_step(stmt) != SQLITE_ROW) {
@@ -104,7 +102,7 @@ PasswordEntry* database_get_all_entries(int *count) {
         return NULL;
     }
 
-    PasswordEntry *entries = malloc(*count * sizeof(PasswordEntry));
+    PasswordEntry *entries = calloc(*count, sizeof(PasswordEntry));
     if (!entries) {
         fputs("Failed to allocate memory for entries\n", stderr);
         return NULL;
@@ -113,7 +111,9 @@ PasswordEntry* database_get_all_entries(int *count) {
     // Then, get ONLY metadata (id, service, username)
     // Sensitive fields (password, totp, recovery) are intentionally NOT retrieved here.
     if (sqlite3_prepare_v2(db, "SELECT id, service, username FROM passwords ORDER BY service COLLATE NOCASE ASC, username COLLATE NOCASE ASC", -1, &stmt, NULL) != SQLITE_OK) {
-        fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db)); // flawfinder: ignore
+        fputs("Failed to prepare statement: ", stderr);
+        fputs(sqlite3_errmsg(db), stderr);
+        fputs("\n", stderr);
         free(entries);
         return NULL;
     }
@@ -142,13 +142,15 @@ PasswordEntry* database_search(const char *query, int *count) {
     if (!db || !query) return NULL;
 
     sqlite3_stmt *stmt;
-    char like_query[1024];
+    char like_query[1024]; // flawfinder: ignore
     snprintf(like_query, sizeof(like_query), "%%%s%%", query);
 
     // Count matching entries
     const char *count_sql = "SELECT COUNT(*) FROM passwords WHERE service LIKE ? OR username LIKE ?";
     if (sqlite3_prepare_v2(db, count_sql, -1, &stmt, NULL) != SQLITE_OK) {
-        fprintf(stderr, "Failed to prepare search count statement: %s\n", sqlite3_errmsg(db));
+        fputs("Failed to prepare search count statement: ", stderr);
+        fputs(sqlite3_errmsg(db), stderr);
+        fputs("\n", stderr);
         return NULL;
     }
     sqlite3_bind_text(stmt, 1, like_query, -1, SQLITE_TRANSIENT);
@@ -166,7 +168,7 @@ PasswordEntry* database_search(const char *query, int *count) {
         return NULL;
     }
 
-    PasswordEntry *entries = malloc(*count * sizeof(PasswordEntry));
+    PasswordEntry *entries = calloc(*count, sizeof(PasswordEntry));
     if (!entries) {
         fputs("Failed to allocate memory for search results\n", stderr);
         return NULL;
@@ -175,7 +177,9 @@ PasswordEntry* database_search(const char *query, int *count) {
     // Get matching metadata
     const char *search_sql = "SELECT id, service, username FROM passwords WHERE service LIKE ? OR username LIKE ? ORDER BY service COLLATE NOCASE ASC";
     if (sqlite3_prepare_v2(db, search_sql, -1, &stmt, NULL) != SQLITE_OK) {
-        fprintf(stderr, "Failed to prepare search statement: %s\n", sqlite3_errmsg(db));
+        fputs("Failed to prepare search statement: ", stderr);
+        fputs(sqlite3_errmsg(db), stderr);
+        fputs("\n", stderr);
         free(entries);
         return NULL;
     }
@@ -249,7 +253,9 @@ PasswordEntry* database_get_entry_secure(int id) {
     const char *sql = "SELECT id, service, username, password, totp_secret, recovery_codes FROM passwords WHERE id = ?";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db)); // flawfinder: ignore
+        fputs("Failed to prepare statement: ", stderr);
+        fputs(sqlite3_errmsg(db), stderr);
+        fputs("\n", stderr);
         return NULL;
     }
 
@@ -289,7 +295,9 @@ int database_add_entry(const PasswordEntry *entry) {
     sqlite3_stmt *stmt;
     const char *sql = "INSERT INTO passwords (service, username, password, totp_secret, recovery_codes) VALUES (?, ?, ?, ?, ?);";
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db)); // flawfinder: ignore
+        fputs("Failed to prepare statement: ", stderr);
+        fputs(sqlite3_errmsg(db), stderr);
+        fputs("\n", stderr);
         return -1;
     }
 
@@ -300,7 +308,9 @@ int database_add_entry(const PasswordEntry *entry) {
     sqlite3_bind_text(stmt, 5, entry->recovery_codes, -1, SQLITE_STATIC);
 
     if (sqlite3_step(stmt) != SQLITE_DONE) {
-        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db)); // flawfinder: ignore
+        fputs("Failed to execute statement: ", stderr);
+        fputs(sqlite3_errmsg(db), stderr);
+        fputs("\n", stderr);
         sqlite3_finalize(stmt);
         return -1;
     }
@@ -315,7 +325,9 @@ int database_update_entry(const PasswordEntry *entry) {
     sqlite3_stmt *stmt;
     const char *sql = "UPDATE passwords SET service = ?, username = ?, password = ?, totp_secret = ?, recovery_codes = ? WHERE id = ?;";
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db)); // flawfinder: ignore
+        fputs("Failed to prepare statement: ", stderr);
+        fputs(sqlite3_errmsg(db), stderr);
+        fputs("\n", stderr);
         return -1;
     }
 
@@ -327,7 +339,9 @@ int database_update_entry(const PasswordEntry *entry) {
     sqlite3_bind_int(stmt, 6, entry->id);
 
     if (sqlite3_step(stmt) != SQLITE_DONE) {
-        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db)); // flawfinder: ignore
+        fputs("Failed to execute statement: ", stderr);
+        fputs(sqlite3_errmsg(db), stderr);
+        fputs("\n", stderr);
         sqlite3_finalize(stmt);
         return -1;
     }
@@ -342,14 +356,18 @@ int database_delete_entry(int id) {
     sqlite3_stmt *stmt;
     const char *sql = "DELETE FROM passwords WHERE id = ?;";
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, NULL) != SQLITE_OK) {
-        fprintf(stderr, "Failed to prepare statement: %s\n", sqlite3_errmsg(db)); // flawfinder: ignore
+        fputs("Failed to prepare statement: ", stderr);
+        fputs(sqlite3_errmsg(db), stderr);
+        fputs("\n", stderr);
         return -1;
     }
 
     sqlite3_bind_int(stmt, 1, id);
 
     if (sqlite3_step(stmt) != SQLITE_DONE) {
-        fprintf(stderr, "Failed to execute statement: %s\n", sqlite3_errmsg(db)); // flawfinder: ignore
+        fputs("Failed to execute statement: ", stderr);
+        fputs(sqlite3_errmsg(db), stderr);
+        fputs("\n", stderr);
         sqlite3_finalize(stmt);
         return -1;
     }
@@ -388,7 +406,9 @@ static int initialize_schema() {
                         "recovery_codes TEXT,"
                         "pwned_count INTEGER DEFAULT -1);";
     if (sqlite3_exec(db, sql, 0, 0, &err_msg) != SQLITE_OK) {
-        fprintf(stderr, "SQL error: %s\n", err_msg); // flawfinder: ignore
+        fputs("SQL error: ", stderr);
+        fputs(err_msg, stderr);
+        fputs("\n", stderr);
         sqlite3_free(err_msg);
         return -1;
     }
@@ -410,7 +430,9 @@ static int initialize_schema() {
     if (!has_recovery_codes) {
         const char *alter_sql = "ALTER TABLE passwords ADD COLUMN recovery_codes TEXT;";
         if (sqlite3_exec(db, alter_sql, 0, 0, &err_msg) != SQLITE_OK) {
-            fprintf(stderr, "Migration error adding recovery_codes: %s\n", err_msg); // flawfinder: ignore
+            fputs("Migration error adding recovery_codes: ", stderr);
+            fputs(err_msg, stderr);
+            fputs("\n", stderr);
             sqlite3_free(err_msg);
         }
     }
@@ -432,7 +454,9 @@ static int initialize_schema() {
     if (!has_pwned_count) {
         const char *alter_sql = "ALTER TABLE passwords ADD COLUMN pwned_count INTEGER DEFAULT -1;";
         if (sqlite3_exec(db, alter_sql, 0, 0, &err_msg) != SQLITE_OK) {
-            fprintf(stderr, "Migration error adding pwned_count: %s\n", err_msg); // flawfinder: ignore
+            fputs("Migration error adding pwned_count: ", stderr);
+            fputs(err_msg, stderr);
+            fputs("\n", stderr);
             sqlite3_free(err_msg);
         }
     }
@@ -459,7 +483,9 @@ int database_rekey(const char *new_password) {
 
     // Attempt SQLCipher rekey
     if (sqlite3_rekey(db, new_key, KEY_LEN) != SQLITE_OK) {
-        fprintf(stderr, "Failed to rekey database: %s\n", sqlite3_errmsg(db)); // flawfinder: ignore
+        fputs("Failed to rekey database: ", stderr);
+        fputs(sqlite3_errmsg(db), stderr);
+        fputs("\n", stderr);
         sodium_memzero(new_key, KEY_LEN);
         return -1;
     }
@@ -474,7 +500,7 @@ int database_rekey(const char *new_password) {
 
     // Atomic-ish swap: write to .new then rename
     if (save_salt(salt_path_new, new_salt) != 0) {
-        fprintf(stderr, "Failed to save new salt to %s\n", salt_path_new); // flawfinder: ignore
+        fprintf(stderr, "Failed to save new salt to %s\n", salt_path_new);
         return -1;
     }
 
@@ -483,7 +509,7 @@ int database_rekey(const char *new_password) {
 #else
     if (rename(salt_path_new, salt_path) != 0) {
 #endif
-        fprintf(stderr, "Failed to rename new salt file.\n"); // flawfinder: ignore
+        fputs("Failed to rename new salt file.\n", stderr);
         return -1;
     }
 

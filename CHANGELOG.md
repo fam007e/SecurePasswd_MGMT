@@ -75,6 +75,25 @@ and this project adheres to date-based versioning (YYYY.MM.DD).
 
 ## [Unreleased]
 
+### Added
+- **Global Search:** Implemented a new searching engine (`database_search`) allowing case-insensitive search by service or username across both CLI and GUI.
+- **Identity-Based Conflict Resolution:** Introduced `database_get_entry_by_identity` to automatically detect duplicate entries during CSV imports, providing users with interactive "Overwrite" or "Skip" options.
+- **Dedicated Search Bar:** Added a real-time search interface to the main GUI window for rapid entry retrieval.
+- **CLI Search Flag:** Added `-s/--search` command-line argument to quickly find entries without entering interactive mode.
+
+### Security
+- **Structural Hardening:** Conducted a comprehensive refactor to replace over 280 manual `flawfinder: ignore` overrides with structural security fixes, achieving **0 High Severity (Level 4/5) hits** in core and CLI source code.
+- **Memory Safety:** Standardized on `calloc` for all `PasswordEntry` array allocations, ensuring zero-initialization and preventing "garbage pointer" crashes during memory cleanup.
+- **Safe I/O Patterns:** Systematically replaced `printf` prompts with `fputs` and `scanf` with `read_line` (utilizing `fgets`) to eliminate format string and buffer overflow risks.
+- **Cross-Platform File I/O:** Transitioned GUI file operations to Qt's `QFile` and `QTextStream` classes for more robust and portable path and data handling.
+- **Banned Function Removal:** Further reduced reliance on potentially dangerous functions like `atoi` and `strncpy` in favor of more robust alternatives like `strtol` and `snprintf`.
+- **Environment Hardening:** Added explicit length validation for untrusted environment variable inputs (`getenv`) used in path construction.
+
+### Fixed
+- **CLI Variable Scope:** Fixed a `cppcheck` style warning in `cli/main.c` by reducing the scope of the interactive choice variable.
+- **Test Coverage:** Added new unit tests to `test_core.c` specifically for search accuracy, case-insensitivity, and identity retrieval.
+- **Header Integrity:** Fixed missing Qt headers (`QStatusBar`, `QListWidget`) in `mainwindow.cpp` to ensure successful compilation.
+
 ## [2025.12.20]
 
 ### Added

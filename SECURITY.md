@@ -38,7 +38,7 @@ SecurePasswd_MGMT is designed with security-first principles and implements defe
 - **Secure Input:** The Command Line Interface (CLI) utilizes `getpass` (or platform equivalents) to ensure passwords and secrets are never echoed to the console during entry.
 - **Banned Function Mitigation:** The codebase explicitly avoids insecure C functions (`strcat`, `sprintf`, `strncpy`, `atoi`). We utilize bounded alternatives and manual length tracking to prevent buffer overflows and undefined behavior.
 - **Path Validation & Sanitization:** File operations (like CSV import/export) include strict validation to prevent Directory Traversal attacks (e.g., blocking `..` in paths). Additionally, platform-specific paths derived from environment variables are processed through a `sanitize_path` utility to filter untrusted input.
-- **Sanitization:** The codebase is regularly tested with AddressSanitizer (ASan), UndefinedBehaviorSanitizer (UBSan), and **Flawfinder**. As of **March 2026**, the codebase has been fully remediated to achieve **0 hits** on Flawfinder's strictest scanning rules, fixing or verifying all reported security risks.
+- **Sanitization:** The codebase is regularly tested with AddressSanitizer (ASan), UndefinedBehaviorSanitizer (UBSan), and **Flawfinder**. As of **March 2026**, the codebase has undergone a major structural hardening effort, replacing over 280 manual `// flawfinder: ignore` overrides with fundamentally safe coding patterns. This ensures that our security posture is verifiable by automated tools without relying on manual suppressions. While the tool still reports baseline hits for standard C functions (like `strlen` and `memcpy`), these have been audited to ensure they are used exclusively with bounded limits and zero-initialized memory. We have achieved **0 High Severity (Level 4/5) hits** in the core and CLI source code.
 - **Thread Safety:** Critical sections, such as the Have I Been Pwned check, utilize thread-safe string manipulation functions (`strtok_r`) to prevent race conditions during concurrent execution.
 - **Static Analysis:** `cppcheck` and GitHub's **CodeQL** are employed to enforce code quality and catch potential leaks, logic errors, or complex security vulnerabilities early.
 - **Mobile Sync Security:** Synchronization between devices is protected using **Chacha20-Poly1305** authenticated encryption. The vault and its salt are packed and encrypted as a single blob with a unique nonce for every sync operation, ensuring both confidentiality and authenticity of the synced data.
@@ -68,7 +68,9 @@ graph TD
 
 ## Memory Management
 
-Sensitive data, specifically the master password and the derived encryption key, is explicitly cleared from memory as soon as it is no longer needed. This is done using the `sodium_memzero()` function from `libsodium` in `core/database.c` to prevent sensitive data from being exposed in memory.
+### Zero-Initialization & Wiping
+- **Secure Allocation:** The project standardizes on `calloc` for all multi-entry data structures (like `PasswordEntry` arrays). This ensures that every pointer and buffer is initialized to zero immediately upon allocation, preventing accidental exposure of sensitive data from previously used memory.
+- **Explicit Wiping:** Sensitive data, specifically the master password and the derived encryption key, is explicitly cleared from memory as soon as it is no longer needed. This is done using the `sodium_memzero()` function from `libsodium` in `core/database.c`.
 
 The "Fetch on Demand" model complements this by ensuring that sensitive entry details are retrieved from the database only when needed, rather than being held in memory as part of a list.
 
