@@ -786,6 +786,8 @@ static void cli_export_csv(const char* filepath) {
             // Simple sanitization lambda-like logic for C
 #define SANITIZE(field) ((field && (field[0] == '=' || field[0] == '+' || field[0] == '-' || field[0] == '@')) ? "'" : "")
 
+            // Suppress CodeQL warning: This is an intentional Export feature.
+            // The user is presented with a clear warning before this code executes.
             // codeql[cpp/cleartext-storage-file]
             fprintf(fp, "\"%s%s\",\"%s%s\",\"%s%s\",\"%s%s\",\"%s%s\"\n",
                     SANITIZE(s), s ? s : "",
