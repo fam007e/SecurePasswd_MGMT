@@ -12,7 +12,7 @@
 #include <errno.h>
 #endif
 
-#ifndef _MSC_V
+#ifndef _MSC_VER
 #include <termios.h> // For hiding input
 #include <unistd.h>  // For STDIN_FILENO
 

@@ -74,7 +74,7 @@ jobs:
     - name: Configure CMake (Linux/macOS)
       if: runner.os != 'Windows'
       run: |
-        cmake -B build -DCMAKE_BUILD_TYPE=Debug \
+        cmake -B build -DCMAKE_BUILD_TYPE=Release \
           ${{ runner.os == 'Linux' && '-DCMAKE_C_FLAGS="-fsanitize=address,undefined" -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined"' || '' }} \
           ${{ runner.os == 'macOS' && '-DLIBSODIUM_ROOT=$(brew --prefix libsodium) -DARGON2_ROOT=$(brew --prefix argon2)' || '' }}
 
@@ -84,12 +84,12 @@ jobs:
       run: |
         $vcpkgRoot = "${{ github.workspace }}/vcpkg"
         cmake -B build `
-          -DCMAKE_BUILD_TYPE=Debug `
+          -DCMAKE_BUILD_TYPE=Release `
           -DCMAKE_TOOLCHAIN_FILE="$vcpkgRoot\scripts\buildsystems\vcpkg.cmake" `
           -DVCPKG_TARGET_TRIPLET=x64-windows
 
     - name: Build
-      run: cmake --build build --config Debug
+      run: cmake --build build --config Release
 
     # --- Test ---
     - name: Run Tests
@@ -97,8 +97,8 @@ jobs:
       run: |
         cd build
         if [[ "${{ runner.os }}" == "Windows" ]]; then
-          ./tests/Debug/core_tests.exe
-          ./tests/Debug/cmocka_tests.exe
+          ./tests/Release/core_tests.exe
+          ./tests/Release/cmocka_tests.exe
         else
           ./tests/core_tests
           ./tests/cmocka_tests
