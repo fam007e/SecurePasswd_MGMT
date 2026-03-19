@@ -6,5 +6,6 @@ var searchData=
   ['memory_3',['memory',['../structMemoryStruct.html#a218a6fde0f367d44400542cbe523e943',1,'MemoryStruct']]],
   ['memory_20management_4',['Memory Management',['../md_SECURITY.html#autotoc_md37',1,'']]],
   ['memory_5fcost_5',['MEMORY_COST',['../key__derivation_8c.html#abbe36b544024ce52b9fb316584e06996',1,'key_derivation.c']]],
-  ['memorystruct_6',['MemoryStruct',['../structMemoryStruct.html',1,'']]]
+  ['memorystruct_6',['MemoryStruct',['../structMemoryStruct.html',1,'']]],
+  ['multi_20platform_7',['Build Status: ✓ PASS (Multi-Platform)',['../md_docs_2TESTING.html#autotoc_md101',1,'']]]
 ];

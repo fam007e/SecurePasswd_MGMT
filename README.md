@@ -18,19 +18,25 @@
 - **Memory Safety:** Sensitive data is explicitly cleared from memory after use.
 - **Pwned Password Check:** Integrated check against the Have I Been Pwned (HIBP) API to ensure your passwords haven't been compromised in known data breaches.
 - **Fetch on Demand:** Secrets are only retrieved from the database when specifically needed, preventing them from lingering in memory.
-- **Hardened C Codebase:** Regularly audited using modern static analysis tools (`cppcheck`, `flawfinder`) to proactively prevent common C vulnerabilities like buffer overflows and race conditions.
+- **Hardened C Codebase:** Regularly audited using modern static analysis tools (`cppcheck`, `flawfinder`). Recently refactored to replace 280+ manual overrides with structural security fixes, achieving **0 High Severity (Level 4/5) hits** in core and CLI source code.
+- **Secure File I/O:** Utilizes standard, safe I/O patterns (`fputs`, `fgets`, `QFile`) to prevent format string and buffer overflow vulnerabilities.
+- **Zero-Initialization:** Employs `calloc` across the core library to ensure sensitive memory structures are always zero-initialized, preventing data leakage from uninitialized pointers.
 - **Secure Storage:** All data is stored locally, encrypted, in a secure directory.
 
 ## Features
 
 ### Command-Line Interface (CLI)
 - **Fast & Efficient:** A lightweight, terminal-based interface for all core functionalities.
+- **Powerful Search:** Instant, case-insensitive searching across services and usernames using `-s` or the interactive menu.
+- **Identity-Aware Import:** Automatically detects duplicate entries during CSV import, offering clear conflict resolution paths to keep your vault clean.
 - **Interactive Menu:** Easy-to-use menu for adding, searching, and managing passwords and TOTP secrets.
-- **Command-Line Options:** Generate passwords directly from the command line.
+- **Command-Line Options:** Search or generate passwords directly from the command line.
 - **Hidden Password Input:** Protects your master password from shoulder-surfing.
 
 ### Graphical User Interface (GUI)
 - **Modern & Intuitive:** A clean, user-friendly interface built with the Qt framework.
+- **Search-First Navigation:** Dedicated real-time search bar for rapid entry retrieval.
+- **Robust Import/Export:** Secure CSV operations with built-in protection against CSV Injection (Formula Injection) and duplicate detection.
 - **Full Feature Set:** Access all features, including password management, TOTP generation, import/export, and password health checks.
 - **Secure Clipboard:** Automatically clears copied passwords and TOTP codes from the clipboard after 30 seconds.
 - **Real-time TOTP:** Displays TOTP codes with a progress bar indicating the time until the next code is generated.

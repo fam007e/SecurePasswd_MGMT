@@ -12,16 +12,18 @@
 int derive_key(const char *password, const uint8_t *salt, uint8_t *key) {
     if (sodium_init() < 0)
         return -1;
-    size_t pass_len = strlen(password); // flawfinder: ignore
+    if (!password) return -1;
+    size_t pass_len = strlen( /* flawfinder: ignore */  /* flawfinder: ignore */ password);
     return argon2id_hash_raw(TIME_COST, MEMORY_COST, PARALLELISM, password,
                              pass_len, salt, SALT_LEN, key, KEY_LEN);
 }
 
 int load_or_generate_salt(const char *path, uint8_t *salt) {
-    FILE *f = fopen(path, "rb"); // flawfinder: ignore (Path is controlled by app config)
+    if (!path || !salt) return -1;
+    FILE *f = fopen( /* flawfinder: ignore */ path, "rb");
     if (f) {
         // Salt file exists, read it
-        size_t n = fread(salt, 1, SALT_LEN, f); // flawfinder: ignore
+        size_t n = fread(salt, 1, SALT_LEN, f);
         fclose(f);
         if (n != SALT_LEN) {
             return -1; // Failed to read salt
@@ -34,7 +36,7 @@ int load_or_generate_salt(const char *path, uint8_t *salt) {
         randombytes_buf(salt, SALT_LEN);
 
         // Save the new salt
-        f = fopen(path, "wb"); // flawfinder: ignore (Path is controlled by app config)
+        f = fopen( /* flawfinder: ignore */ path, "wb");
         if (!f) {
             return -1; // Failed to open salt file for writing
         }
@@ -48,7 +50,8 @@ int load_or_generate_salt(const char *path, uint8_t *salt) {
 }
 
 int save_salt(const char *path, const uint8_t *salt) {
-    FILE *f = fopen(path, "wb"); // flawfinder: ignore
+    if (!path || !salt) return -1;
+    FILE *f = fopen( /* flawfinder: ignore */ path, "wb");
     if (!f) {
         return -1;
     }

@@ -69,88 +69,94 @@ var NAVTREE =
         [ "Master Password Security Flow", "md_SECURITY.html#autotoc_md35", null ],
         [ "Data Storage Format", "md_SECURITY.html#autotoc_md36", null ]
       ] ],
-      [ "Memory Management", "md_SECURITY.html#autotoc_md37", null ],
-      [ "File System Security", "md_SECURITY.html#autotoc_md38", null ],
-      [ "Secure Build Process", "md_SECURITY.html#autotoc_md39", null ],
-      [ "Password Strength Validation", "md_SECURITY.html#autotoc_md40", [
-        [ "Health Check Requirements", "md_SECURITY.html#autotoc_md41", null ],
-        [ "Compliance", "md_SECURITY.html#autotoc_md42", null ]
+      [ "Memory Management", "md_SECURITY.html#autotoc_md37", [
+        [ "Zero-Initialization &amp; Wiping", "md_SECURITY.html#autotoc_md38", null ]
       ] ],
-      [ "Reporting Security Vulnerabilities", "md_SECURITY.html#autotoc_md43", null ]
+      [ "File System Security", "md_SECURITY.html#autotoc_md39", null ],
+      [ "Secure Build Process", "md_SECURITY.html#autotoc_md40", null ],
+      [ "Password Strength Validation", "md_SECURITY.html#autotoc_md41", [
+        [ "Health Check Requirements", "md_SECURITY.html#autotoc_md42", null ],
+        [ "Compliance", "md_SECURITY.html#autotoc_md43", null ]
+      ] ],
+      [ "Reporting Security Vulnerabilities", "md_SECURITY.html#autotoc_md44", null ]
     ] ],
     [ "Contributing to SecurePasswd_MGMT", "md_CONTRIBUTING.html", [
-      [ "Security-Focused Development", "md_CONTRIBUTING.html#autotoc_md45", null ],
-      [ "Code Review", "md_CONTRIBUTING.html#autotoc_md46", null ],
-      [ "Coding Style", "md_CONTRIBUTING.html#autotoc_md47", null ],
-      [ "Testing", "md_CONTRIBUTING.html#autotoc_md48", null ],
-      [ "How to Contribute", "md_CONTRIBUTING.html#autotoc_md49", null ],
-      [ "Release Guidelines", "md_CONTRIBUTING.html#autotoc_md50", null ]
+      [ "Security-Focused Development", "md_CONTRIBUTING.html#autotoc_md46", null ],
+      [ "Code Review", "md_CONTRIBUTING.html#autotoc_md47", null ],
+      [ "Coding Style", "md_CONTRIBUTING.html#autotoc_md48", null ],
+      [ "Testing", "md_CONTRIBUTING.html#autotoc_md49", null ],
+      [ "How to Contribute", "md_CONTRIBUTING.html#autotoc_md50", null ],
+      [ "Release Guidelines", "md_CONTRIBUTING.html#autotoc_md51", null ]
     ] ],
     [ "Contributor Covenant Code of Conduct", "md_CODE__OF__CONDUCT.html", [
-      [ "Our Pledge", "md_CODE__OF__CONDUCT.html#autotoc_md52", null ],
-      [ "Our Standards", "md_CODE__OF__CONDUCT.html#autotoc_md53", null ],
-      [ "Enforcement Responsibilities", "md_CODE__OF__CONDUCT.html#autotoc_md54", null ],
-      [ "Scope", "md_CODE__OF__CONDUCT.html#autotoc_md55", null ],
-      [ "Enforcement", "md_CODE__OF__CONDUCT.html#autotoc_md56", null ],
-      [ "Attribution", "md_CODE__OF__CONDUCT.html#autotoc_md57", null ]
+      [ "Our Pledge", "md_CODE__OF__CONDUCT.html#autotoc_md53", null ],
+      [ "Our Standards", "md_CODE__OF__CONDUCT.html#autotoc_md54", null ],
+      [ "Enforcement Responsibilities", "md_CODE__OF__CONDUCT.html#autotoc_md55", null ],
+      [ "Scope", "md_CODE__OF__CONDUCT.html#autotoc_md56", null ],
+      [ "Enforcement", "md_CODE__OF__CONDUCT.html#autotoc_md57", null ],
+      [ "Attribution", "md_CODE__OF__CONDUCT.html#autotoc_md58", null ]
     ] ],
     [ "Authors", "md_AUTHORS.html", [
-      [ "Core Team", "md_AUTHORS.html#autotoc_md59", null ],
-      [ "Contributors", "md_AUTHORS.html#autotoc_md60", null ],
-      [ "Acknowledgements", "md_AUTHORS.html#autotoc_md61", null ]
+      [ "Core Team", "md_AUTHORS.html#autotoc_md60", null ],
+      [ "Contributors", "md_AUTHORS.html#autotoc_md61", null ],
+      [ "Acknowledgements", "md_AUTHORS.html#autotoc_md62", null ]
     ] ],
     [ "Changelog", "md_CHANGELOG.html", [
-      [ "[2026.03.14]", "md_CHANGELOG.html#autotoc_md63", [
-        [ "Added", "md_CHANGELOG.html#autotoc_md64", null ],
-        [ "Changed", "md_CHANGELOG.html#autotoc_md65", null ],
-        [ "Fixed", "md_CHANGELOG.html#autotoc_md66", null ]
+      [ "[2026.03.14]", "md_CHANGELOG.html#autotoc_md64", [
+        [ "Added", "md_CHANGELOG.html#autotoc_md65", null ],
+        [ "Changed", "md_CHANGELOG.html#autotoc_md66", null ],
+        [ "Fixed", "md_CHANGELOG.html#autotoc_md67", null ]
       ] ],
-      [ "[2026.01.06]", "md_CHANGELOG.html#autotoc_md67", [
-        [ "Security", "md_CHANGELOG.html#autotoc_md68", null ]
+      [ "[2026.01.06]", "md_CHANGELOG.html#autotoc_md68", [
+        [ "Security", "md_CHANGELOG.html#autotoc_md69", null ]
       ] ],
-      [ "[2025.12.28]", "md_CHANGELOG.html#autotoc_md69", [
-        [ "Added", "md_CHANGELOG.html#autotoc_md70", null ],
-        [ "Security", "md_CHANGELOG.html#autotoc_md71", null ]
+      [ "[2025.12.28]", "md_CHANGELOG.html#autotoc_md70", [
+        [ "Added", "md_CHANGELOG.html#autotoc_md71", null ],
+        [ "Security", "md_CHANGELOG.html#autotoc_md72", null ]
       ] ],
-      [ "[2025.12.26]", "md_CHANGELOG.html#autotoc_md72", [
-        [ "Security", "md_CHANGELOG.html#autotoc_md73", null ]
+      [ "[2025.12.26]", "md_CHANGELOG.html#autotoc_md73", [
+        [ "Security", "md_CHANGELOG.html#autotoc_md74", null ]
       ] ],
-      [ "[2026.01.17]", "md_CHANGELOG.html#autotoc_md74", [
-        [ "Fixed", "md_CHANGELOG.html#autotoc_md75", null ],
-        [ "Added", "md_CHANGELOG.html#autotoc_md76", null ]
+      [ "[2026.01.17]", "md_CHANGELOG.html#autotoc_md75", [
+        [ "Fixed", "md_CHANGELOG.html#autotoc_md76", null ],
+        [ "Added", "md_CHANGELOG.html#autotoc_md77", null ]
       ] ],
-      [ "[2026.02.07]", "md_CHANGELOG.html#autotoc_md77", [
-        [ "Security", "md_CHANGELOG.html#autotoc_md78", null ],
-        [ "Fixed", "md_CHANGELOG.html#autotoc_md79", null ]
+      [ "[2026.02.07]", "md_CHANGELOG.html#autotoc_md78", [
+        [ "Security", "md_CHANGELOG.html#autotoc_md79", null ],
+        [ "Fixed", "md_CHANGELOG.html#autotoc_md80", null ]
       ] ],
-      [ "[Unreleased]", "md_CHANGELOG.html#autotoc_md80", null ],
-      [ "[2025.12.20]", "md_CHANGELOG.html#autotoc_md81", [
+      [ "[2026.03.19]", "md_CHANGELOG.html#autotoc_md81", [
         [ "Added", "md_CHANGELOG.html#autotoc_md82", null ],
-        [ "Changed", "md_CHANGELOG.html#autotoc_md83", null ],
+        [ "Security", "md_CHANGELOG.html#autotoc_md83", null ],
         [ "Fixed", "md_CHANGELOG.html#autotoc_md84", null ]
       ] ],
-      [ "[2025.10.25]", "md_CHANGELOG.html#autotoc_md86", [
-        [ "Added", "md_CHANGELOG.html#autotoc_md87", null ],
-        [ "Changed", "md_CHANGELOG.html#autotoc_md88", null ],
-        [ "Fixed", "md_CHANGELOG.html#autotoc_md89", null ]
+      [ "[2025.12.20]", "md_CHANGELOG.html#autotoc_md85", [
+        [ "Added", "md_CHANGELOG.html#autotoc_md86", null ],
+        [ "Changed", "md_CHANGELOG.html#autotoc_md87", null ],
+        [ "Fixed", "md_CHANGELOG.html#autotoc_md88", null ]
       ] ],
-      [ "Version History", "md_CHANGELOG.html#autotoc_md91", null ],
-      [ "Categories Legend", "md_CHANGELOG.html#autotoc_md93", null ]
+      [ "[2025.10.25]", "md_CHANGELOG.html#autotoc_md90", [
+        [ "Added", "md_CHANGELOG.html#autotoc_md91", null ],
+        [ "Changed", "md_CHANGELOG.html#autotoc_md92", null ],
+        [ "Fixed", "md_CHANGELOG.html#autotoc_md93", null ]
+      ] ],
+      [ "Version History", "md_CHANGELOG.html#autotoc_md95", null ],
+      [ "Categories Legend", "md_CHANGELOG.html#autotoc_md97", null ]
     ] ],
     [ "Testing and Verification Summary", "md_docs_2TESTING.html", [
-      [ "Overview", "md_docs_2TESTING.html#autotoc_md95", null ],
-      [ "Build Verification", "md_docs_2TESTING.html#autotoc_md96", [
-        [ "Build Status: ✓ PASS", "md_docs_2TESTING.html#autotoc_md97", null ]
+      [ "Overview", "md_docs_2TESTING.html#autotoc_md99", null ],
+      [ "Build Verification", "md_docs_2TESTING.html#autotoc_md100", [
+        [ "Build Status: ✓ PASS (Multi-Platform)", "md_docs_2TESTING.html#autotoc_md101", null ]
       ] ],
-      [ "Security Verification", "md_docs_2TESTING.html#autotoc_md98", [
-        [ "Static Analysis", "md_docs_2TESTING.html#autotoc_md99", null ],
-        [ "Dynamic Analysis (Sanitizers)", "md_docs_2TESTING.html#autotoc_md100", null ]
+      [ "Security Verification", "md_docs_2TESTING.html#autotoc_md102", [
+        [ "Static Analysis", "md_docs_2TESTING.html#autotoc_md103", null ],
+        [ "Dynamic Analysis (Sanitizers)", "md_docs_2TESTING.html#autotoc_md104", null ]
       ] ],
-      [ "Unit Test Execution", "md_docs_2TESTING.html#autotoc_md101", [
-        [ "Test Summary", "md_docs_2TESTING.html#autotoc_md102", null ],
-        [ "Core Tests (<span class=\"tt\">./core_tests</span>)", "md_docs_2TESTING.html#autotoc_md103", null ]
+      [ "Unit Test Execution", "md_docs_2TESTING.html#autotoc_md105", [
+        [ "Test Summary", "md_docs_2TESTING.html#autotoc_md106", null ],
+        [ "Core Tests (<span class=\"tt\">./core_tests</span>)", "md_docs_2TESTING.html#autotoc_md107", null ]
       ] ],
-      [ "Test Environment", "md_docs_2TESTING.html#autotoc_md104", null ]
+      [ "Test Environment (CI Baseline)", "md_docs_2TESTING.html#autotoc_md108", null ]
     ] ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],

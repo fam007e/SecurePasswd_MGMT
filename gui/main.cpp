@@ -45,5 +45,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    return app.exec();
+    int result = app.exec();
+    curl_global_cleanup();
+    return result;
 }

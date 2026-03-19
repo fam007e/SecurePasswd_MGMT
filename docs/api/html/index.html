@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2026.03.14</span>
+   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2026.03.19</span>
    </div>
    <div id="projectbrief">A modern, cross-platform password manager and two-factor authenticator (TOTP) designed with state-of-the-art security.</div>
   </td>
@@ -104,7 +104,9 @@ Key Security Features</h1>
 <li><b>Memory Safety:</b> Sensitive data is explicitly cleared from memory after use.</li>
 <li><b>Pwned Password Check:</b> Integrated check against the Have I Been Pwned (HIBP) API to ensure your passwords haven't been compromised in known data breaches.</li>
 <li><b>Fetch on Demand:</b> Secrets are only retrieved from the database when specifically needed, preventing them from lingering in memory.</li>
-<li><b>Hardened C Codebase:</b> Regularly audited using modern static analysis tools (<span class="tt">cppcheck</span>, <span class="tt">flawfinder</span>) to proactively prevent common C vulnerabilities like buffer overflows and race conditions.</li>
+<li><b>Hardened C Codebase:</b> Regularly audited using modern static analysis tools (<span class="tt">cppcheck</span>, <span class="tt">flawfinder</span>). Recently refactored to replace 280+ manual overrides with structural security fixes, achieving <b>0 High Severity (Level 4/5) hits</b> in core and CLI source code.</li>
+<li><b>Secure File I/O:</b> Utilizes standard, safe I/O patterns (<span class="tt">fputs</span>, <span class="tt">fgets</span>, <span class="tt">QFile</span>) to prevent format string and buffer overflow vulnerabilities.</li>
+<li><b>Zero-Initialization:</b> Employs <span class="tt">calloc</span> across the core library to ensure sensitive memory structures are always zero-initialized, preventing data leakage from uninitialized pointers.</li>
 <li><b>Secure Storage:</b> All data is stored locally, encrypted, in a secure directory.</li>
 </ul>
 <h1 class="doxsection"><a class="anchor" id="autotoc_md2"></a>
@@ -113,14 +115,18 @@ Features</h1>
 Command-Line Interface (CLI)</h2>
 <ul>
 <li><b>Fast &amp; Efficient:</b> A lightweight, terminal-based interface for all core functionalities.</li>
+<li><b>Powerful Search:</b> Instant, case-insensitive searching across services and usernames using <span class="tt">-s</span> or the interactive menu.</li>
+<li><b>Identity-Aware Import:</b> Automatically detects duplicate entries during CSV import, offering clear conflict resolution paths to keep your vault clean.</li>
 <li><b>Interactive Menu:</b> Easy-to-use menu for adding, searching, and managing passwords and TOTP secrets.</li>
-<li><b>Command-Line Options:</b> Generate passwords directly from the command line.</li>
+<li><b>Command-Line Options:</b> Search or generate passwords directly from the command line.</li>
 <li><b>Hidden Password Input:</b> Protects your master password from shoulder-surfing.</li>
 </ul>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md4"></a>
 Graphical User Interface (GUI)</h2>
 <ul>
 <li><b>Modern &amp; Intuitive:</b> A clean, user-friendly interface built with the Qt framework.</li>
+<li><b>Search-First Navigation:</b> Dedicated real-time search bar for rapid entry retrieval.</li>
+<li><b>Robust Import/Export:</b> Secure CSV operations with built-in protection against CSV Injection (Formula Injection) and duplicate detection.</li>
 <li><b>Full Feature Set:</b> Access all features, including password management, TOTP generation, import/export, and password health checks.</li>
 <li><b>Secure Clipboard:</b> Automatically clears copied passwords and TOTP codes from the clipboard after 30 seconds.</li>
 <li><b>Real-time TOTP:</b> Displays TOTP codes with a progress bar indicating the time until the next code is generated.</li>
@@ -166,13 +172,13 @@ Installation of Dependencies</h2>
 </div><!-- fragment --><p><b>Windows (vcpkg):</b></p>
 <p>On Windows, this project uses <span class="tt">vcpkg</span> to manage dependencies. The setup is handled automatically when building with the provided Visual Studio solution, but if you are building manually, you will need to set up vcpkg first.</p>
 <ol type="1">
-<li><b>Clone vcpkg:</b> <span class="tt">bash
+<li><b>Clone vcpkg:</b> <span class="tt">
     git clone <a href="https://github.com/microsoft/vcpkg.git">https://github.com/microsoft/vcpkg.git</a>
     ./vcpkg/bootstrap-vcpkg.bat
     </span></li>
-<li><b>Install dependencies:</b> <span class="tt">bash
+<li><b>Install dependencies:</b> <span class="tt">
     ./vcpkg/vcpkg install --triplet x64-windows
-    </span> When you run CMake, you must point it to the vcpkg toolchain file: <span class="tt">bash
+    </span> When you run CMake, you must point it to the vcpkg toolchain file: <span class="tt">
     cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_TOOLCHAIN_FILE=path/to/your/vcpkg/scripts/buildsystems/vcpkg.cmake
     </span> </li>
 </ol>
@@ -186,13 +192,13 @@ Build from Source</h2>
 <h3 class="doxsection"><a class="anchor" id="autotoc_md12"></a>
 Linux (Ubuntu)</h3>
 <ol type="1">
-<li><b>Install Dependencies:</b> <span class="tt">bash
+<li><b>Install Dependencies:</b> <span class="tt">
     sudo apt-get update
     sudo apt-get install -y build-essential cmake libsodium-dev libargon2-dev \
       libsqlcipher-dev libcsv-dev qt6-base-dev libqt6svg6-dev libssl-dev libcurl4-openssl-dev \
       libcmocka-dev
     </span></li>
-<li><b>Configure and Build:</b> <span class="tt">bash
+<li><b>Configure and Build:</b> <span class="tt">
     mkdir build &amp;&amp; cd build
     cmake .. -DCMAKE_BUILD_TYPE=Release
     cmake --build . --config Release
@@ -206,7 +212,7 @@ CLI-Only Build (No GUI)</h3>
 </div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md14"></a>
 macOS</h3>
 <ol type="1">
-<li><b>Install Dependencies:</b> <span class="tt">bash
+<li><b>Install Dependencies:</b> <span class="tt">
     brew install qt@6 create-dmg libsodium argon2 sqlcipher cmocka
     git clone <a href="https://github.com/rgamble/libcsv.git">https://github.com/rgamble/libcsv.git</a>
     cd libcsv
@@ -214,7 +220,7 @@ macOS</h3>
     make
     sudo make install
     </span></li>
-<li><b>Configure and Build:</b> <span class="tt">bash
+<li><b>Configure and Build:</b> <span class="tt">
     mkdir build &amp;&amp; cd build
     cmake .. -DCMAKE_BUILD_TYPE=Release \
       -DLIBCSV_INCLUDE_DIRS=/usr/local/include \
@@ -226,7 +232,7 @@ macOS</h3>
 Windows</h3>
 <ol type="1">
 <li><b>Install Dependencies with vcpkg:</b> Follow the instructions in the "Windows (vcpkg)" section above to install the required dependencies.</li>
-<li><p class="startli"><b>Configure and Build:</b> <span class="tt">bash
+<li><p class="startli"><b>Configure and Build:</b> <span class="tt">
     mkdir build &amp;&amp; cd build
     cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_TOOLCHAIN_FILE=C:/path/to/your/vcpkg/scripts/buildsystems/vcpkg.cmake
     cmake --build . --config Release

@@ -8,7 +8,9 @@
 #include <QImage>
 #include <QPixmap>
 #include <QHostAddress>
-#include "qrcodegen.hpp"
+#include <QFile>
+#include <vector>
+#include "qrcodegen/qrcodegen.hpp"
 
 extern "C" {
 #include "sync_service.h"
@@ -103,51 +105,39 @@ void SyncDialog::onNewConnection() {
 
     statusLabel->setText("Client connected. Encrypting and sending vault...");
 
-    char dirPath[2048]; // flawfinder: ignore
-    get_config_path(dirPath, sizeof(dirPath));
-    QString dbPath = QString::fromUtf8(dirPath) + "/vault.db";
+    std::vector<char> dirPath(4096);
+    get_config_path(dirPath.data(), dirPath.size());
+    QString dbPath = QString::fromUtf8(dirPath.data()) + "/vault.db";
 
-    FILE *f1 = fopen(dbPath.toUtf8().constData(), "rb"); // flawfinder: ignore
-    if (!f1) {
+    QFile f1(dbPath);
+    if (!f1.exists()) {
         statusLabel->setText("Error: Could not open vault for reading.");
         clientConnection->disconnectFromHost();
         return;
     }
-    fseek(f1, 0, SEEK_END);
-    size_t db_size = ftell(f1);
-    fclose(f1);
+    size_t db_size = (size_t)f1.size();
 
-    char saltPath[2048]; // flawfinder: ignore
-    snprintf(saltPath, sizeof(saltPath), "%s.salt", dbPath.toUtf8().constData()); // flawfinder: ignore
-    FILE *f2 = fopen(saltPath, "rb"); // flawfinder: ignore
-    if (!f2) {
+    QString saltPath = dbPath + ".salt";
+    QFile f2(saltPath);
+    if (!f2.exists()) {
         statusLabel->setText("Error: Could not open salt for reading.");
         clientConnection->disconnectFromHost();
         return;
     }
-    fseek(f2, 0, SEEK_END);
-    size_t salt_size = ftell(f2);
-    fclose(f2);
+    size_t salt_size = (size_t)f2.size();
 
     size_t total_size = 4 + db_size + 4 + salt_size;
     size_t output_size = total_size + SYNC_NONCE_LEN + SYNC_TAG_LEN + 1024;
-    unsigned char *output = (unsigned char*)malloc(output_size);
-    if (!output) {
-        statusLabel->setText("Error: Memory allocation failed.");
-        clientConnection->disconnectFromHost();
-        return;
-    }
+    std::vector<unsigned char> output(output_size);
 
     size_t actual_size = 0;
-    if (sync_encrypt_vault(dbPath.toUtf8().constData(), output, &actual_size, (unsigned char*)syncKey.constData()) != 0) {
+    if (sync_encrypt_vault(dbPath.toUtf8().constData(), output.data(), &actual_size, (unsigned char*)syncKey.constData()) != 0) {
         statusLabel->setText("Error: Encryption failed.");
-        free(output);
         clientConnection->disconnectFromHost();
         return;
     }
 
-    clientConnection->write(reinterpret_cast<const char*>(output), actual_size);
+    clientConnection->write(reinterpret_cast<const char*>(output.data()), (qint64)actual_size);
     clientConnection->disconnectFromHost();
-    free(output);
     statusLabel->setText("Sync complete.");
 }

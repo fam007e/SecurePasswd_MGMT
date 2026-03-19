@@ -44,6 +44,7 @@ private slots:
     void onToggleRecoveryCodes();
     void onMarkAsUsed();
     void onChangePassword();
+    void onSearchChanged(const QString &text);
 
 private:
     void setupUI();
@@ -55,9 +56,10 @@ private:
 
 
     QListWidget *listWidget;
+    class QLineEdit *searchBar;
     QVector<GUIPasswordEntry> m_entries; // UI Cache
     QToolBar *toolBar;
-    QAction *addAction;
+    QAction *m_addAction;
     QAction *editAction;
     QAction *copyUsernameAction;
     QAction *copyPasswordAction;

@@ -9,7 +9,7 @@ Given the nature of this project, security is our top priority. All contribution
 - **No Plaintext Secrets:** Usernames, passwords, and TOTP secrets must be encrypted when stored. No sensitive information should ever be written to disk in plaintext.
 - **Use Established Cryptographic Libraries:** All cryptographic operations must be implemented using well-vetted, modern libraries. This project uses **SQLCipher** for database encryption and **libargon2** for key derivation. Do not implement custom cryptographic primitives.
 - **Secure Memory Handling:** Sensitive data must be cleared from memory as soon as it is no longer needed. Use `sodium_memzero()` or a similar secure function to overwrite sensitive data in memory.
-- **Input Validation:** All input from users or files must be validated to prevent vulnerabilities like buffer overflows. **Avoid banned C functions like `strcat`, `strcpy`, and `sprintf`; use safer, bounded alternatives like `strncat`, `strncpy`, and `snprintf`.**
+- **Input Validation:** All input from users or files must be validated to prevent vulnerabilities like buffer overflows. **Avoid banned C functions like `strcat`, `strcpy`, `sprintf`, and `strncpy`; use safer, bounded alternatives like `memcpy`, `snprintf`, and `strtol`.**
 - **Constant-Time Operations:** When comparing sensitive data, use constant-time comparison functions where appropriate to prevent timing attacks.
 
 ## Code Review

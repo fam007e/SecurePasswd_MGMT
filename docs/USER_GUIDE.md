@@ -82,12 +82,39 @@ The password health check feature analyzes your passwords for weaknesses.
     - **Low Entropy Passwords:** Passwords that are missing character types (uppercase, lowercase, numbers, symbols).
     - **Pwned Passwords:** Passwords that have been found in known data breaches (requires an internet connection).
 
+## Searching for Entries
+
+Rapidly find your accounts using the global search features:
+
+### GUI Search
+- A dedicated **Search Bar** is available at the top of the main window.
+- As you type, the list of entries filters in real-time to match services or usernames.
+- Clear the search bar to return to the full list.
+- **Shortcut:** Press `Ctrl+F` to quickly focus the search bar.
+
+### CLI Search
+- **Interactive:** Use the `[s]earch` menu option.
+- **Direct:** Run the application with the `-s` or `--search` flag:
+  ```bash
+  ./securepasswd_cli --search "GitHub"
+  ```
+
+## Mobile Synchronization
+
+SecurePasswd_MGMT allows you to sync your encrypted vault to your mobile device:
+
+1.  Click the **Sync to Mobile** button on the toolbar.
+2.  The application will generate a one-time encryption key and start a secure local server.
+3.  A **QR Code** will be displayed containing the connection details and the temporary key.
+4.  Scan this QR code with your SecurePasswd Mobile app to securely transfer your vault.
+5.  All data is protected with **Chacha20-Poly1305** authenticated encryption during transit.
+
 ## Import/Export
 
 You can import and export your password data in CSV format.
 
-- **To import:** Click the **Import** button and select a CSV file to import.
-- **To export:** Click the **Export** button and choose a location to save the CSV file.
+- **To import:** Click the **Import** button and select a CSV file. If duplicate entries are detected (matching Service + Username), the application will automatically offer conflict resolution options.
+- **To export:** Click the **Export** button and choose a location. **WARNING:** Exported files contain unencrypted secrets and should be handled with extreme caution.
 
 ## Changing the Theme
 

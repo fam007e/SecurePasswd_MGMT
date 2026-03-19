@@ -26,7 +26,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2026.03.14</span>
+   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2026.03.19</span>
    </div>
    <div id="projectbrief">A modern, cross-platform password manager and two-factor authenticator (TOTP) designed with state-of-the-art security.</div>
   </td>
@@ -117,6 +117,10 @@ Functions</h2></td></tr>
 <tr class="memdesc:a87a371db10ba025e787c86c407b52419"><td class="mdescLeft">&#160;</td><td class="mdescRight">Closes the database.  <br /></td></tr>
 <tr class="memitem:ab02c638ac9d3276e12ed84cfeb92a5e6" id="r_ab02c638ac9d3276e12ed84cfeb92a5e6"><td class="memItemLeft"><a class="el" href="structPasswordEntry.html">PasswordEntry</a> *&#160;</td><td class="memItemRight"><a class="el" href="#ab02c638ac9d3276e12ed84cfeb92a5e6">database_get_all_entries</a> (int *count)</td></tr>
 <tr class="memdesc:ab02c638ac9d3276e12ed84cfeb92a5e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves all password entries from the database.  <br /></td></tr>
+<tr class="memitem:a29a286c5d2cd13834e957ffc743fb092" id="r_a29a286c5d2cd13834e957ffc743fb092"><td class="memItemLeft"><a class="el" href="structPasswordEntry.html">PasswordEntry</a> *&#160;</td><td class="memItemRight"><a class="el" href="#a29a286c5d2cd13834e957ffc743fb092">database_search</a> (const char *query, int *count)</td></tr>
+<tr class="memdesc:a29a286c5d2cd13834e957ffc743fb092"><td class="mdescLeft">&#160;</td><td class="mdescRight">Searches for password entries by service or username.  <br /></td></tr>
+<tr class="memitem:a2711c92b76f8eacd5d6a99da3db8aeaa" id="r_a2711c92b76f8eacd5d6a99da3db8aeaa"><td class="memItemLeft"><a class="el" href="structPasswordEntry.html">PasswordEntry</a> *&#160;</td><td class="memItemRight"><a class="el" href="#a2711c92b76f8eacd5d6a99da3db8aeaa">database_get_entry_by_identity</a> (const char *service, const char *username)</td></tr>
+<tr class="memdesc:a2711c92b76f8eacd5d6a99da3db8aeaa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves a password entry by its identity (Service + Username).  <br /></td></tr>
 <tr class="memitem:a978a6d279f09fc39d306b1ee84579eb5" id="r_a978a6d279f09fc39d306b1ee84579eb5"><td class="memItemLeft"><a class="el" href="structPasswordEntry.html">PasswordEntry</a> *&#160;</td><td class="memItemRight"><a class="el" href="#a978a6d279f09fc39d306b1ee84579eb5">database_get_entry_secure</a> (int id)</td></tr>
 <tr class="memdesc:a978a6d279f09fc39d306b1ee84579eb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves a single password entry with ALL details (including secrets) by ID.  <br /></td></tr>
 <tr class="memitem:a4bc5a926ac2d7904c49b7b036fae514f" id="r_a4bc5a926ac2d7904c49b7b036fae514f"><td class="memItemLeft">int&#160;</td><td class="memItemRight"><a class="el" href="#a4bc5a926ac2d7904c49b7b036fae514f">database_rekey</a> (const char *new_password)</td></tr>
@@ -228,6 +232,37 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="a2711c92b76f8eacd5d6a99da3db8aeaa" name="a2711c92b76f8eacd5d6a99da3db8aeaa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2711c92b76f8eacd5d6a99da3db8aeaa">&#9670;&#160;</a></span>database_get_entry_by_identity()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structPasswordEntry.html">PasswordEntry</a> * database_get_entry_by_identity </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>service</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>username</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Retrieves a password entry by its identity (Service + Username). </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">service</td><td>The name of the service. </td></tr>
+    <tr><td class="paramname">username</td><td>The username for the service. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A dynamically allocated <a class="el" href="structPasswordEntry.html" title="A struct representing a password entry.">PasswordEntry</a> struct containing full details, or NULL if not found. </dd></dl>
+
+</div>
+</div>
 <a id="a978a6d279f09fc39d306b1ee84579eb5" name="a978a6d279f09fc39d306b1ee84579eb5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a978a6d279f09fc39d306b1ee84579eb5">&#9670;&#160;</a></span>database_get_entry_secure()</h2>
 
@@ -308,6 +343,37 @@ Functions</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>0 on success, -1 on error. </dd></dl>
+
+</div>
+</div>
+<a id="a29a286c5d2cd13834e957ffc743fb092" name="a29a286c5d2cd13834e957ffc743fb092"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a29a286c5d2cd13834e957ffc743fb092">&#9670;&#160;</a></span>database_search()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structPasswordEntry.html">PasswordEntry</a> * database_search </td>
+          <td>(</td>
+          <td class="paramtype">const char *</td>          <td class="paramname"><span class="paramname"><em>query</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int *</td>          <td class="paramname"><span class="paramname"><em>count</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Searches for password entries by service or username. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">query</td><td>The search query string. </td></tr>
+    <tr><td class="paramname">count</td><td>A pointer to an integer that will be filled with the number of entries. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A dynamically allocated array of <a class="el" href="structPasswordEntry.html" title="A struct representing a password entry.">PasswordEntry</a> structs. The caller is responsible for freeing this array and its contents using <a class="el" href="#a77a357353e4cf3b50bc41fb6727485dc" title="Frees a list of PasswordEntry structs.">free_password_entries()</a>. </dd></dl>
 
 </div>
 </div>

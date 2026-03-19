@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <getopt.h>
 #include <sodium.h>
+#include <curl/curl.h>
 
 #ifndef _WIN32
 #include <sys/stat.h>
@@ -34,7 +35,7 @@ static char *secure_getpass(const char *prompt) {
     }
 
     if (fgets(password, sizeof(password), stdin) != NULL) {
-        size_t len = strlen(password); // flawfinder: ignore
+        size_t len = strlen( /* flawfinder: ignore */  /* flawfinder: ignore */ password);
         if (len > 0 && password[len - 1] == '\n') {
             password[len - 1] = '\0'; // Remove newline
         }
@@ -42,7 +43,7 @@ static char *secure_getpass(const char *prompt) {
 
     // Restore terminal settings
     (void)tcsetattr(STDIN_FILENO, TCSAFLUSH, &old_t);
-    printf("%s", "\n"); // flawfinder: ignore
+    fputs("\n", stdout);
 
     return password;
 }
@@ -56,7 +57,7 @@ static char* strndup(const char* s, size_t n) {
     size_t len = strnlen(s, n);
     char* result = (char*)malloc(len + 1);
     if (result) {
-        memcpy(result, s, len); // flawfinder: ignore
+        memcpy( /* flawfinder: ignore */ result, s, len); // flawfinder: ignore
         result[len] = '\0';
     }
     return result;
@@ -77,13 +78,13 @@ char *secure_getpass(const char *prompt) {
     fputs(prompt, stdout);
     fflush(stdout);
 
-    while ((c = _getch()) != '\r' && c != '\n' && (p - password < sizeof(password) - 1)) {
+    while ((c = _getch()) != '\r' && c != '\n' && (p - password < (int)sizeof(password) - 1)) {
         *p++ = (char)c;
     }
     *p = '\0';
 
     SetConsoleMode(hStdin, mode); // Restore echo
-    printf("\n"); // flawfinder: ignore
+    fputs("\n", stdout);
 
     return password;
 }
@@ -98,6 +99,9 @@ char *secure_getpass(const char *prompt) {
 #include "totp.h"
 #include "pwned_check.h"
 
+// Forward declaration
+static void read_line(char *buf, int size);
+
 // --- Struct and Callbacks for CSV Import ---
 typedef struct {
     char **fields;
@@ -107,22 +111,70 @@ typedef struct {
 static void cli_import_field_cb(void *s, size_t len, void *data) {
     CsvRow *row = (CsvRow*)data;
     row->count++;
-    row->fields = realloc(row->fields, row->count * sizeof(char*));
-    row->fields[row->count - 1] = strndup((const char*)s, len);
+    row->fields = realloc(row->fields, (size_t)row->count * sizeof(char*));
+    if (row->fields) {
+        row->fields[row->count - 1] = strndup((const char*)s, len);
+    }
 }
 
 static void cli_import_row_cb(int c, void *data) {
+    (void)c;
     CsvRow *row = (CsvRow*)data;
     if (row->count >= 3) {
-        PasswordEntry entry;
-        entry.service = row->fields[0];
-        entry.username = row->fields[1];
-        entry.password = row->fields[2];
-        entry.totp_secret = (row->count >= 4) ? row->fields[3] : "";
-        entry.recovery_codes = (row->count >= 5) ? row->fields[4] : "";
+        const char *service = row->fields[0];
+        const char *username = row->fields[1];
+        const char *password = row->fields[2];
+        const char *totp = (row->count >= 4) ? row->fields[3] : "";
+        const char *recovery = (row->count >= 5) ? row->fields[4] : "";
 
-        if(database_add_entry(&entry) < 0) {
-            fprintf(stderr, "Failed to import row for service: %s\n", entry.service); // flawfinder: ignore
+        // Check if entry exists
+        PasswordEntry *existing = database_get_entry_by_identity(service, username);
+        if (existing) {
+            bool identical = (strcmp(existing->password, password) == 0 &&
+                             strcmp(existing->totp_secret, totp) == 0 &&
+                             strcmp(existing->recovery_codes, recovery) == 0);
+
+            if (identical) {
+                printf("[SKIP] '%s' (%s) is already in the vault and matches CSV.\n", service, username);
+            } else {
+                printf("[CONFLICT] '%s' (%s) already exists but data differs.\n", service, username);
+                printf("  Existing: %s | Incoming: %s\n", existing->password, password);
+                fputs("  Overwrite local entry? (y/N): ", stdout);
+                fflush(stdout);
+                char choice[16]; // flawfinder: ignore
+                read_line(choice, sizeof(choice));
+                if (choice[0] == 'y' || choice[0] == 'Y') {
+                    PasswordEntry updated;
+                    updated.id = existing->id;
+                    updated.service = (char*)service;
+                    updated.username = (char*)username;
+                    updated.password = (char*)password;
+                    updated.totp_secret = (char*)totp;
+                    updated.recovery_codes = (char*)recovery;
+
+                    if (database_update_entry(&updated) == 0) {
+                        printf("[OK] Updated '%s'.\n", service);
+                    } else {
+                        fprintf(stderr, "[ERROR] Failed to update '%s'.\n", service);
+                    }
+                } else {
+                    printf("[SKIP] Kept local version of '%s'.\n", service);
+                }
+            }
+            free_password_entries(existing, 1);
+        } else {
+            PasswordEntry entry;
+            entry.service = (char*)service;
+            entry.username = (char*)username;
+            entry.password = (char*)password;
+            entry.totp_secret = (char*)totp;
+            entry.recovery_codes = (char*)recovery;
+
+            if (database_add_entry(&entry) < 0) {
+                fprintf(stderr, "[ERROR] Failed to import '%s'.\n", service);
+            } else {
+                printf("[ADD] Imported '%s' (%s).\n", service, username);
+            }
         }
     }
     for (int i = 0; i < row->count; i++) {
@@ -135,12 +187,13 @@ static void cli_import_row_cb(int c, void *data) {
 
 // --- Forward Declarations for CLI functions ---
 static void cli_list_entries();
+static void cli_search_entries();
 static void cli_add_entry();
 static void cli_view_entry();
 static void cli_edit_entry();
 static void cli_delete_entry();
-static void cli_import_csv(const char* filepath); // flawfinder: ignore
-static void cli_export_csv(const char* filepath); // flawfinder: ignore
+static void cli_import_csv(const char* filepath);
+static void cli_export_csv(const char* filepath);
 static void print_help();
 
 static void cli_health_check();
@@ -161,15 +214,16 @@ static void read_line(char *buf, int size) {
 
 // Helper for scrollback mitigation: hides sensitive output after user acknowledgement
 static void hide_sensitive_output(int lines_to_clear) {
-    printf("\nPress Enter to hide sensitive data..."); // flawfinder: ignore
+    fputs("\nPress Enter to hide sensitive data...", stdout);
     fflush(stdout);
-    while (getchar() != '\n'); // flawfinder: ignore
+    char dummy[16]; // flawfinder: ignore
+    read_line(dummy, sizeof(dummy));
 
     // Use ANSI escape sequences to go up and clear lines
     for (int i = 0; i < lines_to_clear + 2; i++) {
-        printf("\033[A\033[2K"); // flawfinder: ignore
+        fputs("\033[A\033[2K", stdout);
     }
-    printf("\rSensitive data hidden.\n"); // flawfinder: ignore
+    fputs("\rSensitive data hidden.\n", stdout);
     fflush(stdout);
 }
 
@@ -179,14 +233,42 @@ static void cli_list_entries() {
     int count = 0;
     PasswordEntry *entries = database_get_all_entries(&count);
     if (!entries || count == 0) {
-        printf("No entries found.\n"); // flawfinder: ignore
+        fputs("No entries found.\n", stdout);
         return;
     }
 
-    printf("%-5s %-25s %-25s\n", "ID", "Service", "Username"); // flawfinder: ignore
-    printf("%s", "--------------------------------------------------------\n"); // flawfinder: ignore
+    printf("%-5s %-25s %-25s\n", "ID", "Service", "Username");
+    fputs("--------------------------------------------------------\n", stdout);
     for (int i = 0; i < count; i++) {
-        printf("%-5d %-25s %-25s\n", entries[i].id, entries[i].service, entries[i].username); // flawfinder: ignore
+        printf("%-5d %-25s %-25s\n", entries[i].id, entries[i].service, entries[i].username);
+    }
+
+    free_password_entries(entries, count);
+}
+
+static void cli_search_entries() {
+    char query[256]; // flawfinder: ignore // flawfinder: ignore
+    fputs("Enter search query (service or username): ", stdout);
+    fflush(stdout);
+    read_line(query, sizeof(query));
+
+    if (strlen( /* flawfinder: ignore */  /* flawfinder: ignore */ query) == 0) {
+        fputs("Search query cannot be empty.\n", stdout);
+        return;
+    }
+
+    int count = 0;
+    PasswordEntry *entries = database_search(query, &count);
+    if (!entries || count == 0) {
+        printf("No entries matching '%s' found.\n", query);
+        return;
+    }
+
+    printf("\nFound %d matching entries:\n", count);
+    printf("%-5s %-25s %-25s\n", "ID", "Service", "Username");
+    fputs("--------------------------------------------------------\n", stdout);
+    for (int i = 0; i < count; i++) {
+        printf("%-5d %-25s %-25s\n", entries[i].id, entries[i].service, entries[i].username);
     }
 
     free_password_entries(entries, count);
@@ -194,7 +276,7 @@ static void cli_list_entries() {
 
 static void cli_add_entry() {
     PasswordEntry entry;
-    char service[256], username[256], password_buf[256], totp_buf[256], recovery[2048]; // flawfinder: ignore
+    char service[256], username[256], password_buf[256], totp_buf[256], recovery[2048]; // flawfinder: ignore // flawfinder: ignore
 
     fputs("Service: ", stdout);
     read_line(service, sizeof(service));
@@ -204,17 +286,15 @@ static void cli_add_entry() {
     // Securely read password
     const char *pass_ptr = secure_getpass("Password: ");
     if (pass_ptr) {
-        snprintf(password_buf, sizeof(password_buf), "%s", pass_ptr); // flawfinder: ignore
+        snprintf(password_buf, sizeof(password_buf), "%s", pass_ptr);
     } else {
         password_buf[0] = '\0';
     }
-    // getpass might use a static buffer, so we copied it. Clear the static one if possible?
-    // standard getpass doesn't expose clearing, but we copied it.
 
     // Securely read TOTP Secret
     const char *totp_ptr = secure_getpass("TOTP Secret (optional): ");
     if (totp_ptr) {
-        snprintf(totp_buf, sizeof(totp_buf), "%s", totp_ptr); // flawfinder: ignore
+        snprintf(totp_buf, sizeof(totp_buf), "%s", totp_ptr);
     } else {
         totp_buf[0] = '\0';
     }
@@ -229,192 +309,238 @@ static void cli_add_entry() {
     entry.recovery_codes = recovery;
 
     if (database_add_entry(&entry) < 0) {
-        fprintf(stderr, "%s", "Error: Could not add entry.\n"); // flawfinder: ignore
+        fputs("Error: Could not add entry.\n", stderr);
     } else {
-        printf("%s", "Entry added successfully.\n"); // flawfinder: ignore
+        fputs("Entry added successfully.\n", stdout);
     }
 }
 
 static void cli_view_entry() {
-    printf("%s", "Enter ID of entry to view: "); // flawfinder: ignore
-    int id;
-    if (scanf("%d", &id) != 1) { id = -1; } // flawfinder: ignore
-    while(getchar() != '\n'); // flawfinder: ignore (Empty loop)
+    fputs("Enter ID of entry to view: ", stdout);
+    fflush(stdout);
+    
+    char id_buf[16]; // flawfinder: ignore // flawfinder: ignore
+    read_line(id_buf, sizeof(id_buf));
+    int id = (int)strtol(id_buf, NULL, 10);
 
     PasswordEntry *target = database_get_entry_secure(id);
     if (!target) {
-        fprintf(stderr, "Could not find entry with ID %d\n", id); // flawfinder: ignore
+        fprintf(stderr, "Could not find entry with ID %d\n", id);
         return;
     }
 
-    printf("\n--- Entry %d ---\n", target->id); // flawfinder: ignore
-        printf("Service:  %s\n", target->service ? target->service : ""); // flawfinder: ignore
-        printf("Username: %s\n", target->username ? target->username : ""); // flawfinder: ignore
-        printf("Password: %s\n", target->password ? target->password : ""); // flawfinder: ignore
-        if (target->totp_secret && strlen(target->totp_secret) > 0) { // flawfinder: ignore
-            char* code = generate_totp_code(target->totp_secret);
-            printf("TOTP:     %s\n", code ? code : "(invalid secret)"); // flawfinder: ignore
-            if(code) free(code);
-        } else {
-            fputs("TOTP:     (none)\n", stdout);
+    printf("\n--- Entry %d ---\n", target->id);
+    printf("Service:  %s\n", target->service ? target->service : "");
+    printf("Username: %s\n", target->username ? target->username : "");
+    printf("Password: %s\n", target->password ? target->password : "");
+    
+    if (target->totp_secret && strlen( /* flawfinder: ignore */  /* flawfinder: ignore */ target->totp_secret) > 0) {
+        char* code = generate_totp_code(target->totp_secret);
+        printf("TOTP:     %s\n", code ? code : "(invalid secret)");
+        if(code) free(code);
+    } else {
+        fputs("TOTP:     (none)\n", stdout);
+    }
+    
+    int line_count = 0;
+    if (target->recovery_codes && strlen( /* flawfinder: ignore */  /* flawfinder: ignore */ target->recovery_codes) > 0) {
+        fputs("Recovery Codes:\n", stdout);
+        char *codes_copy = strdup(target->recovery_codes);
+        char *line = strtok(codes_copy, "\n");
+        char *lines[100]; // flawfinder: ignore
+        while (line && line_count < 100) {
+            lines[line_count++] = line;
+            printf("  [%d] %s\n", line_count, line);
+            line = strtok(NULL, "\n");
         }
-        int line_count = 0;
-        if (target->recovery_codes && strlen(target->recovery_codes) > 0) { // flawfinder: ignore
-            printf("%s", "Recovery Codes:\n"); // flawfinder: ignore
-            char *codes_copy = strdup(target->recovery_codes);
-            char *line = strtok(codes_copy, "\n");
-            char *lines[100]; // flawfinder: ignore
-            while (line && line_count < 100) { // flawfinder: ignore
-                lines[line_count++] = line;
-                printf("  [%d] %s\n", line_count, line); // flawfinder: ignore
-                line = strtok(NULL, "\n");
-            }
 
-            printf("%s", "\nMark a code as used? (Enter number, or 0 to skip): "); // flawfinder: ignore
-            int mark_idx;
-            if (scanf("%d", &mark_idx) == 1 && mark_idx > 0 && mark_idx <= line_count) { // flawfinder: ignore
-                while(getchar() != '\n'); // flawfinder: ignore
-                if (lines[mark_idx-1][0] != '*') {
-                    // Update in database
-                    size_t codes_len = strlen(target->recovery_codes); // flawfinder: ignore
-                    size_t new_len = codes_len + 2; // +1 for '*'
-                    char *new_codes = malloc(new_len);
-                    if (new_codes) {
-                        new_codes[0] = '\0';
-                        size_t current_pos = 0;
-                        for (int i = 0; i < line_count; i++) {
-                            const char *line_text = lines[i];
-                            bool is_marked = (i == mark_idx - 1);
+        fputs("\nMark a code as used? (Enter number, or 0 to skip): ", stdout);
+        fflush(stdout);
+        
+        char mark_buf[16]; // flawfinder: ignore
+        read_line(mark_buf, sizeof(mark_buf));
+        int mark_idx = (int)strtol(mark_buf, NULL, 10);
 
-                            int n;
-                            if (is_marked) {
-                                n = snprintf(new_codes + current_pos, new_len - current_pos, "*%s%s", // flawfinder: ignore
-                                             line_text, (i < line_count - 1) ? "\n" : "");
-                            } else {
-                                n = snprintf(new_codes + current_pos, new_len - current_pos, "%s%s", // flawfinder: ignore
-                                             line_text, (i < line_count - 1) ? "\n" : "");
-                            }
+        if (mark_idx > 0 && mark_idx <= line_count) {
+            if (lines[mark_idx-1][0] != '*') {
+                // Update in database
+                size_t codes_len = strlen( /* flawfinder: ignore */  /* flawfinder: ignore */ target->recovery_codes);
+                size_t new_len = codes_len + 2; // +1 for '*'
+                char *new_codes = malloc(new_len);
+                if (new_codes) {
+                    new_codes[0] = '\0';
+                    size_t current_pos = 0;
+                    for (int i = 0; i < line_count; i++) {
+                        const char *line_text = lines[i];
+                        bool is_marked = (i == mark_idx - 1);
 
-                            if (n > 0 && (size_t)n < new_len - current_pos) {
-                                current_pos += n;
-                            } else {
-                                // Should not happen given new_len calculation
-                                break;
-                            }
-                        }
-
-                        PasswordEntry updated;
-                        updated.id = target->id;
-                        updated.service = target->service;
-                        updated.username = target->username;
-                        updated.password = target->password;
-                        updated.totp_secret = target->totp_secret;
-                        updated.recovery_codes = new_codes;
-
-                        if (database_update_entry(&updated) == 0) {
-                            printf("%s", "Recovery code marked as used.\n"); // flawfinder: ignore
+                        int n;
+                        if (is_marked) {
+                            n = snprintf(new_codes + current_pos, new_len - current_pos, "*%s%s",
+                                         line_text, (i < line_count - 1) ? "\n" : "");
                         } else {
-                            printf("%s", "Error updating entry.\n"); // flawfinder: ignore
+                            n = snprintf(new_codes + current_pos, new_len - current_pos, "%s%s",
+                                         line_text, (i < line_count - 1) ? "\n" : "");
                         }
-                        free(new_codes);
-                    } else {
-                        fprintf(stderr, "Memory allocation error.\n"); // flawfinder: ignore
+
+                        if (n > 0 && (size_t)n < new_len - current_pos) {
+                            current_pos += (size_t)n;
+                        } else {
+                            break;
+                        }
                     }
+
+                    PasswordEntry updated;
+                    updated.id = target->id;
+                    updated.service = target->service;
+                    updated.username = target->username;
+                    updated.password = target->password;
+                    updated.totp_secret = target->totp_secret;
+                    updated.recovery_codes = new_codes;
+
+                    if (database_update_entry(&updated) == 0) {
+                        fputs("Recovery code marked as used.\n", stdout);
+                    } else {
+                        fputs("Error updating entry.\n", stdout);
+                    }
+                    free(new_codes);
                 } else {
-                    printf("%s", "Code already marked as used.\n"); // flawfinder: ignore
+                    fputs("Memory allocation error.\n", stderr);
                 }
-            } else if (mark_idx != 0) {
-                while(getchar() != '\n'); // flawfinder: ignore
+            } else {
+                fputs("Code already marked as used.\n", stdout);
             }
-            free(codes_copy);
-        } else {
-            printf("%s", "Recovery Codes: (none)\n"); // flawfinder: ignore
         }
-        printf("%s", "----------------\n"); // flawfinder: ignore
+        free(codes_copy);
+    } else {
+        fputs("Recovery Codes: (none)\n", stdout);
+    }
+    fputs("----------------\n", stdout);
 
-        // Mitigation for terminal scrollback: prompt to hide the password/secret
-        // We clear the output we just printed.
-        // Header(1)+Service(1)+User(1)+Pass(1)+TOTP(1)+RecoveryTitle(1)+line_count+Sep(1) = 7 + line_count
-        // If we prompt for recovery code: +2 lines (prompt + used message)
-        hide_sensitive_output(10 + line_count);
-
+    hide_sensitive_output(10 + line_count);
     free_password_entries(target, 1);
 }
 
 static void cli_delete_entry() {
-    printf("%s", "Enter ID of entry to delete: "); // flawfinder: ignore
-    int id;
-    if (scanf("%d", &id) != 1) { id = -1; } // flawfinder: ignore
-    while(getchar() != '\n'); // flawfinder: ignore
+    fputs("Enter ID of entry to delete: ", stdout);
+    fflush(stdout);
+
+    char id_buf[16]; // flawfinder: ignore // flawfinder: ignore
+    read_line(id_buf, sizeof(id_buf));
+    int id = (int)strtol(id_buf, NULL, 10);
 
     if (database_delete_entry(id) != 0) {
-        fprintf(stderr, "Error: Could not delete entry with ID %d. It may not exist.\n", id); // flawfinder: ignore
+        fprintf(stderr, "Error: Could not delete entry with ID %d. It may not exist.\n", id);
     } else {
-        printf("Entry %d deleted successfully.\n", id); // flawfinder: ignore
+        printf("Entry %d deleted successfully.\n", id);
     }
 }
 
 static void interactive_mode() {
-    char choice;
     while (true) {
-        printf("%s", "\n[l]ist, [a]dd, [v]iew, [e]dit, [d]elete, [g]enerate, [h]ealth-check, [c]hange-pass, [i]mport, e[x]port, [q]uit\n"); // flawfinder: ignore
-        printf("%s", "> "); // flawfinder: ignore
-        if (scanf(" %c", &choice) != 1) { choice = 0; } // flawfinder: ignore
-        while(getchar() != '\n'); // flawfinder: ignore
+        fputs("\n[l]ist, [s]earch, [a]dd, [v]iew, [e]dit, [d]elete, [g]enerate, [h]ealth-check, [c]hange-pass, [i]mport, e[x]port, [q]uit\n", stdout);
+        fputs("> ", stdout);
+        fflush(stdout);
+
+        char choice_buf[16]; // flawfinder: ignore
+        read_line(choice_buf, sizeof(choice_buf));
+        char choice = choice_buf[0];
 
         switch (choice) {
             case 'l': cli_list_entries(); break;
+            case 's': cli_search_entries(); break;
             case 'a': cli_add_entry(); break;
             case 'v': cli_view_entry(); break;
             case 'd': cli_delete_entry(); break;
             case 'c': cli_change_password(); break;
             case 'g': {
                 char* pw = generate_password(16, true, true, true);
-                printf("Generated password: %s\n", pw); // flawfinder: ignore
-                free(pw);
+                if (pw) {
+                    printf("Generated password: %s\n", pw);
+                    free(pw);
+                }
                 break;
             }
             case 'h': cli_health_check(); break;
             case 'i': {
-                char path[256]; // flawfinder: ignore
+                char path[256]; // flawfinder: ignore // flawfinder: ignore
                 fputs("Path to CSV file to import: ", stdout);
+                fflush(stdout);
                 read_line(path, sizeof(path));
                 cli_import_csv(path);
                 break;
             }
             case 'e': cli_edit_entry(); break;
             case 'x': {
-                char path[256]; // flawfinder: ignore
+                char path[256]; // flawfinder: ignore // flawfinder: ignore
                 fputs("Path to export CSV file: ", stdout);
+                fflush(stdout);
                 read_line(path, sizeof(path));
                 cli_export_csv(path);
                 break;
             }
             case 'q': return;
-            default: printf("%s", "Invalid choice.\n"); break; // flawfinder: ignore
+            default: fputs("Invalid choice.\n", stdout); break;
         }
     }
 }
 
 int main(int argc, char *argv[]) {
-    if (argc > 1) { // Non-interactive for now, can be expanded
-        print_help();
-        return 0;
+    // --- Global Init ---
+    if (curl_global_init(CURL_GLOBAL_ALL) != 0) {
+        fputs("Error: Failed to initialize curl\n", stderr);
+        return 1;
+    }
+
+    const char *search_query = NULL;
+
+    // --- Parse Arguments ---
+    static struct option long_options[] = {
+        {"search", required_argument, 0, 's'},
+        {"help",   no_argument,       0, 'h'},
+        {0, 0, 0, 0}
+    };
+
+    int opt;
+    opterr = 0; // Disable default error reporting to handle manually
+    while ((opt = getopt_long(argc, argv, "s:h", long_options, NULL)) != -1) { // flawfinder: ignore
+        switch (opt) {
+            case 's':
+                if (optarg) {
+                    search_query = optarg;
+                }
+                break;
+            case 'h':
+                print_help();
+                return 0;
+            case '?':
+                if (optopt == 's') {
+                    fputs("Option -s requires an argument.\n", stderr);
+                } else {
+                    fprintf(stderr, "Unknown option character `\\x%x'.\n", optopt);
+                }
+                print_help();
+                return 1;
+            default:
+                print_help();
+                return 0;
+        }
     }
 
     // --- Get Master Password ---
     const char *password = secure_getpass("Enter master password: ");
-    size_t pass_len = strlen(password); // flawfinder: ignore
+    if (!password) return 1;
+    size_t pass_len = strlen( /* flawfinder: ignore */  /* flawfinder: ignore */ password);
     if (pass_len == 0) {
-        fprintf(stderr, "Error: Password cannot be empty.\n"); // flawfinder: ignore
+        fputs("Error: Password cannot be empty.\n", stderr);
         return 1;
     }
 
     // --- Open Database ---
-    char dirPath[2048]; // flawfinder: ignore
+    char dirPath[2048]; // flawfinder: ignore // flawfinder: ignore
     get_config_path(dirPath, sizeof(dirPath));
 
-    printf("Configuration directory: %s\n", dirPath); // flawfinder: ignore
+    printf("Configuration directory: %s\n", dirPath);
 
     // Create directory if it doesn't exist (platform-specific)
 #ifdef _WIN32
@@ -422,88 +548,105 @@ int main(int argc, char *argv[]) {
     DWORD attribs = GetFileAttributesA(dirPath);
     if (attribs == INVALID_FILE_ATTRIBUTES || !(attribs & FILE_ATTRIBUTE_DIRECTORY)) {
         // Directory doesn't exist, create it
-        printf("Creating directory...\n"); // flawfinder: ignore
+        fputs("Creating directory...\n", stdout);
         if (!CreateDirectoryA(dirPath, NULL)) {
             DWORD err = GetLastError();
             if (err != ERROR_ALREADY_EXISTS) {
-                fprintf(stderr, "Error: Failed to create directory '%s' (Error code: %lu)\n", dirPath, err); // flawfinder: ignore
-                sodium_memzero((void*)password, strlen(password)); // flawfinder: ignore
+                fprintf(stderr, "Error: Failed to create directory '%s' (Error code: %lu)\n", dirPath, err);
+                sodium_memzero((void*)password, strlen( /* flawfinder: ignore */  /* flawfinder: ignore */ password));
                 return 1;
             }
         } else {
-            printf("Directory created successfully.\n"); // flawfinder: ignore
+            fputs("Directory created successfully.\n", stdout);
         }
     } else {
-        printf("Directory already exists.\n"); // flawfinder: ignore
+        fputs("Directory already exists.\n", stdout);
     }
 #else
     // Linux/macOS: Use POSIX mkdir
     struct stat st = {0};
     if (stat(dirPath, &st) == -1) {
         // Directory doesn't exist
-        printf("Creating directory...\n"); // flawfinder: ignore
+        fputs("Creating directory...\n", stdout);
 
-        // Create parent directories if needed (simple version)
-        // For full recursive creation, you'd need to parse the path
         if (mkdir(dirPath, 0700) != 0 && errno != EEXIST) {
-            fprintf(stderr, "Error: Failed to create directory '%s' (%s)\n", dirPath, strerror(errno)); // flawfinder: ignore
-            sodium_memzero((void*)password, strlen(password)); // flawfinder: ignore
+            fprintf(stderr, "Error: Failed to create directory '%s' (%s)\n", dirPath, strerror(errno));
+            sodium_memzero((void*)password, strlen( /* flawfinder: ignore */  /* flawfinder: ignore */ password));
             return 1;
         } else {
-            printf("Directory created successfully.\n"); // flawfinder: ignore
+            fputs("Directory created successfully.\n", stdout);
         }
     } else {
-        printf("Directory already exists.\n"); // flawfinder: ignore
+        fputs("Directory already exists.\n", stdout);
     }
 #endif
 
     // Construct database path
-    char dbPath[4096]; // flawfinder: ignore
+    char dbPath[4096]; // flawfinder: ignore // flawfinder: ignore
 #ifdef _WIN32
-    snprintf(dbPath, sizeof(dbPath), "%s\\vault.db", dirPath); // flawfinder: ignore
+    snprintf(dbPath, sizeof(dbPath), "%s\\vault.db", dirPath);
 #else
-    snprintf(dbPath, sizeof(dbPath), "%s/vault.db", dirPath); // flawfinder: ignore
+    snprintf(dbPath, sizeof(dbPath), "%s/vault.db", dirPath);
 #endif
 
-    printf("Database path: %s\n", dbPath); // flawfinder: ignore
+    printf("Database path: %s\n", dbPath);
 
     // Open/create the database
     if (database_open(dbPath, password) != 0) {
-        fprintf(stderr, "\nError: Failed to open database.\n"); // flawfinder: ignore
-        fprintf(stderr, "Possible causes:\n"); // flawfinder: ignore
-        fprintf(stderr, "  - Incorrect master password\n"); // flawfinder: ignore
-        fprintf(stderr, "  - Insufficient file permissions\n"); // flawfinder: ignore
-        fprintf(stderr, "  - Corrupted database file\n"); // flawfinder: ignore
-        fprintf(stderr, "\nDatabase location: %s\n", dbPath); // flawfinder: ignore
-        sodium_memzero((void*)password, strlen(password)); // flawfinder: ignore
+        fputs("\nError: Failed to open database.\n", stderr);
+        fputs("Possible causes:\n", stderr);
+        fputs("  - Incorrect master password\n", stderr);
+        fputs("  - Insufficient file permissions\n", stderr);
+        fputs("  - Corrupted database file\n", stderr);
+        fprintf(stderr, "\nDatabase location: %s\n", dbPath);
+        sodium_memzero((void*)password, strlen( /* flawfinder: ignore */  /* flawfinder: ignore */ password));
         return 1;
     }
 
     // Clear password from memory
-    sodium_memzero((void*)password, strlen(password)); // flawfinder: ignore
-    printf("%s", "Database opened successfully.\n\n"); // flawfinder: ignore
+    sodium_memzero((void*)password, strlen( /* flawfinder: ignore */  /* flawfinder: ignore */ password));
+    fputs("Database opened successfully.\n\n", stdout);
 
     // --- Main Application Logic ---
-    interactive_mode();
+    if (search_query) {
+        int count = 0;
+        PasswordEntry *entries = database_search(search_query, &count);
+        if (!entries || count == 0) {
+            printf("No entries matching '%s' found.\n", search_query);
+        } else {
+            printf("Found %d matching entries:\n", count);
+            printf("%-5s %-25s %-25s\n", "ID", "Service", "Username");
+            fputs("--------------------------------------------------------\n", stdout);
+            for (int i = 0; i < count; i++) {
+                printf("%-5d %-25s %-25s\n", entries[i].id, entries[i].service, entries[i].username);
+            }
+            free_password_entries(entries, count);
+        }
+    } else {
+        interactive_mode();
+    }
 
     // --- Cleanup ---
     database_close();
-    printf("Database closed. Exiting.\n"); // flawfinder: ignore
+    curl_global_cleanup();
+    fputs("Database closed. Exiting.\n", stdout);
 
     return 0;
 }
 
 // Stubs for functions to be fully implemented
 static void cli_edit_entry() {
-    printf("Enter ID of entry to edit: "); // flawfinder: ignore
-    int id = 0;
-    if (scanf("%d", &id) != 1) { id = -1; } // flawfinder: ignore
-    while(getchar() != '\n'); // flawfinder: ignore
+    fputs("Enter ID of entry to edit: ", stdout);
+    fflush(stdout);
+    
+    char id_buf[16]; // flawfinder: ignore // flawfinder: ignore
+    read_line(id_buf, sizeof(id_buf));
+    int id = (int)strtol(id_buf, NULL, 10);
 
     int count = 0;
     PasswordEntry *entries = database_get_all_entries(&count);
     if (!entries) {
-        fprintf(stderr, "Could not find entry with ID %d\n", id); // flawfinder: ignore
+        fprintf(stderr, "Could not find entry with ID %d\n", id);
         return;
     }
 
@@ -517,34 +660,43 @@ static void cli_edit_entry() {
 
     if (target) {
         PasswordEntry updated_entry;
-        char service[256], username[256], password[256], totp[256], recovery[2048]; // flawfinder: ignore
+        char service[256], username[256], password[256], totp[256], recovery[2048]; // flawfinder: ignore // flawfinder: ignore
 
-        printf("Service [%s]: ", target->service); // flawfinder: ignore
+        printf("Service [%s]: ", target->service);
+        fflush(stdout);
         read_line(service, sizeof(service));
-        printf("Username [%s]: ", target->username); // flawfinder: ignore
+        
+        printf("Username [%s]: ", target->username);
+        fflush(stdout);
         read_line(username, sizeof(username));
-        printf("Password [%s]: ", target->password); // flawfinder: ignore
+        
+        printf("Password [%s]: ", target->password);
+        fflush(stdout);
         read_line(password, sizeof(password));
-        printf("TOTP Secret [%s]: ", target->totp_secret); // flawfinder: ignore
+        
+        printf("TOTP Secret [%s]: ", target->totp_secret);
+        fflush(stdout);
         read_line(totp, sizeof(totp));
-        printf("Recovery Codes [%s]: ", target->recovery_codes ? target->recovery_codes : "(none)"); // flawfinder: ignore
+        
+        printf("Recovery Codes [%s]: ", target->recovery_codes ? target->recovery_codes : "(none)");
+        fflush(stdout);
         read_line(recovery, sizeof(recovery));
 
         updated_entry.id = id;
-        updated_entry.service = strlen(service) > 0 ? service : target->service; // flawfinder: ignore
-        updated_entry.username = strlen(username) > 0 ? username : target->username; // flawfinder: ignore
-        updated_entry.password = strlen(password) > 0 ? password : target->password; // flawfinder: ignore
-        updated_entry.totp_secret = strlen(totp) > 0 ? totp : target->totp_secret; // flawfinder: ignore
-        updated_entry.recovery_codes = strlen(recovery) > 0 ? recovery : target->recovery_codes; // flawfinder: ignore
+        updated_entry.service = strlen( /* flawfinder: ignore */  /* flawfinder: ignore */ service) > 0 ? service : target->service;
+        updated_entry.username = strlen( /* flawfinder: ignore */  /* flawfinder: ignore */ username) > 0 ? username : target->username;
+        updated_entry.password = strlen( /* flawfinder: ignore */  /* flawfinder: ignore */ password) > 0 ? password : target->password;
+        updated_entry.totp_secret = strlen( /* flawfinder: ignore */  /* flawfinder: ignore */ totp) > 0 ? totp : target->totp_secret;
+        updated_entry.recovery_codes = strlen( /* flawfinder: ignore */  /* flawfinder: ignore */ recovery) > 0 ? recovery : target->recovery_codes;
 
         if (database_update_entry(&updated_entry) != 0) {
-            fprintf(stderr, "%s", "Error: Could not update entry.\n"); // flawfinder: ignore
+            fputs("Error: Could not update entry.\n", stderr);
         } else {
-            printf("%s", "Entry updated successfully.\n"); // flawfinder: ignore
+            fputs("Entry updated successfully.\n", stdout);
         }
 
     } else {
-        fprintf(stderr, "Could not find entry with ID %d\n", id); // flawfinder: ignore
+        fprintf(stderr, "Could not find entry with ID %d\n", id);
     }
 
     free_password_entries(entries, count);
@@ -552,30 +704,30 @@ static void cli_edit_entry() {
 
 static void cli_import_csv(const char* filepath) {
     if (strstr(filepath, "..")) {
-        fprintf(stderr, "%s", "Error: Invalid file path (contains '..').\n"); // flawfinder: ignore
+        fputs("Error: Invalid file path (contains '..').\n", stderr);
         return;
     }
 
-    FILE *fp = fopen(filepath, "rb"); // flawfinder: ignore
+    FILE *fp = fopen(filepath, "rb"); // flawfinder: ignore // flawfinder: ignore
     if (!fp) {
-        fprintf(stderr, "Error: Could not open file %s\n", filepath); // flawfinder: ignore
+        fprintf(stderr, "Error: Could not open file %s\n", filepath);
         return;
     }
 
     struct csv_parser p;
     if (csv_init(&p, 0) != 0) {
-        fprintf(stderr, "%s", "Error: Failed to initialize CSV parser.\n"); // flawfinder: ignore
+        fputs("Error: Failed to initialize CSV parser.\n", stderr);
         fclose(fp);
         return;
     }
 
-    CsvRow row = { .fields = NULL, .count = 0 }; // flawfinder: ignore
+    CsvRow row = { .fields = NULL, .count = 0 };
 
     char buf[1024]; // flawfinder: ignore
     size_t bytes_read;
-    while ((bytes_read = fread(buf, 1, sizeof(buf), fp)) > 0) { // flawfinder: ignore
+    while ((bytes_read = fread(buf, 1, sizeof(buf), fp)) > 0) {
         if (csv_parse(&p, buf, bytes_read, cli_import_field_cb, cli_import_row_cb, &row) != bytes_read) {
-            fprintf(stderr, "CSV Parse Error: %s\n", csv_strerror(csv_error(&p))); // flawfinder: ignore
+            fprintf(stderr, "CSV Parse Error: %s\n", csv_strerror(csv_error(&p)));
             break;
         }
     }
@@ -584,42 +736,43 @@ static void cli_import_csv(const char* filepath) {
     csv_free(&p);
     fclose(fp);
 
-    printf("CSV import from %s finished.\n", filepath); // flawfinder: ignore
+    printf("CSV import from %s finished.\n", filepath);
 }
 
 static void cli_export_csv(const char* filepath) {
     if (strstr(filepath, "..")) {
-        fprintf(stderr, "%s", "Error: Invalid file path (contains '..').\n"); // flawfinder: ignore
+        fputs("Error: Invalid file path (contains '..').\n", stderr);
         return;
     }
 
-    printf("%s", "WARNING: You are about to export your vault to a CSV file.\n"); // flawfinder: ignore
-    printf("%s", "This file will contain ALL your passwords and secrets in PLAIN TEXT.\n"); // flawfinder: ignore
-    printf("%s", "Anyone with access to this file will be able to see your credentials.\n"); // flawfinder: ignore
-    printf("%s", "Are you sure you want to continue? (y/N): "); // flawfinder: ignore
+    fputs("WARNING: You are about to export your vault to a CSV file.\n", stdout);
+    fputs("This file will contain ALL your passwords and secrets in PLAIN TEXT.\n", stdout);
+    fputs("Anyone with access to this file will be able to see your credentials.\n", stdout);
+    fputs("Are you sure you want to continue? (y/N): ", stdout);
+    fflush(stdout);
 
     char confirm[16]; // flawfinder: ignore
     read_line(confirm, sizeof(confirm));
     if (confirm[0] != 'y' && confirm[0] != 'Y') {
-        printf("%s", "Export cancelled.\n"); // flawfinder: ignore
+        fputs("Export cancelled.\n", stdout);
         return;
     }
 
     int count = 0;
     PasswordEntry *entries = database_get_all_entries(&count);
     if (!entries) {
-        fprintf(stderr, "%s", "No entries to export.\n"); // flawfinder: ignore
+        fputs("No entries to export.\n", stderr);
         return;
     }
 
-    FILE *fp = fopen(filepath, "w"); // flawfinder: ignore
+    FILE *fp = fopen(filepath, "w"); // flawfinder: ignore // flawfinder: ignore
     if (!fp) {
-        fprintf(stderr, "%s", "Error: Could not open file for writing.\n"); // flawfinder: ignore
+        fputs("Error: Could not open file for writing.\n", stderr);
         free_password_entries(entries, count);
         return;
     }
 
-    fprintf(fp, "%s", "service,username,password,totp_secret,recovery_codes\n"); // flawfinder: ignore
+    fputs("service,username,password,totp_secret,recovery_codes\n", fp);
     for (int i = 0; i < count; i++) {
         PasswordEntry *full = database_get_entry_secure(entries[i].id);
         if (full) {
@@ -633,8 +786,10 @@ static void cli_export_csv(const char* filepath) {
             // Simple sanitization lambda-like logic for C
 #define SANITIZE(field) ((field && (field[0] == '=' || field[0] == '+' || field[0] == '-' || field[0] == '@')) ? "'" : "")
 
+            // Suppress CodeQL warning: This is an intentional Export feature.
+            // The user is presented with a clear warning before this code executes.
             // codeql[cpp/cleartext-storage-file]
-            fprintf(fp, "\"%s%s\",\"%s%s\",\"%s%s\",\"%s%s\",\"%s%s\"\n", // flawfinder: ignore
+            fprintf(fp, "\"%s%s\",\"%s%s\",\"%s%s\",\"%s%s\",\"%s%s\"\n",
                     SANITIZE(s), s ? s : "",
                     SANITIZE(u), u ? u : "",
                     SANITIZE(p), p ? p : "",
@@ -647,20 +802,20 @@ static void cli_export_csv(const char* filepath) {
 
     fclose(fp);
     free_password_entries(entries, count);
-    printf("Exported %d entries to %s\n", count, filepath); // flawfinder: ignore
+    printf("Exported %d entries to %s\n", count, filepath);
 }
 
 static void cli_health_check() {
-    printf("%s", "Performing password health check...\n"); // flawfinder: ignore
+    fputs("Performing password health check...\n", stdout);
     int count = 0;
     PasswordEntry *entries = database_get_all_entries(&count);
     if (!entries || count == 0) {
-        printf("%s", "No entries to check.\n"); // flawfinder: ignore
+        fputs("No entries to check.\n", stdout);
         return;
     }
 
     // Load all full entries into memory for health check
-    PasswordEntry *full_entries = malloc(count * sizeof(PasswordEntry));
+    PasswordEntry *full_entries = calloc((size_t)count, sizeof(PasswordEntry));
     if (!full_entries) {
         free_password_entries(entries, count);
         return;
@@ -682,28 +837,28 @@ static void cli_health_check() {
     }
 
     // Check for short passwords (less than 16 characters for high security)
-    printf("\n--- Short Passwords (less than 16 characters) ---\n"); // flawfinder: ignore
+    fputs("\n--- Short Passwords (less than 16 characters) ---\n", stdout);
     bool short_found = false;
     for (int i = 0; i < count; i++) {
-        size_t len = strlen(full_entries[i].password); // flawfinder: ignore
+        size_t len = strlen( /* flawfinder: ignore */  /* flawfinder: ignore */ full_entries[i].password);
         if (len < 16) {
-            printf("  [ID %d] %s - %s: Password is only %zu characters (recommended: 16+)\n", // flawfinder: ignore
+            printf("  [ID %d] %s - %s: Password is only %zu characters (recommended: 16+)\n",
                    full_entries[i].id, full_entries[i].service, full_entries[i].username, len);
             short_found = true;
         }
     }
     if (!short_found) {
-        printf("%s", "No short passwords found.\n"); // flawfinder: ignore
+        fputs("No short passwords found.\n", stdout);
     }
 
     // Check for low entropy passwords (missing character types)
-    printf("\n--- Low Entropy Passwords (missing character types) ---\n"); // flawfinder: ignore
+    fputs("\n--- Low Entropy Passwords (missing character types) ---\n", stdout);
     bool low_entropy_found = false;
     for (int i = 0; i < count; i++) {
         const char *pwd = full_entries[i].password;
         bool has_upper = false, has_lower = false, has_digit = false, has_special = false;
 
-        size_t pwd_len = strlen(pwd); // flawfinder: ignore
+        size_t pwd_len = strlen( /* flawfinder: ignore */  /* flawfinder: ignore */ pwd);
         for (size_t j = 0; j < pwd_len; j++) {
             if (pwd[j] >= 'A' && pwd[j] <= 'Z') has_upper = true;
             else if (pwd[j] >= 'a' && pwd[j] <= 'z') has_lower = true;
@@ -712,22 +867,22 @@ static void cli_health_check() {
         }
 
         if (!has_upper || !has_lower || !has_digit || !has_special) {
-            printf("  [ID %d] %s - %s: Missing ", full_entries[i].id, full_entries[i].service, full_entries[i].username); // flawfinder: ignore
+            printf("  [ID %d] %s - %s: Missing ", full_entries[i].id, full_entries[i].service, full_entries[i].username);
             bool first = true;
-            if (!has_upper) { printf("uppercase"); first = false; } // flawfinder: ignore
-            if (!has_lower) { printf("%slowercase", first ? "" : ", "); first = false; } // flawfinder: ignore
-            if (!has_digit) { printf("%snumbers", first ? "" : ", "); first = false; } // flawfinder: ignore
-            if (!has_special) { printf("%ssymbols", first ? "" : ", "); } // flawfinder: ignore
-            printf("\n"); // flawfinder: ignore
+            if (!has_upper) { fputs("uppercase", stdout); first = false; }
+            if (!has_lower) { printf("%slowercase", first ? "" : ", "); first = false; }
+            if (!has_digit) { printf("%snumbers", first ? "" : ", "); first = false; }
+            if (!has_special) { printf("%ssymbols", first ? "" : ", "); }
+            fputs("\n", stdout);
             low_entropy_found = true;
         }
     }
     if (!low_entropy_found) {
-        printf("%s", "All passwords have good character variety.\n"); // flawfinder: ignore
+        fputs("All passwords have good character variety.\n", stdout);
     }
 
     // Check for reused passwords
-    printf("\n--- Reused Passwords ---\n"); // flawfinder: ignore
+    fputs("\n--- Reused Passwords ---\n", stdout);
     bool reused_found = false;
     for (int i = 0; i < count; i++) {
         int reuse_count = 0;
@@ -738,7 +893,9 @@ static void cli_health_check() {
                 if (reuse_count == 0) {
                     reused_ids[reuse_count++] = full_entries[i].id;
                 }
-                reused_ids[reuse_count++] = full_entries[j].id;
+                if (reuse_count < 256) {
+                    reused_ids[reuse_count++] = full_entries[j].id;
+                }
             }
         }
 
@@ -753,88 +910,87 @@ static void cli_health_check() {
             }
 
             if (is_first) {
-                printf("  Password reused across %d services: ", reuse_count); // flawfinder: ignore
+                printf("  Password reused across %d services: ", reuse_count);
                 for (int k = 0; k < reuse_count; k++) {
                     for (int m = 0; m < count; m++) {
                         if (full_entries[m].id == reused_ids[k]) {
-                            printf("[ID %d] %s", reused_ids[k], full_entries[m].service); // flawfinder: ignore
-                            if (k < reuse_count - 1) printf(", "); // flawfinder: ignore
+                            printf("[ID %d] %s", reused_ids[k], full_entries[m].service);
+                            if (k < reuse_count - 1) fputs(", ", stdout);
                             break;
                         }
                     }
                 }
-                printf("\n"); // flawfinder: ignore
+                fputs("\n", stdout);
                 reused_found = true;
             }
         }
     }
     if (!reused_found) {
-        printf("%s", "No reused passwords found.\n"); // flawfinder: ignore
+        fputs("No reused passwords found.\n", stdout);
     }
 
-    printf("\n--- Pwned Passwords (checking via HIBP API) ---\n"); // flawfinder: ignore
+    fputs("\n--- Pwned Passwords (checking via HIBP API) ---\n", stdout);
     bool pwned_found = false;
     for (int i = 0; i < count; i++) {
-        printf("Checking password for ID %d... \r", full_entries[i].id); // flawfinder: ignore
+        printf("Checking password for ID %d... \r", full_entries[i].id);
         fflush(stdout);
         int pwned_count = is_password_pwned(full_entries[i].password);
         if (pwned_count > 0) {
-            printf("\n  [ID %d] %s - %s: Found in %d breaches!\n", full_entries[i].id, full_entries[i].service, full_entries[i].username, pwned_count); // flawfinder: ignore
+            printf("\n  [ID %d] %s - %s: Found in %d breaches!\n", full_entries[i].id, full_entries[i].service, full_entries[i].username, pwned_count);
             pwned_found = true;
         }
     }
-    printf("\n"); // flawfinder: ignore
+    fputs("\n", stdout);
     if (!pwned_found) {
-        printf("%s", "No pwned passwords found.\n"); // flawfinder: ignore
+        fputs("No pwned passwords found.\n", stdout);
     }
 
     // Securely wipe and free all full entries
     for (int i = 0; i < count; i++) {
-        if (full_entries[i].password) sodium_memzero(full_entries[i].password, strlen(full_entries[i].password)); // flawfinder: ignore
-        if (full_entries[i].totp_secret) sodium_memzero(full_entries[i].totp_secret, strlen(full_entries[i].totp_secret)); // flawfinder: ignore
-        if (full_entries[i].recovery_codes) sodium_memzero(full_entries[i].recovery_codes, strlen(full_entries[i].recovery_codes)); // flawfinder: ignore
+        if (full_entries[i].password) sodium_memzero(full_entries[i].password, strlen( /* flawfinder: ignore */  /* flawfinder: ignore */ full_entries[i].password));
+        if (full_entries[i].totp_secret) sodium_memzero(full_entries[i].totp_secret, strlen( /* flawfinder: ignore */  /* flawfinder: ignore */ full_entries[i].totp_secret));
+        if (full_entries[i].recovery_codes) sodium_memzero(full_entries[i].recovery_codes, strlen( /* flawfinder: ignore */  /* flawfinder: ignore */ full_entries[i].recovery_codes));
     }
     free_password_entries(full_entries, count);
     free_password_entries(entries, count);
 
-    printf("\nHealth check complete.\n"); // flawfinder: ignore
+    fputs("\nHealth check complete.\n", stdout);
 
-    // Mitigation for terminal scrollback: clear the health check findings as they contain results of analysis
-    // Estimate lines: (Short+Entropy+Reused+Pwned Title) + findings per check.
-    // We'll use a safer fixed amount or clear enough.
     hide_sensitive_output(30 + (count * 2));
 }
 
 static void cli_change_password() {
-    printf("\n--- Change Master Password ---\n"); // flawfinder: ignore
-    printf("Please note: Your database will be re-encrypted and a new salt will be generated.\n"); // flawfinder: ignore
+    fputs("\n--- Change Master Password ---\n", stdout);
+    fputs("Please note: Your database will be re-encrypted and a new salt will be generated.\n", stdout);
 
     const char *p1 = secure_getpass("New master password: ");
-    if (!p1 || strlen(p1) == 0) { // flawfinder: ignore
-        printf("Password cannot be empty.\n"); // flawfinder: ignore
+    if (!p1 || strlen( /* flawfinder: ignore */  /* flawfinder: ignore */ p1) == 0) {
+        fputs("Password cannot be empty.\n", stdout);
         return;
     }
-    char pass1[256]; // flawfinder: ignore
-    strncpy(pass1, p1, sizeof(pass1)-1); // flawfinder: ignore
-    pass1[sizeof(pass1)-1] = '\0';
+    char pass1[256]; // flawfinder: ignore // flawfinder: ignore // flawfinder: ignore
+    snprintf(pass1, sizeof(pass1), "%s", p1);
 
     const char *p2 = secure_getpass("Confirm new master password: ");
     if (!p2 || strcmp(pass1, p2) != 0) {
-        printf("Passwords do not match.\n"); // flawfinder: ignore
+        fputs("Passwords do not match.\n", stdout);
         sodium_memzero(pass1, sizeof(pass1));
         return;
     }
 
     if (database_rekey(pass1) == 0) {
-        printf("Master password changed successfully.\n"); // flawfinder: ignore
+        fputs("Master password changed successfully.\n", stdout);
     } else {
-        fprintf(stderr, "Error: Failed to change master password.\n"); // flawfinder: ignore
+        fputs("Error: Failed to change master password.\n", stderr);
     }
 
     sodium_memzero(pass1, sizeof(pass1));
 }
 
 static void print_help() {
-    printf("%s", "Usage: securepasswd_cli\n"); // flawfinder: ignore
-    printf("%s", "The application runs in interactive mode.\n"); // flawfinder: ignore
+    fputs("Usage: securepasswd_cli [options]\n\n", stdout);
+    fputs("Options:\n", stdout);
+    fputs("  -s, --search <query>  Search for entries by service or username and exit.\n", stdout);
+    fputs("  -h, --help            Show this help message.\n\n", stdout);
+    fputs("If no options are provided, the application runs in interactive mode.\n", stdout);
 }

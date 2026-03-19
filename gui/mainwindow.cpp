@@ -1,45 +1,42 @@
 #include "mainwindow.h"
 #include "entrydialog.h"
-#include "healthcheckdialog.h"
 #include "syncdialog.h"
-#include <csv.h>
-
-extern "C" {
+#include "healthcheckdialog.h"
 #include "database.h"
 #include "totp.h"
 #include "platform_paths.h"
-}
+#include "passwordentry.h"
+#include <csv.h>
 
-#include <QAction>
-#include <QApplication>
-#include <QClipboard>
-#include <QDataStream>
-#include <QDebug>
-#include <QDir>
-#include <QFile>
-#include <QFileDialog>
-#include <QFontDatabase>
-#include <QIcon>
-#include <QHBoxLayout>
-#include <QListWidget>
-#include <QMenuBar>
-#include <QSettings>
-#include <QStyleFactory>
-#include <QMessageBox>
-#include <QInputDialog>
-#include <QStandardPaths>
-#include <QStatusBar>
-#include <QTimer>
-#include <QToolBar>
 #include <QVBoxLayout>
-#include <QWidget>
-#include <cstring>
-#include <sodium.h>
-#include <time.h>
+#include <QHBoxLayout>
+#include <QToolBar>
+#include <QAction>
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QHeaderView>
+#include <QClipboard>
+#include <QApplication>
+#include <QTimer>
+#include <QLabel>
+#include <QProgressBar>
+#include <QSettings>
+#include <QFile>
+#include <QDir>
+#include <QInputDialog>
+#include <QLineEdit>
+#include <QPushButton>
+#include <QStatusBar>
+#include <QListWidget>
+#include <vector>
+
+// Forward declaration for CSV callbacks
+static void import_field_cb(void *s, size_t len, void *data);
+static void import_row_cb(int c, void *data);
 
 // Callbacks for libcsv import
 void import_field_cb(void *s, size_t len, void *data) {
-    static_cast<QStringList*>(data)->append(QString::fromUtf8((char*)s, len));
+    static_cast<QStringList*>(data)->append(QString::fromUtf8((char*)s, (int)len));
 }
 
 // Sanitize fields against CSV injection (Formula Injection)
@@ -50,15 +47,15 @@ static QString sanitize_csv_field(QString field) {
     return field;
 }
 
-void import_row_cb(int c, void *data) {
+static void import_row_cb(int c, void *data) {
     QStringList *fields = static_cast<QStringList*>(data);
-    if (fields->size() >= 3) { // service,username,password are required
+    if (fields->count() >= 3) {
         PasswordEntry entry;
         QByteArray service = fields->at(0).toUtf8();
         QByteArray username = fields->at(1).toUtf8();
         QByteArray password = fields->at(2).toUtf8();
-        QByteArray totpSecret = (fields->size() >= 4) ? fields->at(3).toUtf8() : QByteArray();
-        QByteArray recoveryCodes = (fields->size() >= 5) ? fields->at(4).toUtf8() : QByteArray();
+        QByteArray totpSecret = (fields->count() >= 4) ? fields->at(3).toUtf8() : QByteArray("");
+        QByteArray recoveryCodes = (fields->count() >= 5) ? fields->at(4).toUtf8() : QByteArray("");
 
         entry.service = (char*)service.constData();
         entry.username = (char*)username.constData();
@@ -66,16 +63,33 @@ void import_row_cb(int c, void *data) {
         entry.totp_secret = (char*)totpSecret.constData();
         entry.recovery_codes = (char*)recoveryCodes.constData();
 
-        database_add_entry(&entry);
+        // Identity check for duplicates
+        PasswordEntry *existing = database_get_entry_by_identity(entry.service, entry.username);
+        if (existing) {
+            bool identical = (strcmp(existing->password, entry.password) == 0 &&
+                             strcmp(existing->totp_secret, entry.totp_secret) == 0 &&
+                             strcmp(existing->recovery_codes, entry.recovery_codes) == 0);
+
+            if (!identical) {
+                // For GUI, we might want to prompt, but for batch import we'll update or skip.
+                // Here we update to match CLI's "overwrite" capability if we had a dialog.
+                // Simple approach for now: update existing.
+                entry.id = existing->id;
+                database_update_entry(&entry);
+            }
+            free_password_entries(existing, 1);
+        } else {
+            database_add_entry(&entry);
+        }
     }
     fields->clear();
 }
 
-MainWindow::MainWindow(const QString& password, QWidget *parent) : QMainWindow(parent), m_databaseOpen(false) {
+MainWindow::MainWindow(const QString& password, QWidget *parent) : QMainWindow(parent), m_databaseOpen(false), searchBar(nullptr), recoveryCodesEnabled(false) {
     // Use shared platform_paths function
-    char dirPath[2048]; // flawfinder: ignore
-    get_config_path(dirPath, sizeof(dirPath));
-    QString dbDirPath = QString::fromUtf8(dirPath);
+    std::vector<char> dirPath(4096);
+    get_config_path(dirPath.data(), dirPath.size());
+    QString dbDirPath = QString::fromUtf8(dirPath.data());
 
     QDir dir(dbDirPath);
     if (!dir.exists()) {
@@ -83,20 +97,20 @@ MainWindow::MainWindow(const QString& password, QWidget *parent) : QMainWindow(p
     }
     QString dbPath = dbDirPath + "/vault.db";
 
-    if (database_open(dbPath.toUtf8().constData(), password.toUtf8().constData()) != 0) {
+    if (database_open( /* flawfinder: ignore */ dbPath.toUtf8().constData(), password.toUtf8().constData()) != 0) {
         return;
     }
 
     m_databaseOpen = true;
+
+    QSettings settings("SecurePasswd_MGMT", "SecurePasswd_MGMT");
+    recoveryCodesEnabled = settings.value("recovery_codes_enabled", false).toBool();
+
     setupUI();
     refreshEntryList();
 
-    QSettings settings("SecurePasswd_MGMT", "SecurePasswd_MGMT");
     currentTheme = settings.value("theme", "light").toString();
     loadTheme(currentTheme);
-
-    recoveryCodesEnabled = settings.value("recovery_codes_enabled", false).toBool();
-    updateRecoveryCodesVisibility();
 }
 
 MainWindow::~MainWindow() {
@@ -107,8 +121,8 @@ void MainWindow::onImport() {
     QString filePath = QFileDialog::getOpenFileName(this, "Import from CSV", QDir::homePath(), "CSV Files (*.csv)");
     if (filePath.isEmpty()) return;
 
-    FILE *fp = fopen(filePath.toUtf8().constData(), "rb"); // flawfinder: ignore
-    if (!fp) {
+    QFile file(filePath);
+    if (!file.open( /* flawfinder: ignore */ QIODevice::ReadOnly)) {
         QMessageBox::critical(this, "Error", "Could not open file for reading.");
         return;
     }
@@ -116,24 +130,22 @@ void MainWindow::onImport() {
     struct csv_parser p;
     if (csv_init(&p, 0) != 0) {
         QMessageBox::critical(this, "Error", "Failed to initialize CSV parser.");
-        fclose(fp);
         return;
     }
 
     QStringList currentFields;
-
-    char buf[1024]; // flawfinder: ignore
-    size_t bytes_read;
-    while ((bytes_read = fread(buf, 1, sizeof(buf), fp)) > 0) { // flawfinder: ignore
-        if (csv_parse(&p, buf, bytes_read, import_field_cb, import_row_cb, &currentFields) != bytes_read) {
+    char buf[4096]; // flawfinder: ignore // flawfinder: ignore
+    qint64 bytes_read;
+    while ((bytes_read = file.read( /* flawfinder: ignore */ buf, sizeof(buf))) > 0) {
+        if (csv_parse(&p, buf, (size_t)bytes_read, import_field_cb, import_row_cb, &currentFields) != (size_t)bytes_read) {
             QMessageBox::critical(this, "CSV Parse Error", QString::fromStdString(csv_strerror(csv_error(&p))));
             break;
         }
     }
 
-    csv_fini(&p, import_field_cb, import_row_cb, &currentFields); // Finalize parsing
+    csv_fini(&p, import_field_cb, import_row_cb, &currentFields);
     csv_free(&p);
-    fclose(fp);
+    file.close();
 
     refreshEntryList();
     statusBar()->showMessage(QString("Import from %1 complete.").arg(filePath), 5000);
@@ -144,29 +156,31 @@ void MainWindow::onExport() {
     QString filePath = QFileDialog::getSaveFileName(this, "Export to CSV", QDir::homePath() + "/export.csv", "CSV Files (*.csv)");
     if (filePath.isEmpty()) return;
 
-    FILE *fp = fopen(filePath.toUtf8().constData(), "wb"); // flawfinder: ignore
-    if (!fp) {
+    QFile file(filePath);
+    if (!file.open( /* flawfinder: ignore */ QIODevice::WriteOnly | QIODevice::Text)) {
         QMessageBox::critical(this, "Error", "Could not open file for writing.");
         return;
     }
 
-    fputs("service,username,password,totp_secret,recovery_codes\n", fp);
+    QTextStream out(&file);
+    out << "service,username,password,totp_secret,recovery_codes\n";
 
     for (const auto& entry_meta : m_entries) {
         // Fetch full entry for export
         PasswordEntry *db_entry = database_get_entry_secure(entry_meta.id);
         if (db_entry) {
-            fprintf(fp, "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\"\n", // flawfinder: ignore
-                    sanitize_csv_field(QString::fromUtf8(db_entry->service)).toUtf8().constData(),
-                    sanitize_csv_field(QString::fromUtf8(db_entry->username)).toUtf8().constData(),
-                    sanitize_csv_field(QString::fromUtf8(db_entry->password)).toUtf8().constData(),
-                    sanitize_csv_field(QString::fromUtf8(db_entry->totp_secret)).toUtf8().constData(),
-                    sanitize_csv_field(QString::fromUtf8(db_entry->recovery_codes)).toUtf8().constData());
+            // Suppress CodeQL warning: This is an intentional Export feature.
+            // codeql[cpp/cleartext-storage-file]
+            out << "\"" << sanitize_csv_field(QString::fromUtf8(db_entry->service)) << "\",";
+            out << "\"" << sanitize_csv_field(QString::fromUtf8(db_entry->username)) << "\",";
+            out << "\"" << sanitize_csv_field(QString::fromUtf8(db_entry->password)) << "\",";
+            out << "\"" << sanitize_csv_field(QString::fromUtf8(db_entry->totp_secret)) << "\",";
+            out << "\"" << sanitize_csv_field(QString::fromUtf8(db_entry->recovery_codes)) << "\"\n";
             free_password_entries(db_entry, 1);
         }
     }
 
-    fclose(fp);
+    file.close();
     statusBar()->showMessage(QString("Exported %1 entries to %2").arg(m_entries.size()).arg(filePath), 5000);
 }
 
@@ -175,7 +189,40 @@ void MainWindow::onSync() {
     dialog.exec();
 }
 
+void MainWindow::onSearchChanged(const QString &text) {
+    if (text.isEmpty()) {
+        refreshEntryList();
+        return;
+    }
+
+    listWidget->clear();
+    m_entries.clear();
+
+    int count = 0;
+    PasswordEntry *db_entries = database_search(text.toUtf8().constData(), &count);
+
+    if (!db_entries) return;
+
+    for (int i = 0; i < count; i++) {
+        QListWidgetItem *item = new QListWidgetItem(QString::fromUtf8(db_entries[i].service));
+        item->setData(Qt::UserRole, db_entries[i].id);
+        listWidget->addItem(item);
+
+        GUIPasswordEntry qt_entry;
+        qt_entry.id = db_entries[i].id;
+        qt_entry.service = QString::fromUtf8(db_entries[i].service);
+        qt_entry.username = QString::fromUtf8(db_entries[i].username);
+        m_entries.append(qt_entry);
+    }
+
+    free_password_entries(db_entries, count);
+}
+
 void MainWindow::refreshEntryList() {
+    if (searchBar && !searchBar->text().isEmpty()) {
+        onSearchChanged(searchBar->text());
+        return;
+    }
     listWidget->clear();
     m_entries.clear();
 
@@ -193,7 +240,6 @@ void MainWindow::refreshEntryList() {
         qt_entry.id = db_entries[i].id;
         qt_entry.service = QString::fromUtf8(db_entries[i].service);
         qt_entry.username = QString::fromUtf8(db_entries[i].username);
-        // Sensitive fields are no longer stored in the m_entries cache
         m_entries.append(qt_entry);
     }
 
@@ -252,7 +298,7 @@ void MainWindow::updateTotpDisplay() {
     }
 
     time_t now = time(NULL);
-    int remaining = 30 - (now % 30);
+    int remaining = 30 - (int)(now % 30);
     totpProgressBar->setValue(remaining);
 
     if (remaining == 30 || totpLabel->text() == "------") {
@@ -398,18 +444,23 @@ void MainWindow::setupUI() {
     // Layout
     QVBoxLayout *mainLayout = new QVBoxLayout(centralWidget);
 
+    // Search Bar
+    searchBar = new QLineEdit(this);
+    searchBar->setPlaceholderText("Search services or usernames...");
+    searchBar->setClearButtonEnabled(true);
+    searchBar->addAction(QIcon(":/icons/search.svg"), QLineEdit::LeadingPosition);
+    mainLayout->addWidget(searchBar);
+
     // Toolbar
     toolBar = new QToolBar(this);
     toolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     addToolBar(toolBar);
 
-    // Menus (Removed for icon-only UI)
-
     // --- Group 1: Entry Management ---
-    addAction = new QAction(QIcon(":/icons/add.svg"), "Add", this);
-    addAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_A));
-    addAction->setToolTip("Add new entry (Alt+A)");
-    toolBar->addAction(addAction);
+    m_addAction = new QAction(QIcon(":/icons/add.svg"), "Add", this);
+    m_addAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_A));
+    m_addAction->setToolTip("Add new entry (Alt+A)");
+    toolBar->addAction(m_addAction);
 
     editAction = new QAction(QIcon(":/icons/edit.svg"), "Edit", this);
     editAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_E));
@@ -473,6 +524,14 @@ void MainWindow::setupUI() {
     toolBar->addSeparator();
 
     // --- Group 5: UI & Settings ---
+    QAction *findAction = new QAction("Find", this);
+    findAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_F));
+    connect(findAction, &QAction::triggered, this, [this]() {
+        searchBar->setFocus();
+        searchBar->selectAll();
+    });
+    addAction(findAction);
+
     themeAction = new QAction(this);
     themeAction->setShortcut(QKeySequence(Qt::ALT | Qt::SHIFT | Qt::Key_T));
     toolBar->addAction(themeAction);
@@ -525,7 +584,7 @@ void MainWindow::setupUI() {
     statusBar();
 
     // Connections
-    connect(addAction, &QAction::triggered, this, &MainWindow::onAdd);
+    connect(m_addAction, &QAction::triggered, this, &MainWindow::onAdd);
     connect(editAction, &QAction::triggered, this, &MainWindow::onEdit);
     connect(deleteAction, &QAction::triggered, this, &MainWindow::onDelete);
     connect(copyUsernameAction, &QAction::triggered, this, &MainWindow::onCopyUsername);
@@ -540,6 +599,7 @@ void MainWindow::setupUI() {
     connect(themeAction, &QAction::triggered, this, &MainWindow::onToggleTheme);
     connect(toggleRecoveryCodesAction, &QAction::triggered, this, &MainWindow::onToggleRecoveryCodes);
     connect(markUsedButton, &QPushButton::clicked, this, &MainWindow::onMarkAsUsed);
+    connect(searchBar, &QLineEdit::textChanged, this, &MainWindow::onSearchChanged);
 
     // TOTP timer
     totpTimer = new QTimer(this);
@@ -594,7 +654,7 @@ void MainWindow::onToggleTheme() {
 
 void MainWindow::loadTheme(const QString& theme) {
     QFile file(QString(":/%1.qss").arg(theme));
-    if (file.open(QFile::ReadOnly | QFile::Text)) { // flawfinder: ignore
+    if (file.open( /* flawfinder: ignore */ QFile::ReadOnly | QFile::Text)) {
         qApp->setStyleSheet(file.readAll());
         file.close();
     }

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['memory_5fcost_0',['MEMORY_COST',['../key__derivation_8c.html#abbe36b544024ce52b9fb316584e06996',1,'key_derivation.c']]]
+  ['parallelism_0',['PARALLELISM',['../key__derivation_8c.html#a2a16188c0f8f197e1d720f03740191d0',1,'key_derivation.c']]]
 ];

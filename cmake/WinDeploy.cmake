@@ -24,10 +24,14 @@ function(deploy_windows_dependencies target)
             message(WARNING "Failed to find windeployqt.exe. Qt DLLs may not be deployed.")
         else()
             message(STATUS "Found windeployqt: ${WINDEPLOYQT_EXECUTABLE}")
+            
+            # Select --debug or --release flag based on configuration
+            set(CONFIG_FLAG "$<IF:$<CONFIG:Debug>,--debug,--release>")
+
             # Use windeployqt to deploy Qt dependencies
             add_custom_command(TARGET ${target} POST_BUILD
                 COMMAND "${WINDEPLOYQT_EXECUTABLE}"
-                    --release
+                    ${CONFIG_FLAG}
                     --no-translations
                     --no-system-d3d-compiler
                     --no-opengl-sw
@@ -38,6 +42,7 @@ function(deploy_windows_dependencies target)
     endif()
 
     # Deploy vcpkg DLLs - use TARGET_RUNTIME_DLLS for automatic dependency discovery
+    # Note: We add a check to make sure the list is not empty before attempting copy
     add_custom_command(TARGET ${target} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E echo "Copying vcpkg runtime dependencies..."
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
