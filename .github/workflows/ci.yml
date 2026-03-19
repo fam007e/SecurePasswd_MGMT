@@ -8,41 +8,98 @@ on:
 
 jobs:
   build-and-test:
-    name: Build and Test (ASan/UBSan)
-    runs-on: ubuntu-latest
+    name: Build and Test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
 
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install Dependencies
+    # --- Linux Dependencies ---
+    - name: Install Dependencies (Linux)
+      if: runner.os == 'Linux'
       run: |
         sudo apt-get update
         sudo apt-get install -y build-essential cmake libsodium-dev libargon2-dev \
           libsqlcipher-dev libcsv-dev qt6-base-dev libqt6svg6-dev libssl-dev \
           libcurl4-openssl-dev libcmocka-dev cppcheck
 
+    # --- Windows Dependencies (vcpkg) ---
+    - name: Cache vcpkg (Windows)
+      if: runner.os == 'Windows'
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ github.workspace }}/vcpkg
+          !${{ github.workspace }}/vcpkg/buildtrees
+          !${{ github.workspace }}/vcpkg/packages
+          !${{ github.workspace }}/vcpkg/downloads
+        key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}-v4
+
+    - name: Setup vcpkg (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        if (-not (Test-Path "${{ github.workspace }}/vcpkg")) {
+          git clone https://github.com/microsoft/vcpkg.git "${{ github.workspace }}/vcpkg"
+          & "${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat" -disableMetrics
+        }
+
+    - name: Install vcpkg dependencies (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        $vcpkgRoot = "${{ github.workspace }}/vcpkg"
+        & "$vcpkgRoot/vcpkg.exe" install --triplet x64-windows --clean-after-build
+
+    # --- macOS Dependencies ---
+    - name: Install Dependencies (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        brew install qt@6 libsodium argon2 sqlcipher cmocka curl openssl@3
+        git clone https://github.com/rgamble/libcsv.git
+        cd libcsv
+        ./configure && make && sudo make install
+
+    # --- Static Analysis (Linux Only) ---
     - name: Static Analysis (Cppcheck)
+      if: runner.os == 'Linux'
       run: |
         cppcheck --enable=all --check-level=exhaustive --suppress=missingIncludeSystem --suppress=unusedFunction --suppress=cstyleCast --suppress=functionStatic --suppress=checkersReport --suppress=unmatchedSuppression -Dslots= -I . -I core/ -I tests/ -I gui/qrcodegen/ --error-exitcode=1 cli/ core/ gui/ tests/
 
-    - name: Configure CMake (Sanitizers Enabled)
+    # --- Build ---
+    - name: Configure CMake (Linux/macOS)
+      if: runner.os != 'Windows'
       run: |
-        mkdir build
-        cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Debug \
-          -DCMAKE_C_FLAGS="-fsanitize=address,undefined" \
-          -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined"
+        cmake -B build -DCMAKE_BUILD_TYPE=Debug \
+          ${{ runner.os == 'Linux' && '-DCMAKE_C_FLAGS="-fsanitize=address,undefined" -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined"' || '' }} \
+          ${{ runner.os == 'macOS' && '-DLIBSODIUM_ROOT=$(brew --prefix libsodium) -DARGON2_ROOT=$(brew --prefix argon2)' || '' }}
+
+    - name: Configure CMake (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        $vcpkgRoot = "${{ github.workspace }}/vcpkg"
+        cmake -B build `
+          -DCMAKE_BUILD_TYPE=Debug `
+          -DCMAKE_TOOLCHAIN_FILE="$vcpkgRoot\scripts\buildsystems\vcpkg.cmake" `
+          -DVCPKG_TARGET_TRIPLET=x64-windows
 
     - name: Build
-      run: |
-        cd build
-        make
+      run: cmake --build build --config Debug
 
-    - name: Run Tests (with Sanitizers)
+    # --- Test ---
+    - name: Run Tests
+      shell: bash
       run: |
         cd build
-        # We run the test binaries directly to ensure sanitizers catch runtime errors
-        ./tests/core_tests
-        ./tests/cmocka_tests
-        # Also run via ctest for summary
-        ctest --output-on-failure
+        if [[ "${{ runner.os }}" == "Windows" ]]; then
+          ./tests/Debug/core_tests.exe
+          ./tests/Debug/cmocka_tests.exe
+        else
+          ./tests/core_tests
+          ./tests/cmocka_tests
+        fi
