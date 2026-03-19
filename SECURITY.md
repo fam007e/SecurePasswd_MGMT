@@ -76,8 +76,10 @@ The "Fetch on Demand" model complements this by ensuring that sensitive entry de
 
 ## File System Security
 
-- **Secure Permissions:** The application data directory is created with the most restrictive permissions possible (`0700` on Unix-like systems), ensuring only the owner can access it.
-- **Default Location:** Data is stored in a standard, OS-specific location (`~/.config/SecurePasswd_MGMT` on Linux, `%APPDATA%\SecurePasswd_MGMT` on Windows) to avoid cluttering user directories.
+- **Secure Permissions:** The application data directory is created with restrictive permissions (`0700` on Unix-like systems), ensuring only the owner can access it.
+- **Default Location:** Data is stored in standard, OS-specific secure locations:
+  - **Linux/macOS:** `~/.local/share/securepasswd/` (or follows `XDG_DATA_HOME`)
+  - **Windows:** `%LOCALAPPDATA%\securepasswd\`
 
 ## Secure Build Process
 

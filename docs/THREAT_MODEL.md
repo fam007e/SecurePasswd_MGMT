@@ -71,4 +71,6 @@ STRIDE is a threat modeling methodology that helps to identify and categorize th
 **Countermeasures:**
 - **Secure Build Process:** The application is built with security hardening flags (`-fstack-protector-strong`, `-D_FORTIFY_SOURCE=2`, `-Wl,-z,relro,-z,now`) to mitigate common vulnerabilities like buffer overflows and memory corruption.
 - **Modern C/C++:** The codebase uses modern C/C++ practices and avoids dangerous functions where possible.
-- **Input Validation:** The application performs input validation to prevent vulnerabilities like buffer overflows and format string bugs (though this is an area for continuous improvement).
+- **Memory Hardening:** The core library standardizes on `calloc` for all multi-entry data structures to ensure memory is zero-initialized upon allocation, preventing use-of-uninitialized-memory bugs.
+- **Input Validation:** The application performs strict input validation. All CSV export operations include automatic sanitization (prepending `'`) to prevent **CSV Injection (Formula Injection)** attacks in spreadsheet software.
+- **Structural Audit:** Manual security overrides (`// flawfinder: ignore`) have been replaced with structural security fixes to ensure baseline safety is verifiable by automated tools.
