@@ -169,6 +169,8 @@ void MainWindow::onExport() {
         // Fetch full entry for export
         PasswordEntry *db_entry = database_get_entry_secure(entry_meta.id);
         if (db_entry) {
+            // Suppress CodeQL warning: This is an intentional Export feature.
+            // codeql[cpp/cleartext-storage-file]
             out << "\"" << sanitize_csv_field(QString::fromUtf8(db_entry->service)) << "\",";
             out << "\"" << sanitize_csv_field(QString::fromUtf8(db_entry->username)) << "\",";
             out << "\"" << sanitize_csv_field(QString::fromUtf8(db_entry->password)) << "\",";
