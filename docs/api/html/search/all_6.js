@@ -19,7 +19,7 @@ var searchData=
   ['derivation_20function_20kdf_16',['Key Derivation Function (KDF)',['../md_SECURITY.html#autotoc_md30',1,'']]],
   ['derive_5fkey_17',['derive_key',['../key__derivation_8c.html#a54ef4e1a1ee65f727df0a38518d1c540',1,'derive_key(const char *password, const uint8_t *salt, uint8_t *key):&#160;key_derivation.c'],['../key__derivation_8h.html#a54ef4e1a1ee65f727df0a38518d1c540',1,'derive_key(const char *password, const uint8_t *salt, uint8_t *key):&#160;key_derivation.c']]],
   ['desktop_20integration_18',['Desktop Integration',['../index.html#autotoc_md6',1,'']]],
-  ['development_19',['Security-Focused Development',['../md_CONTRIBUTING.html#autotoc_md45',1,'']]],
+  ['development_19',['Security-Focused Development',['../md_CONTRIBUTING.html#autotoc_md46',1,'']]],
   ['documentation_20',['API Documentation',['../index.html#autotoc_md21',1,'']]],
-  ['dynamic_20analysis_20sanitizers_21',['Dynamic Analysis (Sanitizers)',['../md_docs_2TESTING.html#autotoc_md100',1,'']]]
+  ['dynamic_20analysis_20sanitizers_21',['Dynamic Analysis (Sanitizers)',['../md_docs_2TESTING.html#autotoc_md104',1,'']]]
 ];

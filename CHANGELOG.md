@@ -73,7 +73,7 @@ and this project adheres to date-based versioning (YYYY.MM.DD).
 - **NULL Pointer Safety:** Added proactive NULL checks in database open operations to prevent potential crashes.
 - **Windows Build Fix:** Resolved `MOVEFILE_REPLACE_EXISTING` undeclared identifier error in `core/database.c` by adding missing `<windows.h>` include.
 
-## [Unreleased]
+## [2026.03.19]
 
 ### Added
 - **Global Search:** Implemented a new searching engine (`database_search`) allowing case-insensitive search by service or username across both CLI and GUI.

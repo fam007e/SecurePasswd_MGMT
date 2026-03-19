@@ -4,8 +4,7 @@
 - **Maintainer Name** - *Project Lead & Core Developer* - [GitHub Profile](https://github.com/fam007e)
 
 ## Contributors
-- [Contributor 1](https://github.com/contributor1) - *Feature implementation*
-- [Contributor 2](https://github.com/contributor2) - *Bug fixes*
+- *The community of SecurePasswd_MGMT contributors.*
 
 ## Acknowledgements
 - [Libsodium](https://doc.libsodium.org/) team for the crypto library.

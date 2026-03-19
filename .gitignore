@@ -54,6 +54,8 @@ compile_commands.json
 docs/
 !docs/.gitkeep
 !docs/TESTING.md
+!docs/USER_GUIDE.md
+!docs/THREAT_MODEL.md
 !docs/api/
 
 # GDB logging env
