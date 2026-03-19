@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2026.03.14</span>
+   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2026.03.19</span>
    </div>
    <div id="projectbrief">A modern, cross-platform password manager and two-factor authenticator (TOTP) designed with state-of-the-art security.</div>
   </td>
@@ -104,8 +104,10 @@ Macros</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a282c8efccb953d64e16e3394af1a1f98" id="r_a282c8efccb953d64e16e3394af1a1f98"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sync__service_8h.html#a282c8efccb953d64e16e3394af1a1f98">sync_encrypt_vault</a> (const char *db_path, unsigned char *output_buffer, size_t *output_size, const unsigned char key[<a class="el" href="sync__service_8h.html#ae08a140233b2de8b24e4ba7967c4bf2a">SYNC_KEY_LEN</a>])</td></tr>
+<tr class="memdesc:a282c8efccb953d64e16e3394af1a1f98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypts the database and salt for sync.  <br /></td></tr>
 <tr class="separator:a282c8efccb953d64e16e3394af1a1f98"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abce18545611bf6817b55518f3ea649b9" id="r_abce18545611bf6817b55518f3ea649b9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sync__service_8h.html#abce18545611bf6817b55518f3ea649b9">sync_decrypt_vault</a> (const unsigned char *encrypted_data, size_t data_len, const char *db_path, const unsigned char key[<a class="el" href="sync__service_8h.html#ae08a140233b2de8b24e4ba7967c4bf2a">SYNC_KEY_LEN</a>])</td></tr>
+<tr class="memdesc:abce18545611bf6817b55518f3ea649b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypts the received data and restores vault/salt.  <br /></td></tr>
 <tr class="separator:abce18545611bf6817b55518f3ea649b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Macro Definition Documentation</h2>
@@ -189,7 +191,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Decrypts a secure transfer package using OpenSSL ChaCha20-Poly1305. </p>
+
+<p>Decrypts the received data and restores vault/salt. </p>
 
 </div>
 </div>
@@ -230,7 +233,8 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>Encrypts a file using OpenSSL ChaCha20-Poly1305 for secure transfer. </p>
+
+<p>Encrypts the database and salt for sync. </p>
 
 </div>
 </div>

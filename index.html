@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2026.03.14</span>
+   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2026.03.19</span>
    </div>
    <div id="projectbrief">A modern, cross-platform password manager and two-factor authenticator (TOTP) designed with state-of-the-art security.</div>
   </td>
@@ -84,7 +84,9 @@ Key Security Features</h1>
 <li><b>Memory Safety:</b> Sensitive data is explicitly cleared from memory after use.</li>
 <li><b>Pwned Password Check:</b> Integrated check against the Have I Been Pwned (HIBP) API to ensure your passwords haven't been compromised in known data breaches.</li>
 <li><b>Fetch on Demand:</b> Secrets are only retrieved from the database when specifically needed, preventing them from lingering in memory.</li>
-<li><b>Hardened C Codebase:</b> Regularly audited using modern static analysis tools (<code>cppcheck</code>, <code>flawfinder</code>) to proactively prevent common C vulnerabilities like buffer overflows and race conditions.</li>
+<li><b>Hardened C Codebase:</b> Regularly audited using modern static analysis tools (<code>cppcheck</code>, <code>flawfinder</code>). Recently refactored to replace 280+ manual overrides with structural security fixes, achieving <b>0 High Severity (Level 4/5) hits</b> in core and CLI source code.</li>
+<li><b>Secure File I/O:</b> Utilizes standard, safe I/O patterns (<code>fputs</code>, <code>fgets</code>, <code>QFile</code>) to prevent format string and buffer overflow vulnerabilities.</li>
+<li><b>Zero-Initialization:</b> Employs <code>calloc</code> across the core library to ensure sensitive memory structures are always zero-initialized, preventing data leakage from uninitialized pointers.</li>
 <li><b>Secure Storage:</b> All data is stored locally, encrypted, in a secure directory.</li>
 </ul>
 <h1><a class="anchor" id="autotoc_md2"></a>
@@ -93,14 +95,18 @@ Features</h1>
 Command-Line Interface (CLI)</h2>
 <ul>
 <li><b>Fast &amp; Efficient:</b> A lightweight, terminal-based interface for all core functionalities.</li>
+<li><b>Powerful Search:</b> Instant, case-insensitive searching across services and usernames using <code>-s</code> or the interactive menu.</li>
+<li><b>Identity-Aware Import:</b> Automatically detects duplicate entries during CSV import, offering clear conflict resolution paths to keep your vault clean.</li>
 <li><b>Interactive Menu:</b> Easy-to-use menu for adding, searching, and managing passwords and TOTP secrets.</li>
-<li><b>Command-Line Options:</b> Generate passwords directly from the command line.</li>
+<li><b>Command-Line Options:</b> Search or generate passwords directly from the command line.</li>
 <li><b>Hidden Password Input:</b> Protects your master password from shoulder-surfing.</li>
 </ul>
 <h2><a class="anchor" id="autotoc_md4"></a>
 Graphical User Interface (GUI)</h2>
 <ul>
 <li><b>Modern &amp; Intuitive:</b> A clean, user-friendly interface built with the Qt framework.</li>
+<li><b>Search-First Navigation:</b> Dedicated real-time search bar for rapid entry retrieval.</li>
+<li><b>Robust Import/Export:</b> Secure CSV operations with built-in protection against CSV Injection (Formula Injection) and duplicate detection.</li>
 <li><b>Full Feature Set:</b> Access all features, including password management, TOTP generation, import/export, and password health checks.</li>
 <li><b>Secure Clipboard:</b> Automatically clears copied passwords and TOTP codes from the clipboard after 30 seconds.</li>
 <li><b>Real-time TOTP:</b> Displays TOTP codes with a progress bar indicating the time until the next code is generated.</li>

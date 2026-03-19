@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2026.03.14</span>
+   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2026.03.19</span>
    </div>
    <div id="projectbrief">A modern, cross-platform password manager and two-factor authenticator (TOTP) designed with state-of-the-art security.</div>
   </td>
@@ -73,21 +73,21 @@ $(function() {
   <div class="headertitle"><div class="title">Contributing to SecurePasswd_MGMT</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md44"></a> Thank you for your interest in contributing! We welcome contributions of all kinds, from bug reports and documentation improvements to new features and security enhancements.</p>
-<h1><a class="anchor" id="autotoc_md45"></a>
+<div class="textblock"><p><a class="anchor" id="autotoc_md45"></a> Thank you for your interest in contributing! We welcome contributions of all kinds, from bug reports and documentation improvements to new features and security enhancements.</p>
+<h1><a class="anchor" id="autotoc_md46"></a>
 Security-Focused Development</h1>
 <p>Given the nature of this project, security is our top priority. All contributions must adhere to the following security guidelines:</p>
 <ul>
 <li><b>No Plaintext Secrets:</b> Usernames, passwords, and TOTP secrets must be encrypted when stored. No sensitive information should ever be written to disk in plaintext.</li>
 <li><b>Use Established Cryptographic Libraries:</b> All cryptographic operations must be implemented using well-vetted, modern libraries. This project uses <b>SQLCipher</b> for database encryption and <b>libargon2</b> for key derivation. Do not implement custom cryptographic primitives.</li>
 <li><b>Secure Memory Handling:</b> Sensitive data must be cleared from memory as soon as it is no longer needed. Use <code>sodium_memzero()</code> or a similar secure function to overwrite sensitive data in memory.</li>
-<li><b>Input Validation:</b> All input from users or files must be validated to prevent vulnerabilities like buffer overflows. <b>Avoid banned C functions like <code>strcat</code>, <code>strcpy</code>, and <code>sprintf</code>; use safer, bounded alternatives like <code>strncat</code>, <code>strncpy</code>, and <code>snprintf</code>.</b></li>
+<li><b>Input Validation:</b> All input from users or files must be validated to prevent vulnerabilities like buffer overflows. <b>Avoid banned C functions like <code>strcat</code>, <code>strcpy</code>, <code>sprintf</code>, and <code>strncpy</code>; use safer, bounded alternatives like <code>memcpy</code>, <code>snprintf</code>, and <code>strtol</code>.</b></li>
 <li><b>Constant-Time Operations:</b> When comparing sensitive data, use constant-time comparison functions where appropriate to prevent timing attacks.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md46"></a>
+<h1><a class="anchor" id="autotoc_md47"></a>
 Code Review</h1>
 <p>All pull requests, especially those that touch security-sensitive code in the <code>core/</code> directory, will undergo a thorough code review. Be prepared to explain your changes and justify your design decisions.</p>
-<h1><a class="anchor" id="autotoc_md47"></a>
+<h1><a class="anchor" id="autotoc_md48"></a>
 Coding Style</h1>
 <p>To maintain a consistent and readable codebase, we adhere to the following coding style guidelines:</p>
 <ul>
@@ -108,7 +108,7 @@ Coding Style</h1>
 </li>
 <li><b>Comments:</b> Use <code>//</code> for single-line comments and <code>/* ... */</code> for multi-line comments. Explain <em>why</em> you are doing something, not <em>what</em> you are doing.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md48"></a>
+<h1><a class="anchor" id="autotoc_md49"></a>
 Testing</h1>
 <ul>
 <li><b>Unit Tests:</b> All new features should be accompanied by unit tests. The project uses CTest to manage and run tests.</li>
@@ -120,7 +120,7 @@ Testing</h1>
 <div class="line">make &amp;&amp; ctest</div>
 </div><!-- fragment --></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md49"></a>
+<h1><a class="anchor" id="autotoc_md50"></a>
 How to Contribute</h1>
 <ol type="1">
 <li>Fork the repository.</li>
@@ -129,7 +129,7 @@ How to Contribute</h1>
 <li>Add or update tests in the <code>tests/</code> directory and ensure they pass by running <code>ctest</code> in the <code>build</code> directory.</li>
 <li>Submit a pull request.</li>
 </ol>
-<h1><a class="anchor" id="autotoc_md50"></a>
+<h1><a class="anchor" id="autotoc_md51"></a>
 Release Guidelines</h1>
 <p>To create a new release:</p>
 <ol type="1">

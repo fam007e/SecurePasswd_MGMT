@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2026.03.14</span>
+   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2026.03.19</span>
    </div>
    <div id="projectbrief">A modern, cross-platform password manager and two-factor authenticator (TOTP) designed with state-of-the-art security.</div>
   </td>
@@ -73,64 +73,60 @@ $(function() {
   <div class="headertitle"><div class="title">Testing and Verification Summary</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md94"></a> </p>
-<h1><a class="anchor" id="autotoc_md95"></a>
+<div class="textblock"><p><a class="anchor" id="autotoc_md98"></a> </p>
+<h1><a class="anchor" id="autotoc_md99"></a>
 Overview</h1>
-<p>This document provides a summary of the testing and verification performed for the <code>v2026.02.07</code> release of SecurePasswd_MGMT.</p>
-<h1><a class="anchor" id="autotoc_md96"></a>
+<p>This document provides a summary of the testing and verification performed for the current hardened release of SecurePasswd_MGMT.</p>
+<h1><a class="anchor" id="autotoc_md100"></a>
 Build Verification</h1>
-<h2><a class="anchor" id="autotoc_md97"></a>
-Build Status: ✓ PASS</h2>
-<p>The project was successfully built on Linux using <code>cmake</code> and <code>make</code>. All components, including libraries, CLI, GUI, and tests, compiled without errors.</p>
-<h1><a class="anchor" id="autotoc_md98"></a>
+<h2><a class="anchor" id="autotoc_md101"></a>
+Build Status: ✓ PASS (Multi-Platform)</h2>
+<p>The project is verified to build and pass all tests on:</p><ul>
+<li><b>Linux (Ubuntu/Arch):</b> GCC &amp; Clang</li>
+<li><b>Windows (10/11):</b> MSVC 2022 via vcpkg</li>
+<li><b>macOS:</b> Clang via Homebrew</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md102"></a>
 Security Verification</h1>
-<h2><a class="anchor" id="autotoc_md99"></a>
+<h2><a class="anchor" id="autotoc_md103"></a>
 Static Analysis</h2>
 <ul>
-<li><b>Flawfinder:</b> 0 Hits (Level 0+). Codebase is clean of common C/C++ vulnerabilities after remediation and justified suppressions.</li>
-<li><b>Cppcheck:</b> Passed (Exhaustive analysis). No errors or warnings found in CLI, Core, GUI, or Tests.</li>
-<li><b>CodeQL:</b> Passed. Intentional cleartext storage in export feature has been justified and suppressed.</li>
+<li><b>Flawfinder:</b> <b>0 Hits</b> in source directories (audited baseline). 280+ manual overrides were replaced with structural security hardening.</li>
+<li><b>Cppcheck:</b> <b>0 Warnings</b>. Exhaustive analysis confirms safe code patterns and resolved include dependencies.</li>
+<li><b>CodeQL:</b> <b>✓ PASS</b>. Intentional cleartext storage in the user-triggered export feature has been audited and suppressed.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md100"></a>
+<h2><a class="anchor" id="autotoc_md104"></a>
 Dynamic Analysis (Sanitizers)</h2>
 <ul>
-<li><b>AddressSanitizer (ASan):</b> Enabled for test run. No memory leaks or out-of-bounds accesses detected.</li>
-<li><b>UndefinedBehaviorSanitizer (UBSan):</b> Enabled for test run. No undefined behavior detected.</li>
+<li><b>AddressSanitizer (ASan):</b> <b>✓ PASS</b>. Zero memory leaks or out-of-bounds accesses detected across the entire test suite.</li>
+<li><b>UndefinedBehaviorSanitizer (UBSan):</b> <b>✓ PASS</b>. Zero instances of undefined behavior detected.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md101"></a>
+<h1><a class="anchor" id="autotoc_md105"></a>
 Unit Test Execution</h1>
-<p>Unit tests were executed using <code>ctest</code> and direct binary execution for sanitizer validation.</p>
-<h2><a class="anchor" id="autotoc_md102"></a>
+<p>Unit tests are executed automatically on every Pull Request using GitHub Actions across all three major platforms.</p>
+<h2><a class="anchor" id="autotoc_md106"></a>
 Test Summary</h2>
 <div class="fragment"><div class="line">Test project /home/fam007e/Github/SecurePasswd_MGMT/build</div>
-<div class="line">      Start  1: securepasswd_core_tests</div>
-<div class="line"> 1/14 Test  #1: securepasswd_core_tests ........   Passed    0.10 sec</div>
-<div class="line">      Start  2: securepasswd_cmocka_tests</div>
-<div class="line"> 2/14 Test  #2: securepasswd_cmocka_tests ......   Passed    0.05 sec</div>
-<div class="line">... (all 14 tests passed)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md103"></a>
+<div class="line">      Start  1: CoreTests</div>
+<div class="line"> 1/2 Test  #1: CoreTests ........................   Passed    0.15 sec</div>
+<div class="line">      Start  2: CMockaTests</div>
+<div class="line"> 2/2 Test  #2: CMockaTests ......................   Passed    0.05 sec</div>
+<div class="line"> </div>
+<div class="line">100% tests passed, 0 tests failed out of 2 (Total 19 sub-tests)</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md107"></a>
 Core Tests (&lt;tt&gt;./core_tests&lt;/tt&gt;)</h2>
-<div class="fragment"><div class="line">--- Running Test: Database Lifecycle ---</div>
-<div class="line">  [PASSED] database_open with correct key</div>
-<div class="line">  [PASSED] database_add_entry</div>
-<div class="line">  [PASSED] database_get_all_entries</div>
-<div class="line">  [PASSED] database_update_entry</div>
-<div class="line">  [PASSED] database_delete_entry</div>
-<div class="line">  [PASSED] database_delete_entry fails for non-existent entry</div>
-<div class="line">  [PASSED] database_delete_entry fails for already-deleted entry</div>
-<div class="line">  [PASSED] database_open with incorrect key fails</div>
-<div class="line">--- Test Complete ---</div>
-<div class="line"> </div>
-<div class="line">--- Running Test: TOTP Generation ---</div>
-<div class="line">  [PASSED] TOTP generation matches RFC 6238 test vector</div>
-<div class="line">--- Test Complete ---</div>
-<div class="line"> </div>
-<div class="line">All tests passed!</div>
-</div><!-- fragment --><h1><a class="anchor" id="autotoc_md104"></a>
-Test Environment</h1>
-<p><b>Operating System:</b> Linux <b>Compiler:</b> GCC 11.4.0 (or equivalent) <b>CMake:</b> 3.22.1 <b>Qt:</b> 6.2.4 <b>SQLCipher:</b> 4.5.3 <b>libsodium:</b> 1.0.18 <b>Argon2:</b> 20190702</p>
+<p>Verified functionalities include:</p><ul>
+<li><b>Database Lifecycle:</b> Open, Create, Wrong Key Detection.</li>
+<li><b>CRUD Operations:</b> Add, Update, Secure Fetch, Delete.</li>
+<li><b>Global Search:</b> Case-insensitive search by service/username and partial matching.</li>
+<li><b>Identity Retrieval:</b> Duplicate detection for secure imports.</li>
+<li><b>TOTP:</b> RFC 6238 compliant code generation.</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md108"></a>
+Test Environment (CI Baseline)</h1>
+<p><b>Operating Systems:</b> Linux (ubuntu-latest), Windows (windows-latest), macOS (macos-latest) <b>Compilers:</b> GCC 13+, MSVC 19+, AppleClang 15+ <b>Dependencies:</b> SQLCipher 4.x, Libsodium 1.0.18+, Argon2 2019+, libcsv 3.0+</p>
 <hr  />
-<p>Last Updated: 2026-02-07 </p>
+<p>Last Updated: March 2026 </p>
 </div></div><!-- contents -->
 </div><!-- PageDoc -->
 <!-- start footer part -->

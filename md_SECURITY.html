@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2026.03.14</span>
+   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2026.03.19</span>
    </div>
    <div id="projectbrief">A modern, cross-platform password manager and two-factor authenticator (TOTP) designed with state-of-the-art security.</div>
   </td>
@@ -121,7 +121,7 @@ Input Security &amp; Validation</h1>
 <li><b>Secure Input:</b> The Command Line Interface (CLI) utilizes <code>getpass</code> (or platform equivalents) to ensure passwords and secrets are never echoed to the console during entry.</li>
 <li><b>Banned Function Mitigation:</b> The codebase explicitly avoids insecure C functions (<code>strcat</code>, <code>sprintf</code>, <code>strncpy</code>, <code>atoi</code>). We utilize bounded alternatives and manual length tracking to prevent buffer overflows and undefined behavior.</li>
 <li><b>Path Validation &amp; Sanitization:</b> File operations (like CSV import/export) include strict validation to prevent Directory Traversal attacks (e.g., blocking <code>..</code> in paths). Additionally, platform-specific paths derived from environment variables are processed through a <code>sanitize_path</code> utility to filter untrusted input.</li>
-<li><b>Sanitization:</b> The codebase is regularly tested with AddressSanitizer (ASan), UndefinedBehaviorSanitizer (UBSan), and <b>Flawfinder</b>. As of <b>March 2026</b>, the codebase has been fully remediated to achieve <b>0 hits</b> on Flawfinder's strictest scanning rules, fixing or verifying all reported security risks.</li>
+<li><b>Sanitization:</b> The codebase is regularly tested with AddressSanitizer (ASan), UndefinedBehaviorSanitizer (UBSan), and <b>Flawfinder</b>. As of <b>March 2026</b>, the codebase has undergone a major structural hardening effort, replacing over 280 manual <code>// flawfinder: ignore</code> overrides with fundamentally safe coding patterns. This ensures that our security posture is verifiable by automated tools without relying on manual suppressions. While the tool still reports baseline hits for standard C functions (like <code>strlen</code> and <code>memcpy</code>), these have been audited to ensure they are used exclusively with bounded limits and zero-initialized memory. We have achieved <b>0 High Severity (Level 4/5) hits</b> in the core and CLI source code.</li>
 <li><b>Thread Safety:</b> Critical sections, such as the Have I Been Pwned check, utilize thread-safe string manipulation functions (<code>strtok_r</code>) to prevent race conditions during concurrent execution.</li>
 <li><b>Static Analysis:</b> <code>cppcheck</code> and GitHub's <b>CodeQL</b> are employed to enforce code quality and catch potential leaks, logic errors, or complex security vulnerabilities early.</li>
 <li><b>Mobile Sync Security:</b> Synchronization between devices is protected using <b>Chacha20-Poly1305</b> authenticated encryption. The vault and its salt are packed and encrypted as a single blob with a unique nonce for every sync operation, ensuring both confidentiality and authenticity of the synced data.</li>
@@ -149,15 +149,24 @@ Data Storage Format</h2>
 </ul>
 <h1><a class="anchor" id="autotoc_md37"></a>
 Memory Management</h1>
-<p>Sensitive data, specifically the master password and the derived encryption key, is explicitly cleared from memory as soon as it is no longer needed. This is done using the <code>sodium_memzero()</code> function from <code>libsodium</code> in <code><a class="el" href="database_8c.html">core/database.c</a></code> to prevent sensitive data from being exposed in memory.</p>
+<h2><a class="anchor" id="autotoc_md38"></a>
+Zero-Initialization &amp; Wiping</h2>
+<ul>
+<li><b>Secure Allocation:</b> The project standardizes on <code>calloc</code> for all multi-entry data structures (like <code><a class="el" href="structPasswordEntry.html" title="A struct representing a password entry.">PasswordEntry</a></code> arrays). This ensures that every pointer and buffer is initialized to zero immediately upon allocation, preventing accidental exposure of sensitive data from previously used memory.</li>
+<li><b>Explicit Wiping:</b> Sensitive data, specifically the master password and the derived encryption key, is explicitly cleared from memory as soon as it is no longer needed. This is done using the <code>sodium_memzero()</code> function from <code>libsodium</code> in <code><a class="el" href="database_8c.html">core/database.c</a></code>.</li>
+</ul>
 <p>The "Fetch on Demand" model complements this by ensuring that sensitive entry details are retrieved from the database only when needed, rather than being held in memory as part of a list.</p>
-<h1><a class="anchor" id="autotoc_md38"></a>
+<h1><a class="anchor" id="autotoc_md39"></a>
 File System Security</h1>
 <ul>
-<li><b>Secure Permissions:</b> The application data directory is created with the most restrictive permissions possible (<code>0700</code> on Unix-like systems), ensuring only the owner can access it.</li>
-<li><b>Default Location:</b> Data is stored in a standard, OS-specific location (<code>~/.config/SecurePasswd_MGMT</code> on Linux, <code>APPDATA%\SecurePasswd_MGMT</code> on Windows) to avoid cluttering user directories.</li>
+<li><b>Secure Permissions:</b> The application data directory is created with restrictive permissions (<code>0700</code> on Unix-like systems), ensuring only the owner can access it.</li>
+<li><b>Default Location:</b> Data is stored in standard, OS-specific secure locations:<ul>
+<li><b>Linux/macOS:</b> <code>~/.local/share/securepasswd/</code> (or follows <code>XDG_DATA_HOME</code>)</li>
+<li><b>Windows:</b> <code>LOCALAPPDATA%\securepasswd\</code></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md39"></a>
+</li>
+</ul>
+<h1><a class="anchor" id="autotoc_md40"></a>
 Secure Build Process</h1>
 <p>The project uses <b>CMake</b>, a modern and cross-platform build system generator. Security is a primary consideration in the build process.</p>
 <ul>
@@ -169,9 +178,9 @@ Secure Build Process</h1>
 </ul>
 </li>
 </ul>
-<h1><a class="anchor" id="autotoc_md40"></a>
+<h1><a class="anchor" id="autotoc_md41"></a>
 Password Strength Validation</h1>
-<h2><a class="anchor" id="autotoc_md41"></a>
+<h2><a class="anchor" id="autotoc_md42"></a>
 Health Check Requirements</h2>
 <p>The password health check enforces modern security standards to ensure high-entropy passwords:</p>
 <p><b>Minimum Requirements:</b></p><ul>
@@ -189,7 +198,7 @@ Health Check Requirements</h2>
 <li><b>Breach Database Check:</b> Integration with Have I Been Pwned (HIBP) API to identify compromised passwords</li>
 <li><b>Entropy Calculation:</b> 16-character passwords with all character types provide approximately 98.7 bits of entropy, exceeding the NIST 80-bit minimum</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md42"></a>
+<h2><a class="anchor" id="autotoc_md43"></a>
 Compliance</h2>
 <p>Password validation aligns with:</p><ul>
 <li>NIST SP 800-63B (Digital Identity Guidelines)</li>
@@ -197,7 +206,7 @@ Compliance</h2>
 <li>CIS Controls v8 (Password Policy Requirements)</li>
 <li>ISO 27001 (Information Security Management)</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md43"></a>
+<h1><a class="anchor" id="autotoc_md44"></a>
 Reporting Security Vulnerabilities</h1>
 <p>If you discover a security vulnerability, please report it responsibly:</p>
 <ol type="1">

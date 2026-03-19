@@ -9,5 +9,5 @@ var searchData=
   ['graphical_20user_20interface_20gui_6',['Graphical User Interface (GUI)',['../index.html#autotoc_md4',1,'']]],
   ['gui_7',['gui',['../index.html#autotoc_md13',1,'CLI-Only Build (No GUI)'],['../index.html#autotoc_md4',1,'Graphical User Interface (GUI)']]],
   ['gui_20application_8',['GUI Application',['../index.html#autotoc_md17',1,'']]],
-  ['guidelines_9',['Release Guidelines',['../md_CONTRIBUTING.html#autotoc_md50',1,'']]]
+  ['guidelines_9',['Release Guidelines',['../md_CONTRIBUTING.html#autotoc_md51',1,'']]]
 ];
