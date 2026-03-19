@@ -27,6 +27,12 @@ int database_open(const char *db_path, const char *password) {
     if (!db_path) {
         return -1;
     }
+
+    if (db) {
+        sqlite3_close_v2(db);
+        db = NULL;
+    }
+
     snprintf(current_db_path, sizeof(current_db_path), "%s", db_path); // flawfinder: ignore
 
     uint8_t salt[SALT_LEN];
@@ -52,6 +58,10 @@ int database_open(const char *db_path, const char *password) {
         fputs("Cannot open database: ", stderr);
         fputs(sqlite3_errmsg(db), stderr);
         fputs("\n", stderr);
+        if (db) {
+            sqlite3_close_v2(db);
+            db = NULL;
+        }
         sodium_memzero(key, KEY_LEN);
         return -1;
     }
@@ -60,7 +70,7 @@ int database_open(const char *db_path, const char *password) {
         fputs("Failed to set database key: ", stderr);
         fputs(sqlite3_errmsg(db), stderr);
         fputs("\n", stderr);
-        sqlite3_close(db);
+        sqlite3_close_v2(db);
         db = NULL;
         sodium_memzero(key, KEY_LEN);
         return -1;
@@ -68,12 +78,18 @@ int database_open(const char *db_path, const char *password) {
 
     sodium_memzero(key, KEY_LEN);
 
-    return initialize_schema();
+    if (initialize_schema() != 0) {
+        sqlite3_close_v2(db);
+        db = NULL;
+        return -1;
+    }
+
+    return 0;
 }
 
 void database_close() {
     if (db) {
-        sqlite3_close(db);
+        sqlite3_close_v2(db);
         db = NULL;
         memset(current_db_path, 0, sizeof(current_db_path));
     }
@@ -119,7 +135,7 @@ PasswordEntry* database_get_all_entries(int *count) {
     }
 
     int i = 0;
-    while (sqlite3_step(stmt) == SQLITE_ROW) {
+    while (sqlite3_step(stmt) == SQLITE_ROW && i < *count) {
         entries[i].id = sqlite3_column_int(stmt, 0);
         const unsigned char *service = sqlite3_column_text(stmt, 1);
         const unsigned char *username = sqlite3_column_text(stmt, 2);
@@ -223,7 +239,7 @@ PasswordEntry* database_get_entry_by_identity(const char *service, const char *u
         return NULL;
     }
 
-    PasswordEntry *entry = malloc(sizeof(PasswordEntry));
+    PasswordEntry *entry = calloc(1, sizeof(PasswordEntry));
     if (!entry) {
         sqlite3_finalize(stmt);
         return NULL;
@@ -266,7 +282,7 @@ PasswordEntry* database_get_entry_secure(int id) {
         return NULL; // Not found
     }
 
-    PasswordEntry *entry = malloc(sizeof(PasswordEntry));
+    PasswordEntry *entry = calloc(1, sizeof(PasswordEntry));
     if (!entry) {
         sqlite3_finalize(stmt);
         return NULL;

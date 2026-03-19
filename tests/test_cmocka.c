@@ -15,6 +15,7 @@
 #include <setjmp.h>
 #include <cmocka.h>
 #include <string.h>
+#include <curl/curl.h>
 #include "password_generator.h"
 
 /* Compatibility for CMocka < 2.0.0 */
@@ -115,6 +116,7 @@ static void test_is_password_pwned(void **state) {
 }
 
 int main(void) {
+    curl_global_init(CURL_GLOBAL_ALL);
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(test_generate_password_length),
         cmocka_unit_test(test_generate_password_charset),
@@ -123,5 +125,7 @@ int main(void) {
         cmocka_unit_test(test_load_or_generate_salt),
         cmocka_unit_test(test_is_password_pwned),
     };
-    return cmocka_run_group_tests(tests, NULL, NULL);
+    int result = cmocka_run_group_tests(tests, NULL, NULL);
+    curl_global_cleanup();
+    return result;
 }

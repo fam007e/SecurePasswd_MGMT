@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <getopt.h>
 #include <sodium.h>
+#include <curl/curl.h>
 
 #ifndef _WIN32
 #include <sys/stat.h>
@@ -485,6 +486,12 @@ static void interactive_mode() {
 }
 
 int main(int argc, char *argv[]) {
+    // --- Global Init ---
+    if (curl_global_init(CURL_GLOBAL_ALL) != 0) {
+        fputs("Error: Failed to initialize curl\n", stderr);
+        return 1;
+    }
+
     const char *search_query = NULL;
 
     // --- Parse Arguments ---
@@ -621,6 +628,7 @@ int main(int argc, char *argv[]) {
 
     // --- Cleanup ---
     database_close();
+    curl_global_cleanup();
     fputs("Database closed. Exiting.\n", stdout);
 
     return 0;

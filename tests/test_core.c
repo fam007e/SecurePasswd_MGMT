@@ -13,6 +13,7 @@
 #include "core/totp.h"
 #include <sodium.h>
 #include <stdlib.h>
+#include <curl/curl.h>
 
 const char* TEST_DB = "test_vault.db";
 
@@ -150,10 +151,12 @@ static void test_totp_generation() {
 }
 
 int main() {
+    curl_global_init(CURL_GLOBAL_ALL);
     test_database_lifecycle();
     test_database_search_and_identity();
     test_totp_generation();
 
     fputs("All tests passed!\n", stdout);
+    curl_global_cleanup();
     return 0;
 }

@@ -85,7 +85,7 @@ static void import_row_cb(int c, void *data) {
     fields->clear();
 }
 
-MainWindow::MainWindow(const QString& password, QWidget *parent) : QMainWindow(parent), m_databaseOpen(false), searchBar(nullptr) {
+MainWindow::MainWindow(const QString& password, QWidget *parent) : QMainWindow(parent), m_databaseOpen(false), searchBar(nullptr), recoveryCodesEnabled(false) {
     // Use shared platform_paths function
     std::vector<char> dirPath(4096);
     get_config_path(dirPath.data(), dirPath.size());
@@ -102,15 +102,15 @@ MainWindow::MainWindow(const QString& password, QWidget *parent) : QMainWindow(p
     }
 
     m_databaseOpen = true;
+
+    QSettings settings("SecurePasswd_MGMT", "SecurePasswd_MGMT");
+    recoveryCodesEnabled = settings.value("recovery_codes_enabled", false).toBool();
+
     setupUI();
     refreshEntryList();
 
-    QSettings settings("SecurePasswd_MGMT", "SecurePasswd_MGMT");
     currentTheme = settings.value("theme", "light").toString();
     loadTheme(currentTheme);
-
-    recoveryCodesEnabled = settings.value("recovery_codes_enabled", false).toBool();
-    updateRecoveryCodesVisibility();
 }
 
 MainWindow::~MainWindow() {
