@@ -5,6 +5,11 @@ All notable changes to SecurePasswd_MGMT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to date-based versioning (YYYY.MM.DD).
 
+## [2026.05.16]
+
+### Fixed
+- **Integer Overflow:** Cast multiplication operands to `long` in `qrcodegen` to prevent overflow when computing QR code module counts.
+
 ## [2026.03.14]
 
 ### Added
