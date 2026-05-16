@@ -1,6 +1,6 @@
 {
   "name": "securepasswd-mgmt",
-  "version-string": "2026.03.19",
+  "version-string": "2026.05.16",
   "dependencies": [
     "libsodium",
     "argon2",
@@ -17,5 +17,5 @@
     },
     "qtsvg"
   ],
-  "builtin-baseline": "47205630845bd49eaf16cdfb757cf9dfba144c52"
+  "builtin-baseline": "371d1f7a6c3eb391037e9c2bcddf0bec85675bf1"
 }
