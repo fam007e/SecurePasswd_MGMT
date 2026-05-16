@@ -116,6 +116,17 @@ set(CPACK_PACKAGE_CONTACT "fam007e <faisalmoshiur+secpasswdmgmt@gmail.com>")
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "fam007e")
 set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
 set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS
+    "libsodium26 | libsodium23 | libsodium18, \
+libargon2-1, \
+libsqlcipher2 | libsqlcipher1 | libsqlcipher0, \
+libssl3t64 | libssl3 | libssl1.1, \
+libcurl4t64 | libcurl4, \
+libcsv3, \
+libqt6widgets6 (>= 6.2.0), \
+libqt6svg6 (>= 6.2.0), \
+libqt6network6 (>= 6.2.0)"
+)
 set(CPACK_RPM_PACKAGE_GROUP "Utilities")
 set(CPACK_NSIS_PACKAGE_NAME "${PROJECT_NAME} ${CPACK_PACKAGE_VERSION}")
 set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")
