@@ -117,11 +117,11 @@ set(CPACK_DEBIAN_PACKAGE_MAINTAINER "fam007e")
 set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
 set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
 set(CPACK_DEBIAN_PACKAGE_DEPENDS
-    "libsodium23 | libsodium18, \
+    "libsodium26 | libsodium23 | libsodium18, \
 libargon2-1, \
-libsqlcipher0, \
-libssl3 | libssl1.1, \
-libcurl4, \
+libsqlcipher2 | libsqlcipher1 | libsqlcipher0, \
+libssl3t64 | libssl3 | libssl1.1, \
+libcurl4t64 | libcurl4, \
 libcsv3, \
 libqt6widgets6 (>= 6.2.0), \
 libqt6svg6 (>= 6.2.0), \
