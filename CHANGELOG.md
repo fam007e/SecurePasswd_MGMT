@@ -9,6 +9,7 @@ and this project adheres to date-based versioning (YYYY.MM.DD).
 
 ### Fixed
 - **Integer Overflow:** Cast multiplication operands to `long` in `qrcodegen` to prevent overflow when computing QR code module counts.
+- **CPack Packaging:** Added comprehensive runtime dependencies for Debian packages (`.deb`) in `CMakeLists.txt`, ensuring compatibility across multiple Debian/Ubuntu versions (Bullseye to Sid, 20.04 to 26.04) and supporting `t64` variants.
 
 ## [2026.03.14]
 
