@@ -10,6 +10,7 @@
 #include <QHostAddress>
 #include <QFile>
 #include <vector>
+#include <algorithm>
 #include "qrcodegen/qrcodegen.hpp"
 
 extern "C" {
@@ -55,23 +56,25 @@ SyncDialog::SyncDialog(QWidget *parent) : QDialog(parent) {
     QList<QHostAddress> ipAddressesList = QNetworkInterface::allAddresses();
 
     // Heuristic to find the best LAN IP
-    for (const QHostAddress &addr : ipAddressesList) {
+    auto it = std::find_if(ipAddressesList.begin(), ipAddressesList.end(), [](const QHostAddress &addr) {
         if (addr != QHostAddress::LocalHost && addr.toIPv4Address()) {
             QString s = addr.toString();
             // Prioritize standard home network ranges
-            if (s.startsWith("192.168.") || s.startsWith("10.0.") || s.startsWith("172.16.")) {
-                ipAddress = s;
-                break;
-            }
+            return s.startsWith("192.168.") || s.startsWith("10.0.") || s.startsWith("172.16.");
         }
+        return false;
+    });
+
+    if (it != ipAddressesList.end()) {
+        ipAddress = it->toString();
     }
 
     if (ipAddress.isEmpty()) {
-        for (const QHostAddress &addr : ipAddressesList) {
-            if (addr != QHostAddress::LocalHost && addr.toIPv4Address()) {
-                ipAddress = addr.toString();
-                break;
-            }
+        auto itFallback = std::find_if(ipAddressesList.begin(), ipAddressesList.end(), [](const QHostAddress &addr) {
+            return addr != QHostAddress::LocalHost && addr.toIPv4Address();
+        });
+        if (itFallback != ipAddressesList.end()) {
+            ipAddress = itFallback->toString();
         }
     }
 
