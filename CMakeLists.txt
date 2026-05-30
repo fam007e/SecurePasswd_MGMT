@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.21)
 # Check if version is provided from command line (for releases)
 # Otherwise use default version for local builds
 if(NOT DEFINED PROJECT_VERSION)
-    set(PROJECT_VERSION "2026.05.16")
+    set(PROJECT_VERSION "2026.05.30")
 endif()
 
 

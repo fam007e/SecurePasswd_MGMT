@@ -1,10 +1,12 @@
 var searchData=
 [
-  ['baseline_0',['Test Environment (CI Baseline)',['../md_docs_2TESTING.html#autotoc_md110',1,'']]],
-  ['build_20from_20source_1',['Build from Source',['../index.html#autotoc_md11',1,'']]],
-  ['build_20no_20gui_2',['CLI-Only Build (No GUI)',['../index.html#autotoc_md13',1,'']]],
-  ['build_20process_3',['Secure Build Process',['../md_SECURITY.html#autotoc_md40',1,'']]],
-  ['build_20status_3a_20✓_20pass_20multi_20platform_4',['Build Status: ✓ PASS (Multi-Platform)',['../md_docs_2TESTING.html#autotoc_md103',1,'']]],
-  ['build_20verification_5',['Build Verification',['../md_docs_2TESTING.html#autotoc_md102',1,'']]],
-  ['built_20packages_6',['Pre-built Packages',['../index.html#autotoc_md10',1,'']]]
+  ['acknowledgements_0',['Acknowledgements',['../md_AUTHORS.html#autotoc_md62',1,'']]],
+  ['added_1',['Added',['../md_CHANGELOG.html#autotoc_md69',1,'Added'],['../md_CHANGELOG.html#autotoc_md75',1,'Added'],['../md_CHANGELOG.html#autotoc_md81',1,'Added'],['../md_CHANGELOG.html#autotoc_md86',1,'Added'],['../md_CHANGELOG.html#autotoc_md90',1,'Added'],['../md_CHANGELOG.html#autotoc_md95',1,'Added']]],
+  ['analysis_2',['Static Analysis',['../md_docs_2TESTING.html#autotoc_md107',1,'']]],
+  ['analysis_20sanitizers_3',['Dynamic Analysis (Sanitizers)',['../md_docs_2TESTING.html#autotoc_md108',1,'']]],
+  ['and_20verification_20summary_4',['Testing and Verification Summary',['../md_docs_2TESTING.html',1,'']]],
+  ['api_20documentation_5',['API Documentation',['../index.html#autotoc_md21',1,'']]],
+  ['application_6',['GUI Application',['../index.html#autotoc_md17',1,'']]],
+  ['attribution_7',['Attribution',['../md_CODE__OF__CONDUCT.html#autotoc_md58',1,'']]],
+  ['authors_8',['Authors',['../md_AUTHORS.html',1,'']]]
 ];

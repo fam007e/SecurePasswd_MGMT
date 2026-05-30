@@ -1,5 +1,11 @@
 var searchData=
 [
-  ['no_20gui_0',['CLI-Only Build (No GUI)',['../index.html#autotoc_md13',1,'']]],
-  ['number_20generation_1',['Random Number Generation',['../md_SECURITY.html#autotoc_md31',1,'']]]
+  ['macos_0',['macOS',['../index.html#autotoc_md14',1,'']]],
+  ['management_1',['Memory Management',['../md_SECURITY.html#autotoc_md37',1,'']]],
+  ['master_20password_20security_20flow_2',['Master Password Security Flow',['../md_SECURITY.html#autotoc_md35',1,'']]],
+  ['memory_3',['memory',['../structMemoryStruct.html#a218a6fde0f367d44400542cbe523e943',1,'MemoryStruct']]],
+  ['memory_20management_4',['Memory Management',['../md_SECURITY.html#autotoc_md37',1,'']]],
+  ['memory_5fcost_5',['MEMORY_COST',['../key__derivation_8c.html#abbe36b544024ce52b9fb316584e06996',1,'key_derivation.c']]],
+  ['memorystruct_6',['MemoryStruct',['../structMemoryStruct.html',1,'']]],
+  ['multi_20platform_7',['Build Status: ✓ PASS (Multi-Platform)',['../md_docs_2TESTING.html#autotoc_md105',1,'']]]
 ];

@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['legend_0',['Categories Legend',['../md_CHANGELOG.html#autotoc_md99',1,'']]],
-  ['license_1',['License',['../index.html#autotoc_md24',1,'']]],
-  ['line_20interface_2',['Command-Line Interface',['../index.html#autotoc_md18',1,'']]],
-  ['line_20interface_20cli_3',['Command-Line Interface (CLI)',['../index.html#autotoc_md3',1,'']]],
-  ['linux_20ubuntu_4',['Linux (Ubuntu)',['../index.html#autotoc_md12',1,'']]]
+  ['kdf_0',['Key Derivation Function (KDF)',['../md_SECURITY.html#autotoc_md30',1,'']]],
+  ['key_20derivation_20function_20kdf_1',['Key Derivation Function (KDF)',['../md_SECURITY.html#autotoc_md30',1,'']]],
+  ['key_20security_20features_2',['Key Security Features',['../index.html#autotoc_md1',1,'']]]
 ];
