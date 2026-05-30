@@ -1,15 +1,9 @@
 var searchData=
 [
-  ['packages_0',['Pre-built Packages',['../index.html#autotoc_md10',1,'']]],
-  ['pass_20multi_20platform_1',['Build Status: ✓ PASS (Multi-Platform)',['../md_docs_2TESTING.html#autotoc_md103',1,'']]],
-  ['password_20security_20flow_2',['Master Password Security Flow',['../md_SECURITY.html#autotoc_md35',1,'']]],
-  ['password_20strength_20validation_3',['Password Strength Validation',['../md_SECURITY.html#autotoc_md41',1,'']]],
-  ['platform_4',['Build Status: ✓ PASS (Multi-Platform)',['../md_docs_2TESTING.html#autotoc_md103',1,'']]],
-  ['platform_20sync_5',['Cross-Platform Sync',['../index.html#autotoc_md5',1,'']]],
-  ['pledge_6',['Our Pledge',['../md_CODE__OF__CONDUCT.html#autotoc_md53',1,'']]],
-  ['policy_7',['Security Policy',['../md_SECURITY.html',1,'']]],
-  ['pre_20built_20packages_8',['Pre-built Packages',['../index.html#autotoc_md10',1,'']]],
-  ['process_9',['Secure Build Process',['../md_SECURITY.html#autotoc_md40',1,'']]],
-  ['project_20structure_10',['Project Structure',['../index.html#autotoc_md20',1,'']]],
-  ['protection_11',['Data Protection',['../md_SECURITY.html#autotoc_md34',1,'']]]
+  ['of_20conduct_0',['of Conduct',['../index.html#autotoc_md23',1,'Code of Conduct'],['../md_CODE__OF__CONDUCT.html',1,'Contributor Covenant Code of Conduct']]],
+  ['of_20dependencies_1',['Installation of Dependencies',['../index.html#autotoc_md8',1,'']]],
+  ['only_20build_20no_20gui_2',['CLI-Only Build (No GUI)',['../index.html#autotoc_md13',1,'']]],
+  ['our_20pledge_3',['Our Pledge',['../md_CODE__OF__CONDUCT.html#autotoc_md53',1,'']]],
+  ['our_20standards_4',['Our Standards',['../md_CODE__OF__CONDUCT.html#autotoc_md54',1,'']]],
+  ['overview_5',['Overview',['../md_docs_2TESTING.html#autotoc_md103',1,'Overview'],['../md_SECURITY.html#autotoc_md26',1,'Security Overview']]]
 ];

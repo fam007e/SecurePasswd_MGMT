@@ -10,6 +10,7 @@
 #include <QHostAddress>
 #include <QFile>
 #include <vector>
+#include <algorithm>
 #include "qrcodegen/qrcodegen.hpp"
 
 extern "C" {
@@ -36,11 +37,16 @@ SyncDialog::SyncDialog(QWidget *parent) : QDialog(parent) {
     syncKey.resize(SYNC_KEY_LEN);
     RAND_bytes(reinterpret_cast<unsigned char*>(syncKey.data()), SYNC_KEY_LEN);
 
-    // Start TCP Server
+    // Start TCP Server on a fixed port (33261) to help with firewall configuration
     tcpServer = new QTcpServer(this);
-    if (!tcpServer->listen(QHostAddress::Any)) {
-        statusLabel->setText("Failed to start server.");
-        return;
+    quint16 port = 33261;
+    if (!tcpServer->listen(QHostAddress::AnyIPv4, port)) {
+        // Fallback to random port if fixed port is busy
+        if (!tcpServer->listen(QHostAddress::AnyIPv4)) {
+            statusLabel->setText("Failed to start server.");
+            return;
+        }
+        port = tcpServer->serverPort();
     }
 
     connect(tcpServer, &QTcpServer::newConnection, this, &SyncDialog::onNewConnection);
@@ -48,24 +54,41 @@ SyncDialog::SyncDialog(QWidget *parent) : QDialog(parent) {
     // Find local IP
     QString ipAddress;
     QList<QHostAddress> ipAddressesList = QNetworkInterface::allAddresses();
-    for (int i = 0; i < ipAddressesList.size(); ++i) {
-        if (ipAddressesList.at(i) != QHostAddress::LocalHost &&
-            ipAddressesList.at(i).toIPv4Address()) {
-            ipAddress = ipAddressesList.at(i).toString();
-            break;
+
+    // Heuristic to find the best LAN IP
+    auto it = std::find_if(ipAddressesList.begin(), ipAddressesList.end(), [](const QHostAddress &addr) {
+        if (addr != QHostAddress::LocalHost && addr.toIPv4Address()) {
+            QString s = addr.toString();
+            // Prioritize standard home network ranges
+            return s.startsWith("192.168.") || s.startsWith("10.0.") || s.startsWith("172.16.");
+        }
+        return false;
+    });
+
+    if (it != ipAddressesList.end()) {
+        ipAddress = it->toString();
+    }
+
+    if (ipAddress.isEmpty()) {
+        auto itFallback = std::find_if(ipAddressesList.begin(), ipAddressesList.end(), [](const QHostAddress &addr) {
+            return addr != QHostAddress::LocalHost && addr.toIPv4Address();
+        });
+        if (itFallback != ipAddressesList.end()) {
+            ipAddress = itFallback->toString();
         }
     }
+
     if (ipAddress.isEmpty()) {
         ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
     }
 
     QString qrText = QString("vsync:%1:%2:%3")
                      .arg(ipAddress)
-                     .arg(tcpServer->serverPort())
+                     .arg(port)
                      .arg(QString(syncKey.toHex()));
 
     generateQrCode(qrText);
-    statusLabel->setText("Scan QR code with your mobile app to sync.");
+    statusLabel->setText(QString("Scan QR code with your mobile app to sync.\n(Desktop IP: %1, Port: %2)\nNote: Ensure port %2 is allowed in your firewall.").arg(ipAddress).arg(port));
 }
 
 SyncDialog::~SyncDialog() {
@@ -79,7 +102,7 @@ void SyncDialog::generateQrCode(const QString &text) {
     int size = qr.getSize();
     int margin = 2;
     int imgSize = (size + 2 * margin) * scale;
-    
+
     QImage image(imgSize, imgSize, QImage::Format_RGB32);
     image.fill(Qt::white);
 
@@ -94,7 +117,7 @@ void SyncDialog::generateQrCode(const QString &text) {
             }
         }
     }
-    
+
     qrLabel->setPixmap(QPixmap::fromImage(image));
 }
 

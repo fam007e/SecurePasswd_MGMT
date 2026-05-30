@@ -5,6 +5,12 @@ All notable changes to SecurePasswd_MGMT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to date-based versioning (YYYY.MM.DD).
 
+## [2026.05.30]
+
+### Fixed
+- **LAN IP Detection:** Improved local network IP detection for synchronization and standardized on port `33261` with automatic fallback.
+- **Static Analysis:** Refactored raw loops to `std::find_if` in synchronization logic to improve code readability and satisfy `cppcheck` requirements.
+
 ## [2026.05.16]
 
 ### Fixed

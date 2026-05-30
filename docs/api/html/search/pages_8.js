@@ -1,12 +1,9 @@
 var searchData=
 [
-  ['features_0',['Features',['../index.html#autotoc_md2',1,'Features'],['../index.html#autotoc_md1',1,'Key Security Features']]],
-  ['file_20system_20security_1',['File System Security',['../md_SECURITY.html#autotoc_md39',1,'']]],
-  ['fixed_2',['Fixed',['../md_CHANGELOG.html#autotoc_md65',1,'Fixed'],['../md_CHANGELOG.html#autotoc_md69',1,'Fixed'],['../md_CHANGELOG.html#autotoc_md78',1,'Fixed'],['../md_CHANGELOG.html#autotoc_md82',1,'Fixed'],['../md_CHANGELOG.html#autotoc_md86',1,'Fixed'],['../md_CHANGELOG.html#autotoc_md90',1,'Fixed'],['../md_CHANGELOG.html#autotoc_md95',1,'Fixed']]],
-  ['flow_3',['Master Password Security Flow',['../md_SECURITY.html#autotoc_md35',1,'']]],
-  ['focused_20development_4',['Security-Focused Development',['../md_CONTRIBUTING.html#autotoc_md46',1,'']]],
-  ['for_20external_20services_5',['Hashing for External Services',['../md_SECURITY.html#autotoc_md32',1,'']]],
-  ['format_6',['Data Storage Format',['../md_SECURITY.html#autotoc_md36',1,'']]],
-  ['from_20source_7',['Build from Source',['../index.html#autotoc_md11',1,'']]],
-  ['function_20kdf_8',['Key Derivation Function (KDF)',['../md_SECURITY.html#autotoc_md30',1,'']]]
+  ['encryption_0',['Encryption',['../md_SECURITY.html#autotoc_md29',1,'']]],
+  ['enforcement_1',['Enforcement',['../md_CODE__OF__CONDUCT.html#autotoc_md57',1,'']]],
+  ['enforcement_20responsibilities_2',['Enforcement Responsibilities',['../md_CODE__OF__CONDUCT.html#autotoc_md55',1,'']]],
+  ['environment_20ci_20baseline_3',['Test Environment (CI Baseline)',['../md_docs_2TESTING.html#autotoc_md112',1,'']]],
+  ['execution_4',['Unit Test Execution',['../md_docs_2TESTING.html#autotoc_md109',1,'']]],
+  ['external_20services_5',['Hashing for External Services',['../md_SECURITY.html#autotoc_md32',1,'']]]
 ];
