@@ -1,11 +1,9 @@
 var searchData=
 [
-  ['macos_0',['macOS',['../index.html#autotoc_md14',1,'']]],
-  ['management_1',['Memory Management',['../md_SECURITY.html#autotoc_md37',1,'']]],
-  ['master_20password_20security_20flow_2',['Master Password Security Flow',['../md_SECURITY.html#autotoc_md35',1,'']]],
-  ['memory_3',['memory',['../structMemoryStruct.html#a218a6fde0f367d44400542cbe523e943',1,'MemoryStruct']]],
-  ['memory_20management_4',['Memory Management',['../md_SECURITY.html#autotoc_md37',1,'']]],
-  ['memory_5fcost_5',['MEMORY_COST',['../key__derivation_8c.html#abbe36b544024ce52b9fb316584e06996',1,'key_derivation.c']]],
-  ['memorystruct_6',['MemoryStruct',['../structMemoryStruct.html',1,'']]],
-  ['multi_20platform_7',['Build Status: ✓ PASS (Multi-Platform)',['../md_docs_2TESTING.html#autotoc_md103',1,'']]]
+  ['legend_0',['Categories Legend',['../md_CHANGELOG.html#autotoc_md101',1,'']]],
+  ['license_1',['License',['../index.html#autotoc_md24',1,'']]],
+  ['line_20interface_2',['Command-Line Interface',['../index.html#autotoc_md18',1,'']]],
+  ['line_20interface_20cli_3',['Command-Line Interface (CLI)',['../index.html#autotoc_md3',1,'']]],
+  ['linux_20ubuntu_4',['Linux (Ubuntu)',['../index.html#autotoc_md12',1,'']]],
+  ['load_5for_5fgenerate_5fsalt_5',['load_or_generate_salt',['../key__derivation_8c.html#adacd10ab933416227758a3702aa43ec8',1,'load_or_generate_salt(const char *path, uint8_t *salt):&#160;key_derivation.c'],['../key__derivation_8h.html#adacd10ab933416227758a3702aa43ec8',1,'load_or_generate_salt(const char *path, uint8_t *salt):&#160;key_derivation.c']]]
 ];

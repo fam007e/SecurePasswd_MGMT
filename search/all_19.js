@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['✓_20pass_20multi_20platform_0',['Build Status: ✓ PASS (Multi-Platform)',['../md_docs_2TESTING.html#autotoc_md103',1,'']]]
+  ['zero_20initialization_20wiping_0',['Zero-Initialization &amp; Wiping',['../md_SECURITY.html#autotoc_md38',1,'']]]
 ];

@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['legend_0',['Categories Legend',['../md_CHANGELOG.html#autotoc_md99',1,'']]],
-  ['license_1',['License',['../index.html#autotoc_md24',1,'']]],
-  ['line_20interface_2',['Command-Line Interface',['../index.html#autotoc_md18',1,'']]],
-  ['line_20interface_20cli_3',['Command-Line Interface (CLI)',['../index.html#autotoc_md3',1,'']]],
-  ['linux_20ubuntu_4',['Linux (Ubuntu)',['../index.html#autotoc_md12',1,'']]],
-  ['load_5for_5fgenerate_5fsalt_5',['load_or_generate_salt',['../key__derivation_8c.html#adacd10ab933416227758a3702aa43ec8',1,'load_or_generate_salt(const char *path, uint8_t *salt):&#160;key_derivation.c'],['../key__derivation_8h.html#adacd10ab933416227758a3702aa43ec8',1,'load_or_generate_salt(const char *path, uint8_t *salt):&#160;key_derivation.c']]]
+  ['kdf_0',['Key Derivation Function (KDF)',['../md_SECURITY.html#autotoc_md30',1,'']]],
+  ['key_20derivation_20function_20kdf_1',['Key Derivation Function (KDF)',['../md_SECURITY.html#autotoc_md30',1,'']]],
+  ['key_20security_20features_2',['Key Security Features',['../index.html#autotoc_md1',1,'']]],
+  ['key_5fderivation_2ec_3',['key_derivation.c',['../key__derivation_8c.html',1,'']]],
+  ['key_5fderivation_2eh_4',['key_derivation.h',['../key__derivation_8h.html',1,'']]],
+  ['key_5flen_5',['KEY_LEN',['../key__derivation_8h.html#a32a183eeadf922d255d06a4e4f2aca66',1,'key_derivation.h']]]
 ];

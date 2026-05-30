@@ -1,6 +1,8 @@
 var searchData=
 [
-  ['windows_0',['Windows',['../index.html#autotoc_md15',1,'']]],
-  ['wiping_1',['Zero-Initialization &amp; Wiping',['../md_SECURITY.html#autotoc_md38',1,'']]],
-  ['write_5fcallback_2',['write_callback',['../pwned__check_8c.html#aede517c459b7a2bad98905e488109947',1,'pwned_check.c']]]
+  ['validation_0',['validation',['../md_SECURITY.html#autotoc_md33',1,'Input Security &amp; Validation'],['../md_SECURITY.html#autotoc_md41',1,'Password Strength Validation']]],
+  ['verification_1',['verification',['../md_docs_2TESTING.html#autotoc_md104',1,'Build Verification'],['../md_docs_2TESTING.html#autotoc_md106',1,'Security Verification']]],
+  ['verification_20summary_2',['Testing and Verification Summary',['../md_docs_2TESTING.html',1,'']]],
+  ['version_20history_3',['Version History',['../md_CHANGELOG.html#autotoc_md99',1,'']]],
+  ['vulnerabilities_4',['Reporting Security Vulnerabilities',['../md_SECURITY.html#autotoc_md44',1,'']]]
 ];
