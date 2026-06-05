@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.21)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-
 set(ICONS
     icons/add.svg
     icons/app_icon.svg
@@ -21,12 +20,10 @@ set(ICONS
     icons/recovery-enabled.svg
     icons/recovery-disabled.svg
 )
-
 set(THEMES
     dark.qss
     light.qss
 )
-
 qt_add_executable(securepasswd_gui
     WIN32  # This prevents console window on Windows
     main.cpp
@@ -43,23 +40,19 @@ qt_add_executable(securepasswd_gui
     icons.qrc
     qrcodegen/qrcodegen.cpp
 )
-
 # Embed Windows icon into executable
 if(WIN32)
     target_sources(securepasswd_gui PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/app.rc")
 endif()
-
 # Include directories
 target_include_directories(securepasswd_gui PRIVATE
     ${CMAKE_SOURCE_DIR}/core
     ${CMAKE_CURRENT_SOURCE_DIR}/qrcodegen
 )
-
 # Only add LIBCSV_INCLUDE_DIRS if it's not empty (to avoid warnings)
 if(LIBCSV_INCLUDE_DIRS)
     target_include_directories(securepasswd_gui PRIVATE ${LIBCSV_INCLUDE_DIRS})
 endif()
-
 # Link libraries
 target_link_libraries(securepasswd_gui PRIVATE
     Qt6::Widgets
@@ -68,17 +61,14 @@ target_link_libraries(securepasswd_gui PRIVATE
     core_lib
     ${LIBCSV_LIBRARIES}
 )
-
 # Installation rules
 install(TARGETS securepasswd_gui
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
     BUNDLE DESTINATION .
 )
-
 if(WIN32)
     deploy_windows_dependencies(securepasswd_gui USES_QT)
 endif()
-
 if(UNIX AND NOT APPLE)
     # Install desktop file
     configure_file(
@@ -86,16 +76,19 @@ if(UNIX AND NOT APPLE)
         "${CMAKE_CURRENT_BINARY_DIR}/securepasswd_gui.desktop"
         @ONLY
     )
-
     install(
         FILES "${CMAKE_CURRENT_BINARY_DIR}/securepasswd_gui.desktop"
         DESTINATION "${CMAKE_INSTALL_DATADIR}/applications"
     )
-
-    # Install icon
+    # Install icons
     install(
         FILES "${CMAKE_CURRENT_SOURCE_DIR}/icons/app_icon.svg"
         RENAME "securepasswd_gui.svg"
         DESTINATION "${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps"
+    )
+    install(
+        FILES "${CMAKE_CURRENT_SOURCE_DIR}/icons/app_icon.png"
+        RENAME "securepasswd_gui.png"
+        DESTINATION "${CMAKE_INSTALL_DATADIR}/icons/hicolor/64x64/apps"
     )
 endif()
