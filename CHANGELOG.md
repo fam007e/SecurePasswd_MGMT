@@ -5,6 +5,14 @@ All notable changes to SecurePasswd_MGMT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to date-based versioning (YYYY.MM.DD).
 
+## [2026.06.05]
+
+### Added
+- **Linux PNG Icon:** Added installation of a 64x64 PNG icon to `${CMAKE_INSTALL_DATADIR}/icons/hicolor/64x64/apps` for better integration with Linux desktop environments that may not support SVG icons natively.
+
+### Changed
+- **CMake Cleanup:** Cleaned up redundant whitespace in `gui/CMakeLists.txt` for better maintainability.
+
 ## [2026.05.30]
 
 ### Fixed

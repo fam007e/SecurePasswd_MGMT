@@ -5,6 +5,7 @@ set(CMAKE_AUTOUIC ON)
 set(ICONS
     icons/add.svg
     icons/app_icon.svg
+    icons/app_icon.png
     icons/copy_username.svg
     icons/copy_passwd.svg
     icons/copy_totp.svg

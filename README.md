@@ -47,7 +47,7 @@
 - **Secure Mobile Sync:** Synchronize your vault securely between desktop and mobile devices using Chacha20-Poly1305 authenticated encryption.
 
 ### Desktop Integration
-- **Linux:** Provides a `.desktop` file for better integration with desktop environments.
+- **Linux:** Provides a `.desktop` file and multiple icon formats (SVG and PNG) for seamless desktop integration across various desktop environments.
 - **Windows:** Includes an installer and a proper application icon.
 
 ## Requirements
