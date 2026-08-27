@@ -109,6 +109,7 @@ def main() -> None:
     if not doxygen_bin:
         print("Error: 'doxygen' executable not found in PATH.", file=sys.stderr)
         sys.exit(1)
+    doxygen_bin = str(Path(doxygen_bin).resolve())
 
     print(f"Running Doxygen using {doxygen_bin}...")
     result = subprocess.run([doxygen_bin, str(DOXYFILE)], cwd=REPO_ROOT)
