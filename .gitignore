@@ -50,13 +50,12 @@ compile_commands.json
 *.dmg
 *.nsi
 
-# Allow docs generation in CI, but ignore locally
+# Generated docs — CI builds & deploys to gh-pages
 docs/
 !docs/.gitkeep
 !docs/TESTING.md
 !docs/USER_GUIDE.md
 !docs/THREAT_MODEL.md
-!docs/api/
 
 # GDB logging env
 .gdbinit

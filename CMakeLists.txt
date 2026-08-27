@@ -150,5 +150,20 @@ if(BUILD_GUI)
     )
 endif()
 
+# Documentation target
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+    find_package(Python3 COMPONENTS Interpreter)
+    if(Python3_FOUND)
+        add_custom_target(docs
+            COMMAND ${Python3_EXECUTABLE} ${CMAKE_SOURCE_DIR}/scripts/build_docs.py
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+            COMMENT "Building and auditing API documentation..."
+            VERBATIM
+        )
+    endif()
+endif()
+
 # Include CPack AFTER all CPACK_* variables are set
 include(CPack)
+

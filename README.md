@@ -96,22 +96,22 @@ On Windows, this project uses `vcpkg` to manage dependencies. The setup is handl
 
 1.  **Clone vcpkg:**
 
-```bash
-git clone https://github.com/microsoft/vcpkg.git
-./vcpkg/bootstrap-vcpkg.bat
-```
+    ```bash
+    git clone https://github.com/microsoft/vcpkg.git
+    ./vcpkg/bootstrap-vcpkg.bat
+    ```
 
 2.  **Install dependencies:**
 
-```bash
-./vcpkg/vcpkg install --triplet x64-windows
-```
+    ```bash
+    ./vcpkg/vcpkg install --triplet x64-windows
+    ```
 
-When you run CMake, you must point it to the vcpkg toolchain file:
+    When you run CMake, you must point it to the vcpkg toolchain file:
 
-```bash
-cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_TOOLCHAIN_FILE=path/to/your/vcpkg/scripts/buildsystems/vcpkg.cmake
-```
+    ```bash
+    cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_TOOLCHAIN_FILE=path/to/your/vcpkg/scripts/buildsystems/vcpkg.cmake
+    ```
 
 ## Installation
 
@@ -125,20 +125,20 @@ Pre-built packages for various platforms are available on the [GitHub Releases](
 
 1.  **Install Dependencies:**
 
-```bash
-sudo apt-get update
-sudo apt-get install -y build-essential cmake libsodium-dev libargon2-dev \
-  libsqlcipher-dev libcsv-dev qt6-base-dev libqt6svg6-dev libssl-dev libcurl4-openssl-dev \
-  libcmocka-dev
-```
+    ```bash
+    sudo apt-get update
+    sudo apt-get install -y build-essential cmake libsodium-dev libargon2-dev \
+      libsqlcipher-dev libcsv-dev qt6-base-dev libqt6svg6-dev libssl-dev libcurl4-openssl-dev \
+      libcmocka-dev
+    ```
 
 2.  **Configure and Build:**
 
-```bash
-mkdir build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release
-cmake --build . --config Release
-```
+    ```bash
+    mkdir build && cd build
+    cmake .. -DCMAKE_BUILD_TYPE=Release
+    cmake --build . --config Release
+    ```
 
 #### CLI-Only Build (No GUI)
 If you do not want to build the GUI and wish to avoid installing Qt dependencies, use the following:
@@ -152,24 +152,24 @@ cmake --build . --config Release
 
 1.  **Install Dependencies:**
 
-```bash
-brew install qt@6 create-dmg libsodium argon2 sqlcipher cmocka
-git clone https://github.com/rgamble/libcsv.git
-cd libcsv
-./configure
-make
-sudo make install
-```
+    ```bash
+    brew install qt@6 create-dmg libsodium argon2 sqlcipher cmocka
+    git clone https://github.com/rgamble/libcsv.git
+    cd libcsv
+    ./configure
+    make
+    sudo make install
+    ```
 
 2.  **Configure and Build:**
 
-```bash
-mkdir build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=Release \
-  -DLIBCSV_INCLUDE_DIRS=/usr/local/include \
-  -DLIBCSV_LIBRARIES=/usr/local/lib/libcsv.a
-cmake --build . --config Release
-```
+    ```bash
+    mkdir build && cd build
+    cmake .. -DCMAKE_BUILD_TYPE=Release \
+      -DLIBCSV_INCLUDE_DIRS=/usr/local/include \
+      -DLIBCSV_LIBRARIES=/usr/local/lib/libcsv.a
+    cmake --build . --config Release
+    ```
 
 #### Windows
 
@@ -178,11 +178,11 @@ cmake --build . --config Release
 
 2.  **Configure and Build:**
 
-```bash
-mkdir build && cd build
-cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_TOOLCHAIN_FILE=C:/path/to/your/vcpkg/scripts/buildsystems/vcpkg.cmake
-cmake --build . --config Release
-```
+    ```bash
+    mkdir build && cd build
+    cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_TOOLCHAIN_FILE=C:/path/to/your/vcpkg/scripts/buildsystems/vcpkg.cmake
+    cmake --build . --config Release
+    ```
 
     The compiled binaries (`securepasswd_cli.exe` and `securepasswd_gui.exe`) will be created in the `build/bin/Release` directory.
 
