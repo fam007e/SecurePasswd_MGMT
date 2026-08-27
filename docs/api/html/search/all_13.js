@@ -1,11 +1,9 @@
 var searchData=
 [
-  ['random_20number_20generation_0',['Random Number Generation',['../md_SECURITY.html#autotoc_md31',1,'']]],
-  ['readme_2emd_1',['README.md',['../README_8md.html',1,'']]],
-  ['recovery_5fcodes_2',['recovery_codes',['../structPasswordEntry.html#ab20f4bcf8cc4fa6ef69e4d07ac41dec9',1,'PasswordEntry']]],
-  ['release_20guidelines_3',['Release Guidelines',['../md_CONTRIBUTING.html#autotoc_md51',1,'']]],
-  ['reporting_20security_20vulnerabilities_4',['Reporting Security Vulnerabilities',['../md_SECURITY.html#autotoc_md44',1,'']]],
-  ['requirements_5',['Requirements',['../md_SECURITY.html#autotoc_md42',1,'Health Check Requirements'],['../index.html#autotoc_md7',1,'Requirements']]],
-  ['responsibilities_6',['Enforcement Responsibilities',['../md_CODE__OF__CONDUCT.html#autotoc_md55',1,'']]],
-  ['review_7',['Code Review',['../md_CONTRIBUTING.html#autotoc_md47',1,'']]]
+  ['qrcode_0',['QrCode',['../classqrcodegen_1_1QrCode.html',1,'qrcodegen::QrCode'],['../classqrcodegen_1_1QrCode.html#a566e993f52899733fed8017bf8869b2b',1,'qrcodegen::QrCode::QrCode()']]],
+  ['qrcodegen_1',['qrcodegen',['../namespaceqrcodegen.html',1,'']]],
+  ['qrcodegen_2ecpp_2',['qrcodegen.cpp',['../qrcodegen_8cpp.html',1,'']]],
+  ['qrcodegen_2ehpp_3',['qrcodegen.hpp',['../qrcodegen_8hpp.html',1,'']]],
+  ['qrsegment_4',['QrSegment',['../classqrcodegen_1_1QrSegment.html',1,'qrcodegen::QrSegment'],['../classqrcodegen_1_1QrSegment.html#aac098af945f0037b853ac89600795e94',1,'qrcodegen::QrSegment::QrSegment(const Mode &amp;md, int numCh, const std::vector&lt; bool &gt; &amp;dt)'],['../classqrcodegen_1_1QrSegment.html#ad584cb1b2c19440f00adade362be5d23',1,'qrcodegen::QrSegment::QrSegment(const Mode &amp;md, int numCh, std::vector&lt; bool &gt; &amp;&amp;dt)']]],
+  ['quartile_5',['QUARTILE',['../classqrcodegen_1_1QrCode.html#a9ac15e987cf5cb71b1662373e6c9fec0a8927abb1f5ad5fce6a9eccbcf2b0a12d',1,'qrcodegen::QrCode']]]
 ];

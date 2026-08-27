@@ -101,7 +101,7 @@ Include dependency graph for platform_paths.h:</div>
 </div><div class="textblock"><div class="dynheader">
 This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="platform__paths_8h__dep__incl.svg" width="159" height="112"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="platform__paths_8h__dep__incl.svg" width="575" height="112"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
@@ -130,10 +130,11 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Gets the platform-specific path to the configuration directory. </p>
+<p>On Linux, this follows XDG specs (e.g., ~/.config/securepasswd). On Windows, it uses LOCALAPPDATA%/securepasswd.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">path_buffer</td><td>The buffer to store the path in. </td></tr>
-    <tr><td class="paramname">buffer_size</td><td>The size of the path buffer. </td></tr>
+    <tr><td class="paramname">path_buffer</td><td>The buffer where the absolute path will be stored. </td></tr>
+    <tr><td class="paramname">buffer_size</td><td>The size of the path buffer (recommended at least 4096). </td></tr>
   </table>
   </dd>
 </dl>

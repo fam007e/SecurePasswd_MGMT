@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['memorystruct_0',['MemoryStruct',['../structMemoryStruct.html',1,'']]]
+  ['bitbuffer_0',['BitBuffer',['../classqrcodegen_1_1BitBuffer.html',1,'qrcodegen']]]
 ];

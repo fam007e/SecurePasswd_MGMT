@@ -2,7 +2,7 @@ PROJECT_NAME           = "SecurePasswd_MGMT"
 PROJECT_BRIEF          = "A modern, cross-platform password manager and two-factor authenticator (TOTP) designed with state-of-the-art security."
 PROJECT_NUMBER         = 2026.05.30
 OUTPUT_DIRECTORY       = docs/api
-INPUT                  = README.md core/ SECURITY.md CONTRIBUTING.md CODE_OF_CONDUCT.md AUTHORS.md CITATION.cff LICENSE.md CHANGELOG.md docs/TESTING.md
+INPUT                  = README.md core/ gui/ cli/ SECURITY.md CONTRIBUTING.md CODE_OF_CONDUCT.md AUTHORS.md CITATION.cff LICENSE CHANGELOG.md docs/TESTING.md
 USE_MDFILE_AS_MAINPAGE = README.md
 RECURSIVE              = YES
 GENERATE_LATEX         = NO
@@ -20,7 +20,8 @@ TOC_INCLUDE_HEADINGS   = 5
 VERBATIM_HEADERS       = NO
 
 # Image paths
-IMAGE_PATH             = .
+IMAGE_PATH             = . gui/icons
+HTML_EXTRA_FILES       = gui/icons/app_icon.svg gui/icons/app_icon.png
 
 # Graph settings
 HAVE_DOT               = YES

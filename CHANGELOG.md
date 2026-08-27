@@ -9,6 +9,7 @@ and this project adheres to date-based versioning (YYYY.MM.DD).
 
 ### Added
 - **Linux PNG Icon:** Added installation of a 64x64 PNG icon to `${CMAKE_INSTALL_DATADIR}/icons/hicolor/64x64/apps` for better integration with Linux desktop environments that may not support SVG icons natively.
+- **Documentation Hardening:** Improved Doxygen documentation coverage for GUI and Core components, fixed Markdown rendering issues in generated HTML, and expanded `IMAGE_PATH` to resolve broken icons in API docs.
 
 ### Changed
 - **CMake Cleanup:** Cleaned up redundant whitespace in `gui/CMakeLists.txt` for better maintainability.

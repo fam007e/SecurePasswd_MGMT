@@ -102,74 +102,84 @@ var NAVTREE =
       [ "Acknowledgements", "md_AUTHORS.html#autotoc_md62", null ]
     ] ],
     [ "Changelog", "md_CHANGELOG.html", [
-      [ "[2026.05.30]", "md_CHANGELOG.html#autotoc_md64", [
-        [ "Fixed", "md_CHANGELOG.html#autotoc_md65", null ]
+      [ "[2026.06.05]", "md_CHANGELOG.html#autotoc_md64", [
+        [ "Added", "md_CHANGELOG.html#autotoc_md65", null ],
+        [ "Changed", "md_CHANGELOG.html#autotoc_md66", null ]
       ] ],
-      [ "[2026.05.16]", "md_CHANGELOG.html#autotoc_md66", [
-        [ "Fixed", "md_CHANGELOG.html#autotoc_md67", null ]
+      [ "[2026.05.30]", "md_CHANGELOG.html#autotoc_md67", [
+        [ "Fixed", "md_CHANGELOG.html#autotoc_md68", null ]
       ] ],
-      [ "[2026.03.14]", "md_CHANGELOG.html#autotoc_md68", [
-        [ "Added", "md_CHANGELOG.html#autotoc_md69", null ],
-        [ "Changed", "md_CHANGELOG.html#autotoc_md70", null ],
-        [ "Fixed", "md_CHANGELOG.html#autotoc_md71", null ]
+      [ "[2026.05.16]", "md_CHANGELOG.html#autotoc_md69", [
+        [ "Fixed", "md_CHANGELOG.html#autotoc_md70", null ]
       ] ],
-      [ "[2026.01.06]", "md_CHANGELOG.html#autotoc_md72", [
-        [ "Security", "md_CHANGELOG.html#autotoc_md73", null ]
+      [ "[2026.03.14]", "md_CHANGELOG.html#autotoc_md71", [
+        [ "Added", "md_CHANGELOG.html#autotoc_md72", null ],
+        [ "Changed", "md_CHANGELOG.html#autotoc_md73", null ],
+        [ "Fixed", "md_CHANGELOG.html#autotoc_md74", null ]
       ] ],
-      [ "[2025.12.28]", "md_CHANGELOG.html#autotoc_md74", [
-        [ "Added", "md_CHANGELOG.html#autotoc_md75", null ],
+      [ "[2026.01.06]", "md_CHANGELOG.html#autotoc_md75", [
         [ "Security", "md_CHANGELOG.html#autotoc_md76", null ]
       ] ],
-      [ "[2025.12.26]", "md_CHANGELOG.html#autotoc_md77", [
-        [ "Security", "md_CHANGELOG.html#autotoc_md78", null ]
+      [ "[2025.12.28]", "md_CHANGELOG.html#autotoc_md77", [
+        [ "Added", "md_CHANGELOG.html#autotoc_md78", null ],
+        [ "Security", "md_CHANGELOG.html#autotoc_md79", null ]
       ] ],
-      [ "[2026.01.17]", "md_CHANGELOG.html#autotoc_md79", [
-        [ "Fixed", "md_CHANGELOG.html#autotoc_md80", null ],
-        [ "Added", "md_CHANGELOG.html#autotoc_md81", null ]
+      [ "[2025.12.26]", "md_CHANGELOG.html#autotoc_md80", [
+        [ "Security", "md_CHANGELOG.html#autotoc_md81", null ]
       ] ],
-      [ "[2026.02.07]", "md_CHANGELOG.html#autotoc_md82", [
-        [ "Security", "md_CHANGELOG.html#autotoc_md83", null ],
-        [ "Fixed", "md_CHANGELOG.html#autotoc_md84", null ]
+      [ "[2026.01.17]", "md_CHANGELOG.html#autotoc_md82", [
+        [ "Fixed", "md_CHANGELOG.html#autotoc_md83", null ],
+        [ "Added", "md_CHANGELOG.html#autotoc_md84", null ]
       ] ],
-      [ "[2026.03.19]", "md_CHANGELOG.html#autotoc_md85", [
-        [ "Added", "md_CHANGELOG.html#autotoc_md86", null ],
-        [ "Security", "md_CHANGELOG.html#autotoc_md87", null ],
-        [ "Fixed", "md_CHANGELOG.html#autotoc_md88", null ]
+      [ "[2026.02.07]", "md_CHANGELOG.html#autotoc_md85", [
+        [ "Security", "md_CHANGELOG.html#autotoc_md86", null ],
+        [ "Fixed", "md_CHANGELOG.html#autotoc_md87", null ]
       ] ],
-      [ "[2025.12.20]", "md_CHANGELOG.html#autotoc_md89", [
-        [ "Added", "md_CHANGELOG.html#autotoc_md90", null ],
-        [ "Changed", "md_CHANGELOG.html#autotoc_md91", null ],
-        [ "Fixed", "md_CHANGELOG.html#autotoc_md92", null ]
+      [ "[2026.03.19]", "md_CHANGELOG.html#autotoc_md88", [
+        [ "Added", "md_CHANGELOG.html#autotoc_md89", null ],
+        [ "Security", "md_CHANGELOG.html#autotoc_md90", null ],
+        [ "Fixed", "md_CHANGELOG.html#autotoc_md91", null ]
       ] ],
-      [ "[2025.10.25]", "md_CHANGELOG.html#autotoc_md94", [
-        [ "Added", "md_CHANGELOG.html#autotoc_md95", null ],
-        [ "Changed", "md_CHANGELOG.html#autotoc_md96", null ],
-        [ "Fixed", "md_CHANGELOG.html#autotoc_md97", null ]
+      [ "[2025.12.20]", "md_CHANGELOG.html#autotoc_md92", [
+        [ "Added", "md_CHANGELOG.html#autotoc_md93", null ],
+        [ "Changed", "md_CHANGELOG.html#autotoc_md94", null ],
+        [ "Fixed", "md_CHANGELOG.html#autotoc_md95", null ]
       ] ],
-      [ "Version History", "md_CHANGELOG.html#autotoc_md99", null ],
-      [ "Categories Legend", "md_CHANGELOG.html#autotoc_md101", null ]
+      [ "[2025.10.25]", "md_CHANGELOG.html#autotoc_md97", [
+        [ "Added", "md_CHANGELOG.html#autotoc_md98", null ],
+        [ "Changed", "md_CHANGELOG.html#autotoc_md99", null ],
+        [ "Fixed", "md_CHANGELOG.html#autotoc_md100", null ]
+      ] ],
+      [ "Version History", "md_CHANGELOG.html#autotoc_md102", null ],
+      [ "Categories Legend", "md_CHANGELOG.html#autotoc_md104", null ]
     ] ],
     [ "Testing and Verification Summary", "md_docs_2TESTING.html", [
-      [ "Overview", "md_docs_2TESTING.html#autotoc_md103", null ],
-      [ "Build Verification", "md_docs_2TESTING.html#autotoc_md104", [
-        [ "Build Status: ✓ PASS (Multi-Platform)", "md_docs_2TESTING.html#autotoc_md105", null ]
+      [ "Overview", "md_docs_2TESTING.html#autotoc_md106", null ],
+      [ "Build Verification", "md_docs_2TESTING.html#autotoc_md107", [
+        [ "Build Status: ✓ PASS (Multi-Platform)", "md_docs_2TESTING.html#autotoc_md108", null ]
       ] ],
-      [ "Security Verification", "md_docs_2TESTING.html#autotoc_md106", [
-        [ "Static Analysis", "md_docs_2TESTING.html#autotoc_md107", null ],
-        [ "Dynamic Analysis (Sanitizers)", "md_docs_2TESTING.html#autotoc_md108", null ]
+      [ "Security Verification", "md_docs_2TESTING.html#autotoc_md109", [
+        [ "Static Analysis", "md_docs_2TESTING.html#autotoc_md110", null ],
+        [ "Dynamic Analysis (Sanitizers)", "md_docs_2TESTING.html#autotoc_md111", null ]
       ] ],
-      [ "Unit Test Execution", "md_docs_2TESTING.html#autotoc_md109", [
-        [ "Test Summary", "md_docs_2TESTING.html#autotoc_md110", null ],
-        [ "Core Tests (<span class=\"tt\">./core_tests</span>)", "md_docs_2TESTING.html#autotoc_md111", null ]
+      [ "Unit Test Execution", "md_docs_2TESTING.html#autotoc_md112", [
+        [ "Test Summary", "md_docs_2TESTING.html#autotoc_md113", null ],
+        [ "Core Tests (<span class=\"tt\">./core_tests</span>)", "md_docs_2TESTING.html#autotoc_md114", null ]
       ] ],
-      [ "Test Environment (CI Baseline)", "md_docs_2TESTING.html#autotoc_md112", null ]
+      [ "Test Environment (CI Baseline)", "md_docs_2TESTING.html#autotoc_md115", null ]
+    ] ],
+    [ "Namespaces", "namespaces.html", [
+      [ "Namespace List", "namespaces.html", "namespaces_dup" ]
     ] ],
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],
+      [ "Class Hierarchy", "hierarchy.html", "hierarchy" ],
       [ "Class Members", "functions.html", [
         [ "All", "functions.html", null ],
-        [ "Variables", "functions_vars.html", null ]
+        [ "Functions", "functions_func.html", null ],
+        [ "Variables", "functions_vars.html", null ],
+        [ "Enumerations", "functions_enum.html", null ]
       ] ]
     ] ],
     [ "Files", "files.html", [
@@ -186,7 +196,8 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"CITATION_8cff.html"
+"CITATION_8cff.html",
+"md_CHANGELOG.html#autotoc_md76"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronization';

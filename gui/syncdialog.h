@@ -7,6 +7,13 @@
 
 class QLabel;
 
+/**
+ * @class SyncDialog
+ * @brief Manages the secure mobile synchronization process.
+ *
+ * Generates a one-time synchronization key, displays it as a QR code,
+ * and starts a temporary encrypted server to transfer the vault to a mobile device.
+ */
 class SyncDialog : public QDialog {
     Q_OBJECT
 

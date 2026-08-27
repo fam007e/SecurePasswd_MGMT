@@ -1,11 +1,26 @@
 var searchData=
 [
   ['macos_0',['macOS',['../index.html#autotoc_md14',1,'']]],
-  ['management_1',['Memory Management',['../md_SECURITY.html#autotoc_md37',1,'']]],
-  ['master_20password_20security_20flow_2',['Master Password Security Flow',['../md_SECURITY.html#autotoc_md35',1,'']]],
-  ['memory_3',['memory',['../structMemoryStruct.html#a218a6fde0f367d44400542cbe523e943',1,'MemoryStruct']]],
-  ['memory_20management_4',['Memory Management',['../md_SECURITY.html#autotoc_md37',1,'']]],
-  ['memory_5fcost_5',['MEMORY_COST',['../key__derivation_8c.html#abbe36b544024ce52b9fb316584e06996',1,'key_derivation.c']]],
-  ['memorystruct_6',['MemoryStruct',['../structMemoryStruct.html',1,'']]],
-  ['multi_20platform_7',['Build Status: ✓ PASS (Multi-Platform)',['../md_docs_2TESTING.html#autotoc_md105',1,'']]]
+  ['main_1',['main',['../main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97',1,'main(int argc, char *argv[]):&#160;main.cpp'],['../main_8c.html#a0ddf1224851353fc92bfbff6f499fa97',1,'main(int argc, char *argv[]):&#160;main.c']]],
+  ['main_2ec_2',['main.c',['../main_8c.html',1,'']]],
+  ['main_2ecpp_3',['main.cpp',['../main_8cpp.html',1,'']]],
+  ['mainwindow_4',['MainWindow',['../classMainWindow.html',1,'MainWindow'],['../classMainWindow.html#a5ba411f4e7ebde4420e0016ed3858383',1,'MainWindow::MainWindow()']]],
+  ['mainwindow_2ecpp_5',['mainwindow.cpp',['../mainwindow_8cpp.html',1,'']]],
+  ['mainwindow_2eh_6',['mainwindow.h',['../mainwindow_8h.html',1,'']]],
+  ['makealphanumeric_7',['makeAlphanumeric',['../classqrcodegen_1_1QrSegment.html#ae2d00f78a60165d70faf5b56e36ae511',1,'qrcodegen::QrSegment']]],
+  ['makebytes_8',['makeBytes',['../classqrcodegen_1_1QrSegment.html#a32ead40ba58149f5e5fe13a6417d8304',1,'qrcodegen::QrSegment']]],
+  ['makeeci_9',['makeEci',['../classqrcodegen_1_1QrSegment.html#a2cb028d26ef5d9d970b344eee0b98de7',1,'qrcodegen::QrSegment']]],
+  ['makenumeric_10',['makeNumeric',['../classqrcodegen_1_1QrSegment.html#a03484cb17296745b303f0bd48b213446',1,'qrcodegen::QrSegment']]],
+  ['makesegments_11',['makeSegments',['../classqrcodegen_1_1QrSegment.html#aa587c9cfcb4b28552d5d1e4c05b5b962',1,'qrcodegen::QrSegment']]],
+  ['management_12',['Memory Management',['../md_SECURITY.html#autotoc_md37',1,'']]],
+  ['master_20password_20security_20flow_13',['Master Password Security Flow',['../md_SECURITY.html#autotoc_md35',1,'']]],
+  ['max_5fversion_14',['MAX_VERSION',['../classqrcodegen_1_1QrCode.html#ac884bc36ec4765b89540751ad8c7dfa1',1,'qrcodegen::QrCode']]],
+  ['medium_15',['MEDIUM',['../classqrcodegen_1_1QrCode.html#a9ac15e987cf5cb71b1662373e6c9fec0ac87f3be66ffc3c0d4249f1c2cc5f3cce',1,'qrcodegen::QrCode']]],
+  ['memory_16',['memory',['../structMemoryStruct.html#a218a6fde0f367d44400542cbe523e943',1,'MemoryStruct']]],
+  ['memory_20management_17',['Memory Management',['../md_SECURITY.html#autotoc_md37',1,'']]],
+  ['memory_5fcost_18',['MEMORY_COST',['../key__derivation_8c.html#abbe36b544024ce52b9fb316584e06996',1,'key_derivation.c']]],
+  ['memorystruct_19',['MemoryStruct',['../structMemoryStruct.html',1,'']]],
+  ['min_5fversion_20',['MIN_VERSION',['../classqrcodegen_1_1QrCode.html#a49443c1e43f8c73b6a5c6069c6b24bd4',1,'qrcodegen::QrCode']]],
+  ['mode_21',['Mode',['../classqrcodegen_1_1QrSegment_1_1Mode.html',1,'qrcodegen::QrSegment']]],
+  ['multi_20platform_22',['Build Status: ✓ PASS (Multi-Platform)',['../md_docs_2TESTING.html#autotoc_md108',1,'']]]
 ];

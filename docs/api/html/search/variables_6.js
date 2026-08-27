@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['service_0',['service',['../structPasswordEntry.html#a7efd3f2f980acb7d38669e9074f4a85a',1,'PasswordEntry']]],
-  ['size_1',['size',['../structMemoryStruct.html#a79d6a7ad34b172f766c19d0846688440',1,'MemoryStruct']]]
+  ['id_0',['id',['../structPasswordEntry.html#ac0bc3c60a0046116adcf17fbdcbcadbd',1,'PasswordEntry::id'],['../structGUIPasswordEntry.html#a70219318c098610858dc1c97e6a2aaf7',1,'GUIPasswordEntry::id']]]
 ];
