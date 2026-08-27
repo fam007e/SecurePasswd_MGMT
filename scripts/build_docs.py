@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Automated Doxygen documentation generator and HTML auditor."""
 
-import os
 import re
 import shutil
 import subprocess
