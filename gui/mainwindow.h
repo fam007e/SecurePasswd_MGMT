@@ -18,6 +18,13 @@ class QToolBar;
 class QAction;
 class QPushButton;
 
+/**
+ * @class MainWindow
+ * @brief The primary graphical interface for SecurePasswd_MGMT.
+ *
+ * Provides a centralized hub for managing password entries, viewing TOTP codes,
+ * and accessing security tools like Health Checks and Mobile Sync.
+ */
 class MainWindow : public QMainWindow {
     Q_OBJECT
 

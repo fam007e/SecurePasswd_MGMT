@@ -4,45 +4,42 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'Doxyfile'
+      - 'scripts/build_docs.py'
+      - 'docs/**'
+      - 'README.md'
+      - 'core/**'
+      - 'gui/**'
+      - 'cli/**'
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Install Doxygen and Graphviz
-        run: sudo apt-get install -y doxygen graphviz
-
-      - name: Generate Documentation
-        run: doxygen Doxyfile
-
-      - name: Verify Documentation Generated
+      - name: Install Doxygen, Graphviz, and Python
         run: |
-          if [ ! -d "docs/api/html" ]; then
-            echo "Error: Documentation not generated at docs/api/html"
-            echo "Checking directory structure..."
-            ls -la docs/ || echo "docs/ directory not found"
-            ls -la docs/api/ || echo "docs/api/ directory not found"
-            exit 1
-          fi
-          echo "Documentation generated successfully at docs/api/html"
-          ls -la docs/api/html/
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz python3
 
-      - name: Fix Image Paths in HTML
-        run: |
-          echo "Fixing image paths in generated HTML files..."
-          find docs/api/html -name "*.html" -type f -exec sed -i 's|src="gui/icons/app_icon.svg"|src="app_icon.svg"|g' {} +
-          echo "Image paths fixed successfully"
+      - name: Build & Audit Documentation
+        run: python3 scripts/build_docs.py
 
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./docs/api/html
           enable_jekyll: false
+

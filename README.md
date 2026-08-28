@@ -47,7 +47,7 @@
 - **Secure Mobile Sync:** Synchronize your vault securely between desktop and mobile devices using Chacha20-Poly1305 authenticated encryption.
 
 ### Desktop Integration
-- **Linux:** Provides a `.desktop` file for better integration with desktop environments.
+- **Linux:** Provides a `.desktop` file and multiple icon formats (SVG and PNG) for seamless desktop integration across various desktop environments.
 - **Windows:** Includes an installer and a proper application icon.
 
 ## Requirements
@@ -95,18 +95,24 @@ sudo dnf install gcc-c++ cmake libsodium-devel argon2-devel sqlcipher-devel \
 On Windows, this project uses `vcpkg` to manage dependencies. The setup is handled automatically when building with the provided Visual Studio solution, but if you are building manually, you will need to set up vcpkg first.
 
 1.  **Clone vcpkg:**
+
     ```bash
     git clone https://github.com/microsoft/vcpkg.git
     ./vcpkg/bootstrap-vcpkg.bat
     ```
+
 2.  **Install dependencies:**
+
     ```bash
     ./vcpkg/vcpkg install --triplet x64-windows
     ```
+
     When you run CMake, you must point it to the vcpkg toolchain file:
+
     ```bash
     cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_TOOLCHAIN_FILE=path/to/your/vcpkg/scripts/buildsystems/vcpkg.cmake
     ```
+
 ## Installation
 
 ### Pre-built Packages
@@ -118,6 +124,7 @@ Pre-built packages for various platforms are available on the [GitHub Releases](
 #### Linux (Ubuntu)
 
 1.  **Install Dependencies:**
+
     ```bash
     sudo apt-get update
     sudo apt-get install -y build-essential cmake libsodium-dev libargon2-dev \
@@ -126,6 +133,7 @@ Pre-built packages for various platforms are available on the [GitHub Releases](
     ```
 
 2.  **Configure and Build:**
+
     ```bash
     mkdir build && cd build
     cmake .. -DCMAKE_BUILD_TYPE=Release
@@ -143,6 +151,7 @@ cmake --build . --config Release
 #### macOS
 
 1.  **Install Dependencies:**
+
     ```bash
     brew install qt@6 create-dmg libsodium argon2 sqlcipher cmocka
     git clone https://github.com/rgamble/libcsv.git
@@ -153,6 +162,7 @@ cmake --build . --config Release
     ```
 
 2.  **Configure and Build:**
+
     ```bash
     mkdir build && cd build
     cmake .. -DCMAKE_BUILD_TYPE=Release \
@@ -167,6 +177,7 @@ cmake --build . --config Release
     Follow the instructions in the "Windows (vcpkg)" section above to install the required dependencies.
 
 2.  **Configure and Build:**
+
     ```bash
     mkdir build && cd build
     cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_TOOLCHAIN_FILE=C:/path/to/your/vcpkg/scripts/buildsystems/vcpkg.cmake

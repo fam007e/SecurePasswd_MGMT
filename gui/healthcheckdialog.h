@@ -16,6 +16,13 @@ struct PwnedResult {
 };
 Q_DECLARE_METATYPE(PwnedResult)
 
+/**
+ * @class HealthCheckDialog
+ * @brief Performs security audits on the user's password database.
+ *
+ * Analyzes passwords for reuse, weakness, and checks them against the
+ * Have I Been Pwned (HIBP) database using k-anonymity.
+ */
 class HealthCheckDialog : public QDialog
 {
     Q_OBJECT

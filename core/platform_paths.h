@@ -10,8 +10,11 @@ extern "C" {
 /**
  * @brief Gets the platform-specific path to the configuration directory.
  *
- * @param path_buffer The buffer to store the path in.
- * @param buffer_size The size of the path buffer.
+ * On Linux, this follows XDG specs (e.g., ~/.config/securepasswd).
+ * On Windows, it uses %LOCALAPPDATA%/securepasswd.
+ *
+ * @param path_buffer The buffer where the absolute path will be stored.
+ * @param buffer_size The size of the path buffer (recommended at least 4096).
  */
 void get_config_path(char* path_buffer, size_t buffer_size);
 
