@@ -1,0 +1,7 @@
+<map id="gui/entrydialog.h" name="gui/entrydialog.h">
+<area shape="rect" id="Node000001" title=" " alt="" coords="99,5,231,31"/>
+<area shape="rect" id="Node000002" href="$entrydialog_8cpp.html" title=" " alt="" coords="5,79,152,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,41,95,81,91,76,139,37"/>
+<area shape="rect" id="Node000003" href="$mainwindow_8cpp.html" title=" " alt="" coords="176,79,331,104"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="192,37,241,76,237,81,188,41"/>
+</map>

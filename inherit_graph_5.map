@@ -1,0 +1,13 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,104,80,129"/>
+<area shape="rect" id="Node000001" href="$classEntryDialog.html" title=" " alt="" coords="174,5,273,31"/>
+<area shape="poly" id="edge1_Node000000_Node000001" title=" " alt="" coords="63,91,91,64,127,40,173,23,175,28,129,44,95,68,66,95"/>
+<area shape="rect" id="Node000002" href="$classHealthCheckDialog.html" title="Performs security audits on the user&#39;s password database." alt="" coords="150,55,297,80"/>
+<area shape="poly" id="edge2_Node000000_Node000002" title=" " alt="" coords="92,99,127,89,170,77,171,83,129,94,94,104"/>
+<area shape="rect" id="Node000003" href="$classPasswordDialog.html" title=" " alt="" coords="161,104,286,129"/>
+<area shape="poly" id="edge3_Node000000_Node000003" title=" " alt="" coords="94,114,160,114,160,119,94,119"/>
+<area shape="rect" id="Node000004" href="$classPasswordGeneratorDialog.html" title=" " alt="" coords="128,153,319,179"/>
+<area shape="poly" id="edge4_Node000000_Node000004" title=" " alt="" coords="94,128,129,138,175,151,173,156,127,143,93,133"/>
+<area shape="rect" id="Node000005" href="$classSyncDialog.html" title="Manages the secure mobile synchronization process." alt="" coords="176,203,271,228"/>
+<area shape="poly" id="edge5_Node000000_Node000005" title=" " alt="" coords="66,137,95,164,129,188,177,205,175,210,127,192,91,168,63,141"/>
+</map>

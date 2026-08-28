@@ -1,8 +1,8 @@
 var searchData=
 [
-  ['validation_0',['validation',['../md_SECURITY.html#autotoc_md33',1,'Input Security &amp; Validation'],['../md_SECURITY.html#autotoc_md41',1,'Password Strength Validation']]],
-  ['verification_1',['verification',['../md_docs_2TESTING.html#autotoc_md104',1,'Build Verification'],['../md_docs_2TESTING.html#autotoc_md106',1,'Security Verification']]],
-  ['verification_20summary_2',['Testing and Verification Summary',['../md_docs_2TESTING.html',1,'']]],
-  ['version_20history_3',['Version History',['../md_CHANGELOG.html#autotoc_md99',1,'']]],
-  ['vulnerabilities_4',['Reporting Security Vulnerabilities',['../md_SECURITY.html#autotoc_md44',1,'']]]
+  ['ubuntu_0',['Linux (Ubuntu)',['../index.html#autotoc_md12',1,'']]],
+  ['unit_20test_20execution_1',['Unit Test Execution',['../md_docs_2TESTING.html#autotoc_md112',1,'']]],
+  ['usage_2',['Usage',['../index.html#autotoc_md16',1,'']]],
+  ['user_20interface_20gui_3',['Graphical User Interface (GUI)',['../index.html#autotoc_md4',1,'']]],
+  ['username_4',['username',['../structPasswordEntry.html#ac010387094106edd5158adf122543d5a',1,'PasswordEntry::username'],['../structGUIPasswordEntry.html#ac952145e0b518c0fabb94d7b8d5c66d7',1,'GUIPasswordEntry::username']]]
 ];

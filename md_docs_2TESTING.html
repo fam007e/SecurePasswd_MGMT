@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2026.05.30</span>
+   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;latest</span>
    </div>
    <div id="projectbrief">A modern, cross-platform password manager and two-factor authenticator (TOTP) designed with state-of-the-art security.</div>
   </td>
@@ -73,38 +73,38 @@ $(function() {
   <div class="headertitle"><div class="title">Testing and Verification Summary</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md102"></a> </p>
-<h1><a class="anchor" id="autotoc_md103"></a>
+<div class="textblock"><p><a class="anchor" id="autotoc_md105"></a> </p>
+<h1><a class="anchor" id="autotoc_md106"></a>
 Overview</h1>
 <p>This document provides a summary of the testing and verification performed for the current hardened release of SecurePasswd_MGMT.</p>
-<h1><a class="anchor" id="autotoc_md104"></a>
+<h1><a class="anchor" id="autotoc_md107"></a>
 Build Verification</h1>
-<h2><a class="anchor" id="autotoc_md105"></a>
+<h2><a class="anchor" id="autotoc_md108"></a>
 Build Status: ✓ PASS (Multi-Platform)</h2>
 <p>The project is verified to build and pass all tests on:</p><ul>
 <li><b>Linux (Ubuntu/Arch):</b> GCC &amp; Clang</li>
 <li><b>Windows (10/11):</b> MSVC 2022 via vcpkg</li>
 <li><b>macOS:</b> Clang via Homebrew</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md106"></a>
+<h1><a class="anchor" id="autotoc_md109"></a>
 Security Verification</h1>
-<h2><a class="anchor" id="autotoc_md107"></a>
+<h2><a class="anchor" id="autotoc_md110"></a>
 Static Analysis</h2>
 <ul>
 <li><b>Flawfinder:</b> <b>0 Hits</b> in source directories (audited baseline). 280+ manual overrides were replaced with structural security hardening.</li>
 <li><b>Cppcheck:</b> <b>0 Warnings</b>. Exhaustive analysis confirms safe code patterns and resolved include dependencies.</li>
 <li><b>CodeQL:</b> <b>✓ PASS</b>. Intentional cleartext storage in the user-triggered export feature has been audited and suppressed.</li>
 </ul>
-<h2><a class="anchor" id="autotoc_md108"></a>
+<h2><a class="anchor" id="autotoc_md111"></a>
 Dynamic Analysis (Sanitizers)</h2>
 <ul>
 <li><b>AddressSanitizer (ASan):</b> <b>✓ PASS</b>. Zero memory leaks or out-of-bounds accesses detected across the entire test suite.</li>
 <li><b>UndefinedBehaviorSanitizer (UBSan):</b> <b>✓ PASS</b>. Zero instances of undefined behavior detected.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md109"></a>
+<h1><a class="anchor" id="autotoc_md112"></a>
 Unit Test Execution</h1>
 <p>Unit tests are executed automatically on every Pull Request using GitHub Actions across all three major platforms.</p>
-<h2><a class="anchor" id="autotoc_md110"></a>
+<h2><a class="anchor" id="autotoc_md113"></a>
 Test Summary</h2>
 <div class="fragment"><div class="line">Test project /home/fam007e/Github/SecurePasswd_MGMT/build</div>
 <div class="line">      Start  1: CoreTests</div>
@@ -113,7 +113,7 @@ Test Summary</h2>
 <div class="line"> 2/2 Test  #2: CMockaTests ......................   Passed    0.05 sec</div>
 <div class="line"> </div>
 <div class="line">100% tests passed, 0 tests failed out of 2 (Total 19 sub-tests)</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md111"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md114"></a>
 Core Tests (&lt;tt&gt;./core_tests&lt;/tt&gt;)</h2>
 <p>Verified functionalities include:</p><ul>
 <li><b>Database Lifecycle:</b> Open, Create, Wrong Key Detection.</li>
@@ -122,7 +122,7 @@ Core Tests (&lt;tt&gt;./core_tests&lt;/tt&gt;)</h2>
 <li><b>Identity Retrieval:</b> Duplicate detection for secure imports.</li>
 <li><b>TOTP:</b> RFC 6238 compliant code generation.</li>
 </ul>
-<h1><a class="anchor" id="autotoc_md112"></a>
+<h1><a class="anchor" id="autotoc_md115"></a>
 Test Environment (CI Baseline)</h1>
 <p><b>Operating Systems:</b> Linux (ubuntu-latest), Windows (windows-latest), macOS (macos-latest) <b>Compilers:</b> GCC 13+, MSVC 19+, AppleClang 15+ <b>Dependencies:</b> SQLCipher 4.x, Libsodium 1.0.18+, Argon2 2019+, libcsv 3.0+</p>
 <hr  />

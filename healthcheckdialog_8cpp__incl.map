@@ -1,0 +1,35 @@
+<map id="gui/healthcheckdialog.cpp" name="gui/healthcheckdialog.cpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="740,5,932,31"/>
+<area shape="rect" id="Node000002" href="$healthcheckdialog_8h.html" title=" " alt="" coords="126,79,279,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="740,32,293,81,293,76,740,27"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="303,79,414,104"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="753,33,428,81,427,76,753,28"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="438,79,543,104"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="781,33,558,79,557,74,780,28"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="567,79,678,104"/>
+<area shape="poly" id="edge9_Node000001_Node000010" title=" " alt="" coords="803,33,671,77,669,72,801,28"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="702,79,845,104"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="828,33,795,70,791,66,824,29"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="869,79,929,104"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="848,29,881,66,877,70,844,33"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="953,79,1151,104"/>
+<area shape="poly" id="edge12_Node000001_Node000013" title=" " alt="" coords="872,28,1005,72,1003,77,870,33"/>
+<area shape="rect" id="Node000014" title=" " alt="" coords="1175,79,1241,104"/>
+<area shape="poly" id="edge13_Node000001_Node000014" title=" " alt="" coords="907,28,1161,76,1160,81,906,33"/>
+<area shape="rect" id="Node000015" href="$pwned__check_8h.html" title=" " alt="" coords="1265,79,1388,104"/>
+<area shape="poly" id="edge14_Node000001_Node000015" title=" " alt="" coords="918,28,1252,76,1251,81,918,33"/>
+<area shape="rect" id="Node000016" href="$database_8h.html" title=" " alt="" coords="1413,79,1507,104"/>
+<area shape="poly" id="edge15_Node000001_Node000016" title=" " alt="" coords="932,24,1142,44,1399,76,1398,81,1142,50,932,30"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="5,152,80,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="178,106,82,149,80,144,176,102"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="105,152,178,177"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="195,106,162,143,158,140,191,103"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="202,152,329,177"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="215,103,248,140,244,143,211,106"/>
+<area shape="rect" id="Node000006" href="$passwordentry_8h.html" title=" " alt="" coords="353,152,481,177"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="238,101,370,145,369,150,236,107"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="382,225,453,251"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="420,178,420,212,415,212,415,178"/>
+<area shape="rect" id="Node000017" title=" " alt="" coords="1423,152,1497,177"/>
+<area shape="poly" id="edge16_Node000016_Node000017" title=" " alt="" coords="1463,104,1463,138,1457,138,1457,104"/>
+</map>

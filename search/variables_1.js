@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['db_0',['db',['../database_8c.html#ad6e663497d2c934364b3bcf07496b30b',1,'database.c']]]
+  ['byte_0',['BYTE',['../classqrcodegen_1_1QrSegment_1_1Mode.html#a4015444043af5e53c8226e694d635a8f',1,'qrcodegen::QrSegment::Mode']]]
 ];

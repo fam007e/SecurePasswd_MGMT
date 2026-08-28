@@ -21,7 +21,7 @@
  <tbody>
  <tr id="projectrow">
   <td id="projectalign">
-   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;2026.05.30</span>
+   <div id="projectname">SecurePasswd_MGMT<span id="projectnumber">&#160;latest</span>
    </div>
    <div id="projectbrief">A modern, cross-platform password manager and two-factor authenticator (TOTP) designed with state-of-the-art security.</div>
   </td>
@@ -95,10 +95,10 @@ Include dependency graph for sync_service.c:</div>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a282c8efccb953d64e16e3394af1a1f98" id="r_a282c8efccb953d64e16e3394af1a1f98"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sync__service_8c.html#a282c8efccb953d64e16e3394af1a1f98">sync_encrypt_vault</a> (const char *db_path, unsigned char *output_buffer, size_t *output_size, const unsigned char key[<a class="el" href="sync__service_8h.html#ae08a140233b2de8b24e4ba7967c4bf2a">SYNC_KEY_LEN</a>])</td></tr>
-<tr class="memdesc:a282c8efccb953d64e16e3394af1a1f98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypts the database and salt for sync.  <br /></td></tr>
+<tr class="memdesc:a282c8efccb953d64e16e3394af1a1f98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encrypts the database and salt into a single package for mobile synchronization.  <br /></td></tr>
 <tr class="separator:a282c8efccb953d64e16e3394af1a1f98"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abce18545611bf6817b55518f3ea649b9" id="r_abce18545611bf6817b55518f3ea649b9"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sync__service_8c.html#abce18545611bf6817b55518f3ea649b9">sync_decrypt_vault</a> (const unsigned char *encrypted_data, size_t data_len, const char *db_path, const unsigned char key[<a class="el" href="sync__service_8h.html#ae08a140233b2de8b24e4ba7967c4bf2a">SYNC_KEY_LEN</a>])</td></tr>
-<tr class="memdesc:abce18545611bf6817b55518f3ea649b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypts the received data and restores vault/salt.  <br /></td></tr>
+<tr class="memdesc:abce18545611bf6817b55518f3ea649b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decrypts a received sync package and restores the database and salt files.  <br /></td></tr>
 <tr class="separator:abce18545611bf6817b55518f3ea649b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
@@ -140,7 +140,17 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Decrypts the received data and restores vault/salt. </p>
+<p>Decrypts a received sync package and restores the database and salt files. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">encrypted_data</td><td>The received encrypted package data. </td></tr>
+    <tr><td class="paramname">data_len</td><td>The length of the encrypted data. </td></tr>
+    <tr><td class="paramname">db_path</td><td>Path where the database should be restored (salt path is derived). </td></tr>
+    <tr><td class="paramname">key</td><td>The 32-byte synchronization key used for encryption. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 on success, -1 on error. </dd></dl>
 
 </div>
 </div>
@@ -182,7 +192,18 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>Encrypts the database and salt for sync. </p>
+<p>Encrypts the database and salt into a single package for mobile synchronization. </p>
+<p>This function packs the vault.db and vault.db.salt files together, then encrypts the package using Chacha20-Poly1305 authenticated encryption.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">db_path</td><td>Path to the database file (the salt path is derived from this). </td></tr>
+    <tr><td class="paramname">output_buffer</td><td>Buffer where the encrypted package will be stored. </td></tr>
+    <tr><td class="paramname">output_size</td><td>Pointer to store the size of the generated package. </td></tr>
+    <tr><td class="paramname">key</td><td>The 32-byte synchronization key. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>0 on success, -1 on error. </dd></dl>
 
 </div>
 </div>
