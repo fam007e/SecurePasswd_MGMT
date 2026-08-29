@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.21)
 # Check if version is provided from command line (for releases)
 # Otherwise use default version for local builds
 if(NOT DEFINED PROJECT_VERSION)
-    set(PROJECT_VERSION "2026.05.30")
+    set(PROJECT_VERSION "2026.06.05")
 endif()
 
 
@@ -113,20 +113,22 @@ else()
     set(CPACK_GENERATOR "DEB;RPM;TGZ")
 endif()
 set(CPACK_PACKAGE_CONTACT "fam007e <faisalmoshiur+secpasswdmgmt@gmail.com>")
+set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.com/fam007e/SecurePasswd_MGMT")
 set(CPACK_DEBIAN_PACKAGE_MAINTAINER "fam007e")
 set(CPACK_DEBIAN_PACKAGE_SECTION "utils")
 set(CPACK_DEBIAN_PACKAGE_PRIORITY "optional")
-set(CPACK_DEBIAN_PACKAGE_DEPENDS
-    "libsodium26 | libsodium23 | libsodium18, \
-libargon2-1, \
-libsqlcipher2 | libsqlcipher1 | libsqlcipher0, \
-libssl3t64 | libssl3 | libssl1.1, \
-libcurl4t64 | libcurl4, \
-libcsv3, \
-libqt6widgets6 (>= 6.2.0), \
-libqt6svg6 (>= 6.2.0), \
-libqt6network6 (>= 6.2.0)"
-)
+set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/fam007e/SecurePasswd_MGMT")
+
+# Auto-resolve real runtime deps/versions from the built binaries instead of
+# a hand-written list (previous list mixed ABI-incompatible fallbacks, e.g.
+# libssl1.1 alongside libssl3). Requires dpkg-dev + file on the build host.
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS TRUE)
+
+# Qt's SVG icon rendering is plugin-loaded at runtime, not link-time, so
+# shlibdeps can't see it. libqt6svg6t64/libqt6svg6 is a same-ABI rename
+# across Debian/Ubuntu's time_t transition -- legitimate OR-alternative.
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6svg6t64 | libqt6svg6")
+
 set(CPACK_RPM_PACKAGE_GROUP "Utilities")
 set(CPACK_NSIS_PACKAGE_NAME "${PROJECT_NAME} ${CPACK_PACKAGE_VERSION}")
 set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")

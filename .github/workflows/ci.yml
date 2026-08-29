@@ -30,8 +30,8 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt-get install -y build-essential cmake libsodium-dev libargon2-dev \
-          libsqlcipher-dev libcsv-dev qt6-base-dev libqt6svg6-dev libssl-dev \
-          libcurl4-openssl-dev libcmocka-dev cppcheck
+          libsqlcipher-dev libcsv-dev qt6-base-dev libqt6svg6-dev libssl-dev libcurl4-openssl-dev \
+          libcmocka-dev cppcheck dpkg-dev file
 
     # --- Windows Dependencies (vcpkg) ---
     - name: Cache vcpkg (Windows)
