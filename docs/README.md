@@ -32,7 +32,7 @@ Security policy documenting:
 ### CHANGELOG.md
 Version history following Keep a Changelog format, documenting all fixes, changes, additions, and security enhancements.
 
-### CONTRIBUTION.md
+### CONTRIBUTING.md
 Guidelines for contributing to the project, including security-focused development practices, code review process, and testing requirements.
 
 ## Quick Reference

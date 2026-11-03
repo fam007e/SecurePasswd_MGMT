@@ -139,14 +139,19 @@ static void test_database_search_and_identity() {
 static void test_totp_generation() {
     fputs("--- Running Test: TOTP Generation ---\n", stdout);
     // Test vector from RFC 6238 for SHA1
-    // Secret: "12345678901234567890"
     // Time: 59
     // Expected code: 287082
-    // Base32 of secret: GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ
     char* code = generate_totp_code_at_time("GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ", 59);
+    assert(code != NULL);
     assert(strcmp(code, "287082") == 0);
     fputs("  [PASSED] TOTP generation matches RFC 6238 test vector\n", stdout);
     free(code);
+
+    // Empty or non-base32 secrets must return NULL
+    assert(generate_totp_code_at_time("", 59) == NULL);
+    assert(generate_totp_code_at_time("   ", 59) == NULL);
+    assert(generate_totp_code_at_time("!@#$%", 59) == NULL);
+    fputs("  [PASSED] Invalid and empty TOTP secrets return NULL\n", stdout);
     fputs("--- Test Complete ---\n\n", stdout);
 }
 

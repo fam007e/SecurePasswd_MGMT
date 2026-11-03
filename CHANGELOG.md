@@ -5,6 +5,23 @@ All notable changes to SecurePasswd_MGMT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to date-based versioning (YYYY.MM.DD).
 
+## [2026.11.03]
+
+### Added
+- **OSSign Code Signing Automation:** Added `.github/workflows/request-signing.yml` to trigger automated Authenticode code signing via OSSign trusted workflows on version tag releases.
+- **CPack License Resource:** Added `CPACK_RESOURCE_FILE_LICENSE` to display the project license during Windows NSIS installer setup.
+- **Seamless Windows Upgrades:** Configured `CPACK_PACKAGE_INSTALL_DIRECTORY` and `CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL` in `CMakeLists.txt` to replace older versions cleanly and prevent duplicate directory accumulation.
+
+### Changed
+- **Dependencies Baseline:** Updated vcpkg `builtin-baseline` to release `2026.10.16` (`9eec002df1cd109f8f104cd966a763daf9751489`) for latest security patches across OpenSSL, curl, and SQLCipher.
+- **Issue & PR Templates:** Hardened GitHub issue templates and pull request templates, removing generic mobile/web fields in favor of desktop-specific diagnostics (CLI/GUI, OS, install package).
+- **Discord Notification Workflow:** Hardened webhook payloads with `allowed_mentions` protection, link markdown sanitization, and graceful skips on forks.
+
+### Fixed
+- **Uninstaller Start Menu Leftovers:** Corrected NSIS icon deletion variable to `$MUI_TEMP` in `CPACK_NSIS_DELETE_ICONS_EXTRA`, ensuring Start Menu shortcuts and folders are completely removed upon uninstallation.
+- **TOTP Empty/Invalid Key Handling:** Fixed `generate_totp_code_at_time` in `core/totp.c` to reject zero-length and non-base32 secrets, preventing spurious TOTP codes from displaying for entries without a 2FA secret.
+- **CI Dependency Consistency:** Aligned Windows vcpkg setup in `.github/workflows/release.yml` with the manifest's `builtin-baseline`.
+
 ## [2026.06.05]
 
 ### Added

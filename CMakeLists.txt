@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.21)
 # Check if version is provided from command line (for releases)
 # Otherwise use default version for local builds
 if(NOT DEFINED PROJECT_VERSION)
-    set(PROJECT_VERSION "2026.06.05")
+    set(PROJECT_VERSION "2026.11.03")
 endif()
 
 
@@ -106,6 +106,7 @@ add_subdirectory(tests)
 set(CPACK_PACKAGE_NAME "SecurePasswd_MGMT")
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
 set(CPACK_PACKAGE_FILE_NAME "SecurePasswd_MGMT-${CPACK_PACKAGE_VERSION}")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
 
 if(BUILD_GUI)
     set(CPACK_GENERATOR "DEB;RPM;NSIS")
@@ -130,25 +131,26 @@ set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS TRUE)
 set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqt6svg6t64 | libqt6svg6")
 
 set(CPACK_RPM_PACKAGE_GROUP "Utilities")
-set(CPACK_NSIS_PACKAGE_NAME "${PROJECT_NAME} ${CPACK_PACKAGE_VERSION}")
+
+# NSIS Windows packaging settings
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "SecurePasswd_MGMT")
+set(CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL ON)
 set(CPACK_NSIS_INSTALL_ROOT "$PROGRAMFILES64")
 set(CPACK_NSIS_MUI_ICON "${CMAKE_CURRENT_SOURCE_DIR}/gui/icons/app_icon.ico")
 set(CPACK_NSIS_MUI_UNIICON "${CMAKE_CURRENT_SOURCE_DIR}/gui/icons/app_icon.ico")
-
 set(CPACK_NSIS_PACKAGE_NAME "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION}")
 set(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_NAME}")
 set(CPACK_NSIS_PROGRAM_GROUP "SecurePasswd MGMT")
 
 # NSIS shortcuts
+# Note: Uninstall.lnk is created and deleted automatically by NSIS.template.in
 if(BUILD_GUI)
     set(CPACK_NSIS_CREATE_ICONS_EXTRA
         "CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\SecurePasswd MGMT.lnk' '$INSTDIR\\\\${CMAKE_INSTALL_BINDIR}\\\\securepasswd_gui.exe'"
-        "CreateShortCut '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\Uninstall.lnk' '$INSTDIR\\\\uninstall.exe'"
     )
 
     set(CPACK_NSIS_DELETE_ICONS_EXTRA
-        "Delete '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\SecurePasswd MGMT.lnk'"
-        "Delete '$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\Uninstall.lnk'"
+        "Delete '$SMPROGRAMS\\\\$MUI_TEMP\\\\SecurePasswd MGMT.lnk'"
     )
 endif()
 
