@@ -70,7 +70,11 @@ jobs:
         shell: pwsh
         run: |
           if (-not (Test-Path "${{ github.workspace }}/vcpkg")) {
+            $baseline = (Get-Content vcpkg.json -Raw | ConvertFrom-Json).'builtin-baseline'
             git clone https://github.com/microsoft/vcpkg.git "${{ github.workspace }}/vcpkg"
+            if ($baseline) {
+              git -C "${{ github.workspace }}/vcpkg" checkout --detach $baseline
+            }
             & "${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat" -disableMetrics
           }
       - name: Install vcpkg dependencies

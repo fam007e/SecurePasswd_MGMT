@@ -1,30 +1,26 @@
+---
+name: Feature Request
+about: Suggest an idea or enhancement for SecurePasswd_MGMT
+title: '[Feature]: '
+labels: enhancement
+assignees: ''
+---
+
 ## Feature Description
 A clear and concise description of the proposed feature.
 
 ## Problem Statement
-What problem does this feature solve?
+What problem or limitation does this feature solve?
 
 ## Proposed Solution
-How should this feature work?
-
-## Alternatives Considered
-Alternative approaches you've considered.
-
-## Use Cases
-- Use case 1: Description
-- Use case 2: Description
-- Use case 3: Description
+How should this feature work from a user or architectural perspective?
 
 ## Security Considerations
-- Does this feature introduce new attack vectors?
-- Are there privacy implications?
-- What are the security requirements?
+- Does this feature touch cryptographic keys or plaintext passwords?
+- Does it introduce new network dependencies or external attack vectors?
 
-## Implementation Complexity
-- [ ] Simple (minor addition)
-- [ ] Moderate (requires some refactoring)
-- [ ] Complex (significant architecture changes)
-- [ ] Major (fundamental changes required)
+## Alternatives Considered
+Alternative approaches or workflows you have considered.
 
 ## Additional Context
-Any other context, mockups, or examples.
+Any mockups, CLI syntax examples, or references.

@@ -1,38 +1,30 @@
 ---
-name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
+name: Bug Report
+about: Report a reproducible bug in SecurePasswd_MGMT
+title: '[Bug]: '
+labels: bug
 assignees: ''
-
 ---
 
-**Describe the bug**
+## Describe the Bug
 A clear and concise description of what the bug is.
 
-**To Reproduce**
-Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+## Steps to Reproduce
+1. Run command or open window '...'
+2. Perform action '....'
+3. See error or crash
 
-**Expected behavior**
+## Expected Behavior
 A clear and concise description of what you expected to happen.
 
-**Screenshots**
-If applicable, add screenshots to help explain your problem.
+## Environment
+- **App Version:** (e.g., 2026.11.03 or git commit)
+- **Component:** [CLI / GUI]
+- **OS & Version:** [e.g., Windows 11, Ubuntu 24.04, Arch Linux, macOS 14]
+- **Installation Method:** [e.g., NSIS Installer, DEB package, RPM package, built from source]
 
-**Desktop (please complete the following information):**
- - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
- - Version [e.g. 22]
+## Logs / Screenshots
+If applicable, add console output, error logs, or screenshots.
 
-**Smartphone (please complete the following information):**
- - Device: [e.g. iPhone6]
- - OS: [e.g. iOS8.1]
- - Browser [e.g. stock browser, safari]
- - Version [e.g. 22]
-
-**Additional context**
-Add any other context about the problem here.
+## Additional Context
+Add any other context about the problem here (e.g., SQLCipher error, Qt plugin issue).

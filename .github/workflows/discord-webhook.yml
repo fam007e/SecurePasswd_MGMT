@@ -62,10 +62,22 @@ jobs:
           # Secrets
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
+          # Fork PRs and Dependabot runs do not receive secrets. Skip instead of failing.
           if [ -z "$DISCORD_WEBHOOK_URL" ]; then
-            echo "Error: DISCORD_WEBHOOK_URL secret is not set"
-            exit 1
+            echo "::warning::DISCORD_WEBHOOK_URL is empty (fork PR, Dependabot, or secret not set). Skipping notification."
+            exit 0
           fi
+
+          # Untrusted text goes into Markdown links: drop characters that can break
+          # out of the link syntax, strip newlines, and cap the length.
+          sanitize() {
+            printf '%s' "$1" | tr -d '[]()\r\n' | cut -c1-200
+          }
+
+          PR_TITLE=$(sanitize "$PR_TITLE")
+          ISSUE_TITLE=$(sanitize "$ISSUE_TITLE")
+          RELEASE_NAME=$(sanitize "$RELEASE_NAME")
+          RELEASE_TAG=$(sanitize "$RELEASE_TAG")
 
           CONTENT=""
 
@@ -120,7 +132,10 @@ jobs:
           esac
 
           if [ -n "$CONTENT" ]; then
-            PAYLOAD=$(jq -n --arg content "$CONTENT" '{"content": $content}')
+            # allowed_mentions.parse = [] stops @everyone, @here and role/user pings
+            # coming from titles or other user-controlled text.
+            PAYLOAD=$(jq -n --arg content "$CONTENT" \
+              '{"content": $content, "allowed_mentions": {"parse": []}}')
             curl -sfS -X POST \
                  -H "Content-Type: application/json" \
                  -d "$PAYLOAD" \
