@@ -1,6 +1,12 @@
 var searchData=
 [
-  ['securepasswd_5fmgmt_0',['securepasswd_mgmt',['../md_CONTRIBUTING.html',1,'Contributing to SecurePasswd_MGMT'],['../index.html',1,'SecurePasswd_MGMT']]],
-  ['security_20policy_1',['Security Policy',['../md_SECURITY.html',1,'']]],
-  ['summary_2',['Testing and Verification Summary',['../md_docs_2TESTING.html',1,'']]]
+  ['acknowledgements_0',['Acknowledgements',['../md_AUTHORS.html#autotoc_md62',1,'']]],
+  ['added_1',['Added',['../md_CHANGELOG.html#autotoc_md65',1,'Added'],['../md_CHANGELOG.html#autotoc_md69',1,'Added'],['../md_CHANGELOG.html#autotoc_md76',1,'Added'],['../md_CHANGELOG.html#autotoc_md82',1,'Added'],['../md_CHANGELOG.html#autotoc_md88',1,'Added'],['../md_CHANGELOG.html#autotoc_md93',1,'Added'],['../md_CHANGELOG.html#autotoc_md97',1,'Added'],['../md_CHANGELOG.html#autotoc_md102',1,'Added']]],
+  ['analysis_2',['Static Analysis',['../md_docs_2TESTING.html#autotoc_md114',1,'']]],
+  ['analysis_20sanitizers_3',['Dynamic Analysis (Sanitizers)',['../md_docs_2TESTING.html#autotoc_md115',1,'']]],
+  ['and_20verification_20summary_4',['Testing and Verification Summary',['../md_docs_2TESTING.html',1,'']]],
+  ['api_20documentation_5',['API Documentation',['../index.html#autotoc_md21',1,'']]],
+  ['application_6',['GUI Application',['../index.html#autotoc_md17',1,'']]],
+  ['attribution_7',['Attribution',['../md_CODE__OF__CONDUCT.html#autotoc_md58',1,'']]],
+  ['authors_8',['Authors',['../md_AUTHORS.html',1,'']]]
 ];

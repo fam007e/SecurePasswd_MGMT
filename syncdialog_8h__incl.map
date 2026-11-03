@@ -1,9 +1,9 @@
 <map id="gui/syncdialog.h" name="gui/syncdialog.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="88,5,216,31"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,79,80,104"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="136,33,74,73,71,69,133,28"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="105,79,199,104"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="155,31,155,65,149,65,149,31"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="224,79,320,104"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="173,28,242,69,239,74,170,33"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="86,5,214,33"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,81,79,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="133,33,75,74,72,70,128,34"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="103,81,197,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="152,32,152,67,148,64,148,36"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="221,81,316,109"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="172,31,238,72,232,73,170,36"/>
 </map>

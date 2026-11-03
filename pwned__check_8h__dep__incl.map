@@ -1,9 +1,9 @@
 <map id="core/pwned_check.h" name="core/pwned_check.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="115,5,269,31"/>
-<area shape="rect" id="Node000002" href="$main_8c.html" title=" " alt="" coords="5,79,91,104"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="158,39,73,81,70,76,156,34"/>
-<area shape="rect" id="Node000003" href="$pwned__check_8c.html" title=" " alt="" coords="115,79,269,104"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="195,44,195,79,189,79,189,44"/>
-<area shape="rect" id="Node000004" href="$healthcheckdialog_8cpp.html" title=" " alt="" coords="293,79,485,104"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="237,33,358,76,356,81,236,38"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="114,5,267,33"/>
+<area shape="rect" id="Node000002" href="$main_8c.html" title=" " alt="" coords="5,81,90,109"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="153,43,74,83,72,78,150,38"/>
+<area shape="rect" id="Node000003" href="$pwned__check_8c.html" title=" " alt="" coords="114,81,266,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="192,47,192,82,188,79,188,51"/>
+<area shape="rect" id="Node000004" href="$healthcheckdialog_8cpp.html" title=" " alt="" coords="290,81,482,109"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="240,36,354,80,349,81,239,41"/>
 </map>

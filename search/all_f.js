@@ -1,10 +1,10 @@
 var searchData=
 [
   ['macos_0',['macOS',['../index.html#autotoc_md14',1,'']]],
-  ['main_1',['main',['../main_8c.html#a0ddf1224851353fc92bfbff6f499fa97',1,'main(int argc, char *argv[]):&#160;main.c'],['../main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97',1,'main(int argc, char *argv[]):&#160;main.cpp']]],
+  ['main_1',['main',['../main_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97',1,'main(int argc, char *argv[]):&#160;main.cpp'],['../main_8c.html#a0ddf1224851353fc92bfbff6f499fa97',1,'main(int argc, char *argv[]):&#160;main.c']]],
   ['main_2ec_2',['main.c',['../main_8c.html',1,'']]],
   ['main_2ecpp_3',['main.cpp',['../main_8cpp.html',1,'']]],
-  ['mainwindow_4',['mainwindow',['../classMainWindow.html',1,'MainWindow'],['../classMainWindow.html#a5ba411f4e7ebde4420e0016ed3858383',1,'MainWindow::MainWindow()']]],
+  ['mainwindow_4',['MainWindow',['../classMainWindow.html',1,'MainWindow'],['../classMainWindow.html#a5ba411f4e7ebde4420e0016ed3858383',1,'MainWindow::MainWindow()']]],
   ['mainwindow_2ecpp_5',['mainwindow.cpp',['../mainwindow_8cpp.html',1,'']]],
   ['mainwindow_2eh_6',['mainwindow.h',['../mainwindow_8h.html',1,'']]],
   ['makealphanumeric_7',['makeAlphanumeric',['../classqrcodegen_1_1QrSegment.html#ae2d00f78a60165d70faf5b56e36ae511',1,'qrcodegen::QrSegment']]],
@@ -22,5 +22,5 @@ var searchData=
   ['memorystruct_19',['MemoryStruct',['../structMemoryStruct.html',1,'']]],
   ['min_5fversion_20',['MIN_VERSION',['../classqrcodegen_1_1QrCode.html#a49443c1e43f8c73b6a5c6069c6b24bd4',1,'qrcodegen::QrCode']]],
   ['mode_21',['Mode',['../classqrcodegen_1_1QrSegment_1_1Mode.html',1,'qrcodegen::QrSegment']]],
-  ['multi_20platform_22',['Build Status: ✓ PASS (Multi-Platform)',['../md_docs_2TESTING.html#autotoc_md108',1,'']]]
+  ['multi_20platform_22',['Build Status: ✓ PASS (Multi-Platform)',['../md_docs_2TESTING.html#autotoc_md112',1,'']]]
 ];

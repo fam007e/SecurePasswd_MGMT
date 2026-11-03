@@ -1,12 +1,12 @@
 var searchData=
 [
-  ['id_0',['id',['../structGUIPasswordEntry.html#a70219318c098610858dc1c97e6a2aaf7',1,'GUIPasswordEntry::id'],['../structPasswordEntry.html#ac0bc3c60a0046116adcf17fbdcbcadbd',1,'PasswordEntry::id']]],
+  ['id_0',['id',['../structPasswordEntry.html#ac0bc3c60a0046116adcf17fbdcbcadbd',1,'PasswordEntry::id'],['../structGUIPasswordEntry.html#a70219318c098610858dc1c97e6a2aaf7',1,'GUIPasswordEntry::id']]],
   ['implementation_1',['Cryptographic Implementation',['../md_SECURITY.html#autotoc_md28',1,'']]],
   ['import_5ffield_5fcb_2',['import_field_cb',['../mainwindow_8cpp.html#a841d8584f5d5a9a100dcc55bc451342b',1,'mainwindow.cpp']]],
   ['import_5frow_5fcb_3',['import_row_cb',['../mainwindow_8cpp.html#a59ab84ca17b6f1284d4bf2b3341ef029',1,'mainwindow.cpp']]],
-  ['initialization_20wiping_4',['Zero-Initialization &amp; Wiping',['../md_SECURITY.html#autotoc_md38',1,'']]],
+  ['initialization_20wiping_4',['Zero-Initialization &amp;amp; Wiping',['../md_SECURITY.html#autotoc_md38',1,'']]],
   ['initialize_5fschema_5',['initialize_schema',['../database_8c.html#a2cb69ec8c2737785c2498ccb4d83f0c6',1,'database.c']]],
-  ['input_20security_20validation_6',['Input Security &amp; Validation',['../md_SECURITY.html#autotoc_md33',1,'']]],
+  ['input_20security_20validation_6',['Input Security &amp;amp; Validation',['../md_SECURITY.html#autotoc_md33',1,'']]],
   ['installation_7',['Installation',['../index.html#autotoc_md9',1,'']]],
   ['installation_20of_20dependencies_8',['Installation of Dependencies',['../index.html#autotoc_md8',1,'']]],
   ['integration_9',['Desktop Integration',['../index.html#autotoc_md6',1,'']]],

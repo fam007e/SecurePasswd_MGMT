@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['policy_0',['Security Policy',['../md_SECURITY.html',1,'']]]
+  ['30_0',['[2026.05.30]',['../md_CHANGELOG.html#autotoc_md71',1,'']]]
 ];

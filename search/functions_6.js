@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['generate_5fpassword_0',['generate_password',['../password__generator_8h.html#a4e88bb16c8a4bba1c78bdc22dd948d88',1,'generate_password(int len, bool upper, bool num, bool special):&#160;password_generator.c'],['../password__generator_8c.html#a4e88bb16c8a4bba1c78bdc22dd948d88',1,'generate_password(int len, bool upper, bool num, bool special):&#160;password_generator.c']]],
-  ['generate_5ftotp_5fcode_1',['generate_totp_code',['../totp_8h.html#ae7b45510f140fc84bc09c5a0ea37fe41',1,'generate_totp_code(const char *base32_secret):&#160;totp.c'],['../totp_8c.html#ae7b45510f140fc84bc09c5a0ea37fe41',1,'generate_totp_code(const char *base32_secret):&#160;totp.c']]],
-  ['generate_5ftotp_5fcode_5fat_5ftime_2',['generate_totp_code_at_time',['../totp_8h.html#a6ceb43e00d5e209c20dbbbfa85f5fd3a',1,'generate_totp_code_at_time(const char *base32_secret, time_t current_time):&#160;totp.c'],['../totp_8c.html#a6ceb43e00d5e209c20dbbbfa85f5fd3a',1,'generate_totp_code_at_time(const char *base32_secret, time_t current_time):&#160;totp.c']]],
-  ['get_5fconfig_5fpath_3',['get_config_path',['../platform__paths_8h.html#a5408f47085a6362de329e9a12058b192',1,'get_config_path(char *path_buffer, size_t buffer_size):&#160;platform_paths.c'],['../platform__paths_8c.html#a5408f47085a6362de329e9a12058b192',1,'get_config_path(char *path_buffer, size_t buffer_size):&#160;platform_paths.c']]],
+  ['generate_5fpassword_0',['generate_password',['../password__generator_8c.html#a4e88bb16c8a4bba1c78bdc22dd948d88',1,'generate_password(int len, bool upper, bool num, bool special):&#160;password_generator.c'],['../password__generator_8h.html#a4e88bb16c8a4bba1c78bdc22dd948d88',1,'generate_password(int len, bool upper, bool num, bool special):&#160;password_generator.c']]],
+  ['generate_5ftotp_5fcode_1',['generate_totp_code',['../totp_8c.html#ae7b45510f140fc84bc09c5a0ea37fe41',1,'generate_totp_code(const char *base32_secret):&#160;totp.c'],['../totp_8h.html#ae7b45510f140fc84bc09c5a0ea37fe41',1,'generate_totp_code(const char *base32_secret):&#160;totp.c']]],
+  ['generate_5ftotp_5fcode_5fat_5ftime_2',['generate_totp_code_at_time',['../totp_8c.html#a6ceb43e00d5e209c20dbbbfa85f5fd3a',1,'generate_totp_code_at_time(const char *base32_secret, time_t current_time):&#160;totp.c'],['../totp_8h.html#a6ceb43e00d5e209c20dbbbfa85f5fd3a',1,'generate_totp_code_at_time(const char *base32_secret, time_t current_time):&#160;totp.c']]],
+  ['get_5fconfig_5fpath_3',['get_config_path',['../platform__paths_8c.html#a5408f47085a6362de329e9a12058b192',1,'get_config_path(char *path_buffer, size_t buffer_size):&#160;platform_paths.c'],['../platform__paths_8h.html#a5408f47085a6362de329e9a12058b192',1,'get_config_path(char *path_buffer, size_t buffer_size):&#160;platform_paths.c']]],
   ['getdata_4',['getData',['../classqrcodegen_1_1QrSegment.html#ac805cd86c99c0871fd16e5d49fc4517a',1,'qrcodegen::QrSegment']]],
   ['geterrorcorrectionlevel_5',['getErrorCorrectionLevel',['../classqrcodegen_1_1QrCode.html#a158bfeb79b33f0f7c7325d60a50f5404',1,'qrcodegen::QrCode']]],
   ['getlength_6',['getLength',['../classPasswordGeneratorDialog.html#a292eb29b00d3f10b10671acf4a974a25',1,'PasswordGeneratorDialog']]],
@@ -12,7 +12,7 @@ var searchData=
   ['getmodebits_9',['getModeBits',['../classqrcodegen_1_1QrSegment_1_1Mode.html#a0bf62a8b741691614a85c5ed2180a85f',1,'qrcodegen::QrSegment::Mode']]],
   ['getmodule_10',['getModule',['../classqrcodegen_1_1QrCode.html#a729c17d33f13d21fb8295c04ef465133',1,'qrcodegen::QrCode']]],
   ['getnumchars_11',['getNumChars',['../classqrcodegen_1_1QrSegment.html#a5cfeb0667c8986782e76f013372b2de3',1,'qrcodegen::QrSegment']]],
-  ['getpassword_12',['getpassword',['../classEntryDialog.html#a185a1196bf7bf29b77a84a860a3134ae',1,'EntryDialog::getPassword()'],['../classPasswordDialog.html#ad5ed21e093c463d41f8eb6d9a490d789',1,'PasswordDialog::getPassword()']]],
+  ['getpassword_12',['getPassword',['../classEntryDialog.html#a185a1196bf7bf29b77a84a860a3134ae',1,'EntryDialog::getPassword()'],['../classPasswordDialog.html#ad5ed21e093c463d41f8eb6d9a490d789',1,'PasswordDialog::getPassword()']]],
   ['getrecoverycodes_13',['getRecoveryCodes',['../classEntryDialog.html#a2fd3520d26bffbb5f905c71dd2a980dd',1,'EntryDialog']]],
   ['getservice_14',['getService',['../classEntryDialog.html#a0216d3dab1e6e84a12c4f8cfa0501948',1,'EntryDialog']]],
   ['getsize_15',['getSize',['../classqrcodegen_1_1QrCode.html#a1fd72bbd390acc49362eddcfdf93b42b',1,'qrcodegen::QrCode']]],
