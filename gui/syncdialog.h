@@ -14,6 +14,7 @@ class QLabel;
 class QPlainTextEdit;
 class QComboBox;
 class QPushButton;
+class QSpinBox;
 class QFrame;
 
 /**
@@ -38,6 +39,7 @@ private slots:
     void onNewConnection();
     void onReadyRead();
     void onIpIndexChanged(int index);
+    void onPortChanged(int port);
     void onCopySyncCodeClicked();
 
 private:
@@ -64,6 +66,7 @@ private:
     QLabel *qrLabel;
     QLabel *statusLabel;
     QComboBox *ipComboBox;
+    QSpinBox *portSpinBox = nullptr;
     QPushButton *copyButton;
     QPushButton *closeButton;
     QPlainTextEdit *detailBox;

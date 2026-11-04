@@ -3,6 +3,8 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QComboBox>
+#include <QSpinBox>
+#include <QSettings>
 #include <QPushButton>
 #include <QPlainTextEdit>
 #include <QHostInfo>
@@ -51,6 +53,18 @@ SyncDialog::SyncDialog(QWidget *parent) : QDialog(parent) {
     ipLayout->addWidget(ipComboBox, 1);
     layout->addLayout(ipLayout);
 
+    QHBoxLayout *portLayout = new QHBoxLayout();
+    QLabel *portPromptLabel = new QLabel("Port:", this);
+    portSpinBox = new QSpinBox(this);
+    portSpinBox->setRange(1, 65535);
+    portSpinBox->setValue((int)serverPort);
+    portSpinBox->setToolTip("Preferred TCP port for Vault Sync. Remembered for future sessions; a random port is used automatically when this one is busy.");
+    portLayout->addWidget(portPromptLabel);
+    portLayout->addWidget(portSpinBox);
+    portLayout->addStretch(1);
+    layout->addLayout(portLayout);
+    connect(portSpinBox, QOverload<int>::of(&QSpinBox::valueChanged), this, &SyncDialog::onPortChanged);
+
     // Status card: mirrors the mobile app's status surface (DESIGN_TOKENS.md).
     QFrame *statusCard = new QFrame(this);
     statusCard->setObjectName("statusCard");
@@ -88,9 +102,13 @@ SyncDialog::SyncDialog(QWidget *parent) : QDialog(parent) {
     pairingSecret.resize(SYNC_PSK_LEN);
     RAND_bytes(reinterpret_cast<unsigned char *>(pairingSecret.data()), SYNC_PSK_LEN);
 
-    // Start TCP Server on a fixed port (33261) to help with firewall configuration
+    // Start TCP Server on the user's preferred port (default 33261) to
+    // help with firewall configuration; falls back to a random port when
+    // the preferred one is busy.
     tcpServer = new QTcpServer(this);
-    serverPort = 33261;
+    QSettings syncSettings("SecurePasswd_MGMT", "SecurePasswd_MGMT");
+    serverPort = (quint16)syncSettings.value("sync_port", 33261).toUInt();
+    if (serverPort == 0) serverPort = 33261;
     if (!tcpServer->listen(QHostAddress::AnyIPv4, serverPort)) {
         // Fallback to random port if fixed port is busy
         if (!tcpServer->listen(QHostAddress::AnyIPv4)) {
@@ -154,6 +172,31 @@ void SyncDialog::updateQrPayload() {
     generateQrCode(currentQrText);
     statusLabel->setText(QString("Scan the QR code with the mobile app to start Vault Sync.\nDesktop IP: %1 · Port: %2\nAllow port %2 through your firewall if prompted.")
                          .arg(ipAddress).arg(serverPort));
+}
+
+void SyncDialog::onPortChanged(int port) {
+    if (port < 1 || port > 65535) return;
+    QSettings settings("SecurePasswd_MGMT", "SecurePasswd_MGMT");
+    settings.setValue("sync_port", port);
+
+    // Re-bind only while no client is connected; mid-session changes are
+    // ignored (the QR already carries the active port).
+    if (state != State::AwaitingConnection || !tcpServer) return;
+    tcpServer->close();
+    serverPort = (quint16)port;
+    if (!tcpServer->listen(QHostAddress::AnyIPv4, serverPort)) {
+        if (!tcpServer->listen(QHostAddress::AnyIPv4)) {
+            fail("Failed to restart the sync server on the chosen port.");
+            return;
+        }
+        serverPort = tcpServer->serverPort();
+        portSpinBox->blockSignals(true);
+        portSpinBox->setValue((int)serverPort);
+        portSpinBox->blockSignals(false);
+        statusLabel->setText(QString("Preferred port %1 is busy — using port %2 for this session.")
+                                 .arg(port).arg(serverPort));
+    }
+    updateQrPayload();
 }
 
 void SyncDialog::onIpIndexChanged(int /*index*/) {
