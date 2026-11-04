@@ -12,6 +12,7 @@ extern "C" {
 
 class QLabel;
 class QPlainTextEdit;
+class QTimer;
 class QComboBox;
 class QPushButton;
 class QSpinBox;
@@ -28,6 +29,9 @@ class QFrame;
  * sends the merged snapshot back. All traffic is protected by an X25519 +
  * PSK-authenticated handshake with per-direction AEAD frames.
  */
+/* Max seconds a sync session may stay silent before being aborted. */
+static const int SESSION_TIMEOUT_MS = 30000;
+
 class SyncDialog : public QDialog {
     Q_OBJECT
 
@@ -71,6 +75,7 @@ private:
     QPushButton *closeButton;
     QPlainTextEdit *detailBox;
     QFrame *summaryCard = nullptr;
+    QTimer *sessionTimer = nullptr;
     QTcpServer *tcpServer;
     QTcpSocket *clientSocket = nullptr;
 

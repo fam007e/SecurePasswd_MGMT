@@ -13,6 +13,21 @@
 
 /* ---------- handshake ---------- */
 
+static void test_ct_equal(void **state) {
+    (void)state;
+    const uint8_t a[8] = { 1, 2, 3, 4, 5, 6, 7, 8 };
+    uint8_t b[8];
+    memcpy(b, a, sizeof(a));
+    assert_int_equal(sync_ct_equal(a, b, sizeof(a)), 1);
+    assert_int_equal(sync_ct_equal(a, a, sizeof(a)), 1);
+
+    b[7] ^= 0x01;
+    assert_int_equal(sync_ct_equal(a, b, sizeof(a)), 0);
+    b[0] ^= 0x01; /* two differing bytes still rejected */
+    assert_int_equal(sync_ct_equal(a, b, sizeof(a)), 0);
+    assert_int_equal(sync_ct_equal(NULL, b, sizeof(a)), 0);
+}
+
 static void test_handshake_roundtrip(void **state) {
     (void)state;
     uint8_t psk[SYNC_PSK_LEN];
@@ -349,6 +364,7 @@ static void test_merge_identical_entries(void **state) {
 
 int main(void) {
     const struct CMUnitTest tests[] = {
+        cmocka_unit_test(test_ct_equal),
         cmocka_unit_test(test_handshake_roundtrip),
         cmocka_unit_test(test_handshake_wrong_psk_fails_confirmation),
         cmocka_unit_test(test_frame_roundtrip_and_direction),

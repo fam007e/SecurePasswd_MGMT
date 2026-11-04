@@ -120,6 +120,16 @@ SyncDialog::SyncDialog(QWidget *parent) : QDialog(parent) {
 
     connect(tcpServer, &QTcpServer::newConnection, this, &SyncDialog::onNewConnection);
 
+    // Inactivity guard: a client that connects but stalls (before or during
+    // the session) must not hold the sync server open indefinitely.
+    sessionTimer = new QTimer(this);
+    sessionTimer->setSingleShot(true);
+    connect(sessionTimer, &QTimer::timeout, this, [this]() {
+        if (state != State::Done && state != State::Failed) {
+            fail("Session timed out due to inactivity.");
+        }
+    });
+
     // Enumerate local IPv4 network interfaces
     const auto interfaces = QNetworkInterface::allInterfaces();
     int defaultIndex = -1;
@@ -224,6 +234,13 @@ SyncDialog::~SyncDialog() {
     if (clientSocket) {
         clientSocket->disconnectFromHost();
     }
+    // The 512-bit pairing secret and the ephemeral private key must not
+    // linger in freed heap memory after the dialog closes.
+    OPENSSL_cleanse(pairingSecret.data(), (size_t)pairingSecret.size());
+    OPENSSL_cleanse(serverPriv, sizeof(serverPriv));
+    if (sessionTimer) {
+        sessionTimer->stop();
+    }
 }
 
 void SyncDialog::generateQrCode(const QString &text) {
@@ -274,6 +291,7 @@ void SyncDialog::onNewConnection() {
 
     statusLabel->setText("Connected. Authenticating…");
     state = State::AwaitClientHello;
+    sessionTimer->start(SESSION_TIMEOUT_MS);
     sendServerHello();
 }
 
@@ -328,6 +346,7 @@ void SyncDialog::fail(const QString &message) {
 
 void SyncDialog::onReadyRead() {
     if (!clientSocket || state == State::Failed) return;
+    sessionTimer->start(SESSION_TIMEOUT_MS);
     rxBuffer.append(clientSocket->readAll());
     processRxBuffer();
 }
@@ -412,7 +431,7 @@ void SyncDialog::handleFrame(const QByteArray &frame) {
     switch (state) {
     case State::AwaitConfirm: {
         if (payload_len != 32 ||
-            memcmp(payload.data(), session.transcript_hash, 32) != 0) {
+            sync_ct_equal(payload.data(), session.transcript_hash, 32) != 1) {
             fail("Key confirmation failed. The mobile client used a different pairing key.");
             return;
         }
@@ -495,6 +514,7 @@ void SyncDialog::handleFrame(const QByteArray &frame) {
     }
     case State::AwaitAck: {
         state = State::Done;
+        sessionTimer->stop();
         statusLabel->setText("Vault Sync complete! Changes are merged on both devices.");
         if (sessionActive) {
             sync_session_zero(&session);
