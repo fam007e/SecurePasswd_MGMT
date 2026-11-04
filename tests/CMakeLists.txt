@@ -51,3 +51,19 @@ enable_testing()
 add_test(NAME CoreTests COMMAND core_tests)
 add_test(NAME CMockaTests COMMAND cmocka_tests)
 add_test(NAME SyncProtocolTests COMMAND sync_protocol_tests)
+
+# libFuzzer targets for the sync protocol parsers (untrusted input surface).
+# Build with clang and global sanitizer flags, e.g.:
+#   cmake -B build-fuzz -DCMAKE_C_COMPILER=clang -DENABLE_FUZZING=ON \
+#     -DCMAKE_C_FLAGS="-fsanitize=address,undefined,fuzzer-no-link -fno-omit-frame-pointer" \
+#     -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"
+option(ENABLE_FUZZING "Build libFuzzer fuzz targets for the sync protocol (requires clang)" OFF)
+if(ENABLE_FUZZING)
+    foreach(fuzz_target fuzz_snapshot fuzz_frames)
+        add_executable(${fuzz_target} fuzz/${fuzz_target}.c)
+        target_include_directories(${fuzz_target} PRIVATE ../)
+        target_link_libraries(${fuzz_target} PRIVATE core_lib)
+        target_compile_options(${fuzz_target} PRIVATE -fsanitize=fuzzer)
+        target_link_options(${fuzz_target} PRIVATE -fsanitize=fuzzer)
+    endforeach()
+endif()

@@ -107,7 +107,59 @@ jobs:
         if [[ "${{ runner.os }}" == "Windows" ]]; then
           ./tests/Release/core_tests.exe
           ./tests/Release/cmocka_tests.exe
+          ./tests/Release/sync_protocol_tests.exe
         else
           ./tests/core_tests
           ./tests/cmocka_tests
+          ./tests/sync_protocol_tests
         fi
+
+  # Memory-safety fuzzing of the sync protocol parsers (untrusted input
+  # surface): snapshot deserialization + AEAD frame parsing, chained like
+  # the real server. libFuzzer + ASan + UBSan + LeakSanitizer.
+  fuzz:
+    name: Fuzz Sync Protocol (ASan/UBSan/libFuzzer)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang libsqlcipher-dev libsodium-dev libargon2-dev \
+          libssl-dev libcurl4-openssl-dev libcmocka-dev cmake
+
+    - name: Configure (fuzzing + sanitizers)
+      run: |
+        cmake -B build-fuzz -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+          -DENABLE_FUZZING=ON \
+          -DCMAKE_C_FLAGS="-fsanitize=address,undefined,fuzzer-no-link -fno-omit-frame-pointer" \
+          -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined,fuzzer-no-link -fno-omit-frame-pointer" \
+          -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"
+
+    - name: Build fuzz targets
+      run: cmake --build build-fuzz --target fuzz_snapshot fuzz_frames -j"$(nproc)"
+
+    - name: Fuzz snapshot parser
+      run: |
+        mkdir -p corpus_snapshot
+        ./build-fuzz/tests/fuzz_snapshot -max_total_time=60 -max_len=262144 \
+          -rss_limit_mb=4096 corpus_snapshot/
+
+    - name: Fuzz AEAD frame parser
+      run: |
+        mkdir -p corpus_frames
+        ./build-fuzz/tests/fuzz_frames -max_total_time=60 -max_len=65536 \
+          -rss_limit_mb=4096 corpus_frames/
+
+    - name: Upload crash artifacts
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: fuzz-crashes
+        path: |
+          crash-*
+          leak-*
+          oom-*
