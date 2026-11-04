@@ -14,6 +14,7 @@ class QLabel;
 class QPlainTextEdit;
 class QComboBox;
 class QPushButton;
+class QFrame;
 
 /**
  * @class SyncDialog
@@ -56,6 +57,7 @@ private:
     void processRxBuffer();
     void handleFrame(const QByteArray &frame);
     void fail(const QString &message);
+    void setSummaryVariant(const QString &variant);
     bool applyMergeReport(const sync_merge_report_t &report, QString *summary);
     void sendMergedSnapshot();
 
@@ -65,6 +67,7 @@ private:
     QPushButton *copyButton;
     QPushButton *closeButton;
     QPlainTextEdit *detailBox;
+    QFrame *summaryCard = nullptr;
     QTcpServer *tcpServer;
     QTcpSocket *clientSocket = nullptr;
 

@@ -11,6 +11,9 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QToolBar>
+#include <QGuiApplication>
+#include <QStyleHints>
+#include <QSettings>
 #include <QAction>
 #include <QMessageBox>
 #include <QFileDialog>
@@ -109,8 +112,29 @@ MainWindow::MainWindow(const QString& password, QWidget *parent) : QMainWindow(p
     setupUI();
     refreshEntryList();
 
-    currentTheme = settings.value("theme", "light").toString();
+    // Theme: follow the system color scheme by default (matching the
+    // mobile app); an explicit toggle stores "light"/"dark" permanently.
+    currentTheme = settings.value("theme").toString();
+    if (currentTheme.isEmpty()) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+        currentTheme = (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark)
+                           ? "dark" : "light";
+#else
+        currentTheme = "light";
+#endif
+        systemTheme = true;
+    }
     loadTheme(currentTheme);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    connect(QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged, this, [this]() {
+        if (systemTheme) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+            loadTheme((QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark)
+                          ? "dark" : "light");
+#endif
+        }
+    });
+#endif
 }
 
 MainWindow::~MainWindow() {
@@ -642,6 +666,8 @@ void MainWindow::onDelete() {
 }
 
 void MainWindow::onToggleTheme() {
+    // Toggling escapes follow-system mode and stores an explicit choice.
+    systemTheme = false;
     if (currentTheme == "light") {
         currentTheme = "dark";
     } else {

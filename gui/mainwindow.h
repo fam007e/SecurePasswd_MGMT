@@ -80,6 +80,7 @@ private:
     QAction *toggleRecoveryCodesAction;
     QAction *changePasswordAction;
     QString currentTheme;
+    bool systemTheme = false; /* true until the user picks a theme explicitly */
 
     // TOTP Display
     QLabel *totpLabel;

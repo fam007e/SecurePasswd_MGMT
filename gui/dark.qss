@@ -1,45 +1,72 @@
+/* ============================================================
+   SecurePasswd MGMT — Dark Theme (Nord)
+   Tokens are defined in docs/DESIGN_TOKENS.md and mirrored in
+   the Android app (ui/theme/Color.kt). Keep both in sync.
+   ============================================================ */
 
-/* Nord Dark Theme */
-QMainWindow {
+/* -- Surface roles -- */
+/* background      #2E3440  (surface)        */
+/* surface         #3B4252  (cards, inputs)  */
+/* surfaceHover    #434C5E                   */
+/* outline         #4C566A  (borders)        */
+/* onSurface       #D8DEE9  (text)           */
+/* primary         #88C0D0  (Frost accent)   */
+/* primaryHover    #5E81AC                   */
+/* primaryActive   #81A1C1                   */
+
+QMainWindow,
+QDialog {
     background-color: #2E3440;
     color: #D8DEE9;
 }
+
+QLabel {
+    color: #D8DEE9;
+    background: transparent;
+}
+
+/* -- Lists -- */
 QListWidget {
     background-color: #3B4252;
     border: 1px solid #4C566A;
+    border-radius: 6px;
     color: #D8DEE9;
+    padding: 4px;
+    outline: none;
+}
+QListWidget::item {
+    padding: 6px 8px;
+    border-radius: 4px;
 }
 QListWidget::item:selected {
     background-color: #4C566A;
+    color: #ECEFF4;
 }
-QListWidget::item:hover {
+QListWidget::item:hover:!selected {
     background-color: #434C5E;
 }
+
+/* -- Bars -- */
 QToolBar {
     background-color: #3B4252;
     border: none;
+    spacing: 4px;
+    padding: 4px;
 }
 QToolBar QToolButton {
     color: #D8DEE9;
+    border-radius: 6px;
+    padding: 6px;
 }
 QToolBar QToolButton:hover {
     background-color: #4C566A;
 }
+QToolBar QToolButton:pressed {
+    background-color: #434C5E;
+}
 QStatusBar {
     background-color: #3B4252;
     color: #D8DEE9;
-}
-QLabel {
-    color: #D8DEE9;
-}
-QProgressBar {
-    border: 1px solid #4C566A;
-    background-color: #3B4252;
-    color: #D8DEE9;
-    text-align: center;
-}
-QProgressBar::chunk {
-    background-color: #88C0D0;
 }
 QMenuBar {
     background-color: #3B4252;
@@ -47,33 +74,182 @@ QMenuBar {
 }
 QMenuBar::item:selected {
     background-color: #4C566A;
+    border-radius: 4px;
 }
 QMenu {
     background-color: #3B4252;
     color: #D8DEE9;
     border: 1px solid #4C566A;
+    border-radius: 8px;
+    padding: 4px;
+}
+QMenu::item {
+    padding: 6px 24px 6px 12px;
+    border-radius: 4px;
 }
 QMenu::item:selected {
     background-color: #4C566A;
 }
+
+/* -- Progress (TOTP indicator) -- */
+QProgressBar {
+    border: 1px solid #4C566A;
+    border-radius: 6px;
+    background-color: #3B4252;
+    color: #D8DEE9;
+    text-align: center;
+    height: 14px;
+}
+QProgressBar::chunk {
+    background-color: #88C0D0;
+    border-radius: 5px;
+}
+
+/* -- Buttons -- */
 QPushButton {
     background-color: #4C566A;
-    color: #D8DEE9;
+    color: #ECEFF4;
     border: 1px solid #4C566A;
-    padding: 5px;
+    border-radius: 6px;
+    padding: 8px 16px;
+    min-height: 18px;
 }
 QPushButton:hover {
     background-color: #5E81AC;
+    border-color: #5E81AC;
 }
 QPushButton:pressed {
     background-color: #81A1C1;
+    border-color: #81A1C1;
 }
+QPushButton:disabled {
+    background-color: #3B4252;
+    color: #7B88A1;
+    border-color: #3B4252;
+}
+QPushButton:focus {
+    border: 1px solid #88C0D0;
+}
+QToolButton {
+    color: #D8DEE9;
+    border-radius: 6px;
+    padding: 4px;
+}
+QToolButton:hover {
+    background-color: #4C566A;
+}
+
+/* -- Inputs -- */
 QLineEdit {
     background-color: #3B4252;
     color: #D8DEE9;
     border: 1px solid #4C566A;
-    padding: 5px;
+    border-radius: 6px;
+    padding: 8px;
+    selection-background-color: #5E81AC;
 }
-QDialog {
-    background-color: #2E3440;
+QLineEdit:focus {
+    border: 1px solid #88C0D0;
+}
+QLineEdit:disabled {
+    color: #7B88A1;
+}
+QComboBox {
+    background-color: #3B4252;
+    color: #D8DEE9;
+    border: 1px solid #4C566A;
+    border-radius: 6px;
+    padding: 6px 8px;
+}
+QComboBox:focus {
+    border: 1px solid #88C0D0;
+}
+QComboBox QAbstractItemView {
+    background-color: #3B4252;
+    color: #D8DEE9;
+    border: 1px solid #4C566A;
+    selection-background-color: #4C566A;
+}
+QCheckBox, QRadioButton {
+    color: #D8DEE9;
+    spacing: 8px;
+    padding: 4px;
+}
+QCheckBox::indicator, QRadioButton::indicator {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #4C566A;
+    border-radius: 4px;
+    background: #3B4252;
+}
+QRadioButton::indicator {
+    border-radius: 8px;
+}
+QCheckBox::indicator:checked, QRadioButton::indicator:checked {
+    background: #88C0D0;
+    border-color: #88C0D0;
+}
+
+/* -- Scrollbars (slim, non-intrusive) -- */
+QScrollBar:vertical {
+    background: transparent;
+    width: 10px;
+    margin: 2px;
+}
+QScrollBar::handle:vertical {
+    background: #4C566A;
+    border-radius: 4px;
+    min-height: 24px;
+}
+QScrollBar::handle:vertical:hover {
+    background: #5E81AC;
+}
+QScrollBar::add-line, QScrollBar::sub-line {
+    height: 0;
+    width: 0;
+}
+QScrollBar:horizontal {
+    background: transparent;
+    height: 10px;
+    margin: 2px;
+}
+QScrollBar::handle:horizontal {
+    background: #4C566A;
+    border-radius: 4px;
+    min-width: 24px;
+}
+QScrollBar::handle:horizontal:hover {
+    background: #5E81AC;
+}
+
+/* -- Tooltips -- */
+QToolTip {
+    background-color: #3B4252;
+    color: #ECEFF4;
+    border: 1px solid #4C566A;
+    border-radius: 4px;
+    padding: 4px 8px;
+}
+
+/* -- Cards (sync dialog, status/summary panels) -- */
+QFrame#statusCard,
+QFrame#summaryCard {
+    background-color: #3B4252;
+    border: 1px solid #4C566A;
+    border-radius: 12px;
+}
+QFrame#statusCard QLabel {
+    color: #D8DEE9;
+    font-weight: 500;
+}
+QFrame#summaryCard QPlainTextEdit {
+    background: transparent;
+    border: none;
+    color: #D8DEE9;
+}
+QFrame#summaryCard[variant="success"] {
+    border: 1px solid #A3BE8C;
+}
+QFrame#summaryCard[variant="error"] {
+    border: 1px solid #BF616A;
 }

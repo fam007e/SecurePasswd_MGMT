@@ -16,6 +16,7 @@
 #include <QGuiApplication>
 #include <QClipboard>
 #include <QTimer>
+#include <QStyle>
 #include <vector>
 #include <algorithm>
 #include "qrcodegen/qrcodegen.hpp"
@@ -31,7 +32,7 @@ static QByteArray pskToBase64Url(const QByteArray &raw) {
 }
 
 SyncDialog::SyncDialog(QWidget *parent) : QDialog(parent) {
-    setWindowTitle("Two-Way Sync to Mobile");
+    setWindowTitle("Vault Sync");
     setMinimumSize(460, 620);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -50,16 +51,28 @@ SyncDialog::SyncDialog(QWidget *parent) : QDialog(parent) {
     ipLayout->addWidget(ipComboBox, 1);
     layout->addLayout(ipLayout);
 
-    statusLabel = new QLabel("Initializing...", this);
+    // Status card: mirrors the mobile app's status surface (DESIGN_TOKENS.md).
+    QFrame *statusCard = new QFrame(this);
+    statusCard->setObjectName("statusCard");
+    QVBoxLayout *statusLayout = new QVBoxLayout(statusCard);
+    statusLabel = new QLabel("Waiting for the mobile app… Scan the QR code.", statusCard);
     statusLabel->setAlignment(Qt::AlignCenter);
     statusLabel->setWordWrap(true);
-    layout->addWidget(statusLabel);
+    statusLayout->addWidget(statusLabel);
+    layout->addWidget(statusCard);
 
-    detailBox = new QPlainTextEdit(this);
+    // Summary card: per-change results; border turns green on success,
+    // red on failure (variant property, styled in the theme files).
+    summaryCard = new QFrame(this);
+    summaryCard->setObjectName("summaryCard");
+    QVBoxLayout *summaryLayout = new QVBoxLayout(summaryCard);
+    detailBox = new QPlainTextEdit(summaryCard);
     detailBox->setReadOnly(true);
     detailBox->setMaximumHeight(140);
     detailBox->hide();
-    layout->addWidget(detailBox);
+    summaryLayout->addWidget(detailBox);
+    summaryCard->hide();
+    layout->addWidget(summaryCard);
 
     QHBoxLayout *btnLayout = new QHBoxLayout();
     copyButton = new QPushButton(QIcon(":/icons/copy_passwd.svg"), "Copy Sync Code", this);
@@ -139,7 +152,7 @@ void SyncDialog::updateQrPayload() {
                     .arg(QString::fromLatin1(pskToBase64Url(pairingSecret)));
 
     generateQrCode(currentQrText);
-    statusLabel->setText(QString("Scan the QR code with your mobile app to start two-way sync.\n(Desktop IP: %1, Port: %2)\nNote: Ensure port %2 is allowed in your firewall.")
+    statusLabel->setText(QString("Scan the QR code with the mobile app to start Vault Sync.\nDesktop IP: %1 · Port: %2\nAllow port %2 through your firewall if prompted.")
                          .arg(ipAddress).arg(serverPort));
 }
 
@@ -216,7 +229,7 @@ void SyncDialog::onNewConnection() {
         clientSocket = nullptr;
     });
 
-    statusLabel->setText("Mobile client connected. Performing authenticated handshake...");
+    statusLabel->setText("Connected. Authenticating…");
     state = State::AwaitClientHello;
     sendServerHello();
 }
@@ -234,31 +247,38 @@ void SyncDialog::sendServerHello() {
     clientSocket->write(hello);
 }
 
+void SyncDialog::setSummaryVariant(const QString &variant) {
+    if (!summaryCard) return;
+    summaryCard->setProperty("variant", variant);
+    // Force the stylesheet to re-evaluate the dynamic property.
+    summaryCard->style()->unpolish(summaryCard);
+    summaryCard->style()->polish(summaryCard);
+    summaryCard->update();
+}
+
 void SyncDialog::fail(const QString &message) {
     state = State::Failed;
-    statusLabel->setText(QString("Sync failed: %1").arg(message));
-    detailBox->show();
+    statusLabel->setText(QString("Vault Sync failed: %1").arg(message));
+    setSummaryVariant("error");
+    detailBox->hide();
+    if (clientSocket && sessionActive) {
+        // Best-effort: tell the mobile side why we aborted. Must happen
+        // while the session keys are still alive.
+        QByteArray msg = message.toUtf8();
+        std::vector<unsigned char> out(5 + (size_t)msg.size() + SYNC_TAG_LEN + 16);
+        size_t out_len = 0;
+        if (sync_frame_encrypt(&session, SYNC_FRAME_ERROR,
+                               reinterpret_cast<const unsigned char *>(msg.constData()),
+                               (size_t)msg.size(), out.data(), out.size(), &out_len) == 0) {
+            clientSocket->write(reinterpret_cast<const char *>(out.data()), (qint64)out_len);
+            clientSocket->flush();
+        }
+    }
     if (sessionActive) {
         sync_session_zero(&session);
         sessionActive = false;
     }
     if (clientSocket) {
-        // Best-effort: tell the mobile side why we aborted (only possible
-        // once the AEAD session has actually been derived).
-        if (sessionActive) {
-            QByteArray msg = message.toUtf8();
-            std::vector<unsigned char> out(5 + (size_t)msg.size() + SYNC_TAG_LEN + 16);
-            size_t out_len = 0;
-            if (sync_frame_encrypt(&session, SYNC_FRAME_ERROR,
-                                   reinterpret_cast<const unsigned char *>(msg.constData()),
-                                   (size_t)msg.size(), out.data(), out.size(), &out_len) == 0 &&
-                clientSocket) {
-                clientSocket->write(reinterpret_cast<const char *>(out.data()), (qint64)out_len);
-                clientSocket->flush();
-            }
-            sync_session_zero(&session);
-            sessionActive = false;
-        }
         clientSocket->disconnectFromHost();
     }
 }
@@ -354,7 +374,7 @@ void SyncDialog::handleFrame(const QByteArray &frame) {
             return;
         }
         state = State::AwaitSnapshot;
-        statusLabel->setText("Session authenticated. Receiving vault from mobile...");
+        statusLabel->setText("Authenticated. Receiving vault from mobile…");
         break;
     }
     case State::AwaitSnapshot: {
@@ -423,14 +443,16 @@ void SyncDialog::handleFrame(const QByteArray &frame) {
         if (state == State::Failed) return;
 
         state = State::AwaitAck;
-        statusLabel->setText("Merged vault sent. Waiting for acknowledgement...");
+        statusLabel->setText("Merging complete. Sending merged vault…");
         detailBox->setPlainText(summary);
         detailBox->show();
+        summaryCard->show();
+        setSummaryVariant("success");
         break;
     }
     case State::AwaitAck: {
         state = State::Done;
-        statusLabel->setText("Two-way sync complete! Changes are merged on both devices.");
+        statusLabel->setText("Vault Sync complete! Changes are merged on both devices.");
         if (sessionActive) {
             sync_session_zero(&session);
             sessionActive = false;
@@ -445,11 +467,13 @@ void SyncDialog::handleFrame(const QByteArray &frame) {
 
 bool SyncDialog::applyMergeReport(const sync_merge_report_t &report, QString *summary) {
     QStringList lines;
-    lines << QString("Added from mobile: %1").arg(report.added);
-    lines << QString("Updated from mobile: %1").arg(report.updated);
-    lines << QString("Deleted (removed on mobile): %1").arg(report.deleted);
+    // Headline uses the cross-platform summary format (DESIGN_TOKENS.md);
+    // the same string is shown by the mobile app.
+    lines << QString("Added %1 · Updated %2 · Deleted %3 · Conflicts %4")
+                 .arg(report.added).arg(report.updated)
+                 .arg(report.deleted).arg(report.conflicts);
     lines << QString("Unchanged: %1").arg(report.identical);
-    lines << QString("Conflicts resolved (newer version kept): %1").arg(report.conflicts);
+    lines << QString();
 
     for (int i = 0; i < report.result_count; i++) {
         const sync_merge_result_t *r = &report.results[i];
