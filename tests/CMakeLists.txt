@@ -33,7 +33,21 @@ target_link_libraries(cmocka_tests PRIVATE
     ${CMOCKA_LIBRARIES}
 )
 
+# Sync protocol v2 tests
+add_executable(sync_protocol_tests test_sync_protocol.c)
+target_include_directories(sync_protocol_tests PRIVATE ../)
+
+if(NOT WIN32)
+    target_include_directories(sync_protocol_tests PRIVATE ${CMOCKA_INCLUDE_DIRS})
+endif()
+
+target_link_libraries(sync_protocol_tests PRIVATE
+    core_lib
+    ${CMOCKA_LIBRARIES}
+)
+
 # Enable testing
 enable_testing()
 add_test(NAME CoreTests COMMAND core_tests)
 add_test(NAME CMockaTests COMMAND cmocka_tests)
+add_test(NAME SyncProtocolTests COMMAND sync_protocol_tests)

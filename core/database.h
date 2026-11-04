@@ -2,6 +2,7 @@
 #define DATABASE_H
 
 #include <stddef.h>
+#include "sync_protocol.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,6 +18,7 @@ typedef struct {
     char *password;     /**< The password for the service. */
     char *totp_secret;  /**< The TOTP secret for the service. */
     char *recovery_codes; /**< The recovery codes for the service (newline-separated). Used codes are prefixed with '*'. */
+    long long updated_at; /**< Unix timestamp of the last local modification (sync causality). */
 } PasswordEntry;
 
 /**
@@ -40,6 +42,26 @@ void database_close();
  * @return A dynamically allocated array of PasswordEntry structs. The caller is responsible for freeing this array and its contents using free_password_entries().
  */
 PasswordEntry* database_get_all_entries(int *count);
+
+/**
+ * @brief Retrieves all password entries including all fields (secrets and
+ *        updated_at). Used by the sync engine; do not use for list views.
+ *
+ * @param count A pointer to an integer that will be filled with the number of entries.
+ * @return A dynamically allocated array of PasswordEntry structs.
+ */
+PasswordEntry* database_get_all_entries_full(int *count);
+
+/**
+ * @brief Retrieves all deletion tombstones recorded in the database.
+ *
+ * Tombstones remember which (service, username) pairs were deleted and when,
+ * so deletions can propagate during 2-way sync.
+ *
+ * @param count A pointer to an integer that will be filled with the number of tombstones.
+ * @return A dynamically allocated array of sync_tombstone_t structs.
+ */
+sync_tombstone_t* database_get_tombstones(int *count);
 
 /**
  * @brief Searches for password entries by service or username.

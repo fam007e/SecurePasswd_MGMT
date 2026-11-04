@@ -1,6 +1,10 @@
 #include "syncdialog.h"
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QLabel>
+#include <QComboBox>
+#include <QPushButton>
+#include <QPlainTextEdit>
 #include <QHostInfo>
 #include <QNetworkInterface>
 #include <QTcpSocket>
@@ -9,89 +13,161 @@
 #include <QPixmap>
 #include <QHostAddress>
 #include <QFile>
+#include <QGuiApplication>
+#include <QClipboard>
+#include <QTimer>
 #include <vector>
 #include <algorithm>
 #include "qrcodegen/qrcodegen.hpp"
 
 extern "C" {
-#include "sync_service.h"
+#include "database.h"
 #include "platform_paths.h"
 #include <openssl/rand.h>
 }
 
+static QByteArray pskToBase64Url(const QByteArray &raw) {
+    return raw.toBase64(QByteArray::Base64UrlEncoding | QByteArray::OmitTrailingEquals);
+}
+
 SyncDialog::SyncDialog(QWidget *parent) : QDialog(parent) {
-    setWindowTitle("Sync to Mobile");
-    setMinimumSize(400, 500);
+    setWindowTitle("Two-Way Sync to Mobile");
+    setMinimumSize(460, 620);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
+    layout->setSpacing(10);
+    layout->setContentsMargins(20, 20, 20, 20);
 
     qrLabel = new QLabel(this);
     qrLabel->setAlignment(Qt::AlignCenter);
+    qrLabel->setMinimumSize(280, 280);
     layout->addWidget(qrLabel);
+
+    QHBoxLayout *ipLayout = new QHBoxLayout();
+    QLabel *ipPromptLabel = new QLabel("Network Interface:", this);
+    ipComboBox = new QComboBox(this);
+    ipLayout->addWidget(ipPromptLabel);
+    ipLayout->addWidget(ipComboBox, 1);
+    layout->addLayout(ipLayout);
 
     statusLabel = new QLabel("Initializing...", this);
     statusLabel->setAlignment(Qt::AlignCenter);
+    statusLabel->setWordWrap(true);
     layout->addWidget(statusLabel);
 
-    // Generate 32-byte key
-    syncKey.resize(SYNC_KEY_LEN);
-    RAND_bytes(reinterpret_cast<unsigned char*>(syncKey.data()), SYNC_KEY_LEN);
+    detailBox = new QPlainTextEdit(this);
+    detailBox->setReadOnly(true);
+    detailBox->setMaximumHeight(140);
+    detailBox->hide();
+    layout->addWidget(detailBox);
+
+    QHBoxLayout *btnLayout = new QHBoxLayout();
+    copyButton = new QPushButton(QIcon(":/icons/copy_passwd.svg"), "Copy Sync Code", this);
+    closeButton = new QPushButton(QIcon(":/icons/exit.svg"), "Close", this);
+    btnLayout->addWidget(copyButton);
+    btnLayout->addWidget(closeButton);
+    layout->addLayout(btnLayout);
+
+    connect(copyButton, &QPushButton::clicked, this, &SyncDialog::onCopySyncCodeClicked);
+    connect(closeButton, &QPushButton::clicked, this, &QDialog::accept);
+
+    // Fresh 512-bit pairing secret for this session only (never persisted).
+    pairingSecret.resize(SYNC_PSK_LEN);
+    RAND_bytes(reinterpret_cast<unsigned char *>(pairingSecret.data()), SYNC_PSK_LEN);
 
     // Start TCP Server on a fixed port (33261) to help with firewall configuration
     tcpServer = new QTcpServer(this);
-    quint16 port = 33261;
-    if (!tcpServer->listen(QHostAddress::AnyIPv4, port)) {
+    serverPort = 33261;
+    if (!tcpServer->listen(QHostAddress::AnyIPv4, serverPort)) {
         // Fallback to random port if fixed port is busy
         if (!tcpServer->listen(QHostAddress::AnyIPv4)) {
             statusLabel->setText("Failed to start server.");
             return;
         }
-        port = tcpServer->serverPort();
+        serverPort = tcpServer->serverPort();
     }
 
     connect(tcpServer, &QTcpServer::newConnection, this, &SyncDialog::onNewConnection);
 
-    // Find local IP
-    QString ipAddress;
-    QList<QHostAddress> ipAddressesList = QNetworkInterface::allAddresses();
+    // Enumerate local IPv4 network interfaces
+    const auto interfaces = QNetworkInterface::allInterfaces();
+    int defaultIndex = -1;
+    int currentIndex = 0;
 
-    // Heuristic to find the best LAN IP
-    auto it = std::find_if(ipAddressesList.begin(), ipAddressesList.end(), [](const QHostAddress &addr) {
-        if (addr != QHostAddress::LocalHost && addr.toIPv4Address()) {
-            QString s = addr.toString();
-            // Prioritize standard home network ranges
-            return s.startsWith("192.168.") || s.startsWith("10.0.") || s.startsWith("172.16.");
+    for (const auto &iface : interfaces) {
+        if (!(iface.flags() & QNetworkInterface::IsUp) || (iface.flags() & QNetworkInterface::IsLoopBack))
+            continue;
+
+        for (const auto &entry : iface.addressEntries()) {
+            QHostAddress addr = entry.ip();
+            if (addr.protocol() == QAbstractSocket::IPv4Protocol && !addr.isLoopback()) {
+                QString ipStr = addr.toString();
+                QString displayName = QString("%1 (%2)").arg(ipStr, iface.humanReadableName());
+                ipComboBox->addItem(displayName, ipStr);
+
+                if (defaultIndex == -1 && (ipStr.startsWith("192.168.") || ipStr.startsWith("10.") || ipStr.startsWith("172.16."))) {
+                    defaultIndex = currentIndex;
+                }
+                currentIndex++;
+            }
         }
-        return false;
-    });
-
-    if (it != ipAddressesList.end()) {
-        ipAddress = it->toString();
     }
 
+    if (ipComboBox->count() == 0) {
+        ipComboBox->addItem("127.0.0.1 (Localhost)", "127.0.0.1");
+        defaultIndex = 0;
+    }
+
+    if (defaultIndex != -1) {
+        ipComboBox->setCurrentIndex(defaultIndex);
+    }
+
+    connect(ipComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SyncDialog::onIpIndexChanged);
+
+    updateQrPayload();
+}
+
+void SyncDialog::updateQrPayload() {
+    QString ipAddress = ipComboBox->currentData().toString();
     if (ipAddress.isEmpty()) {
-        auto itFallback = std::find_if(ipAddressesList.begin(), ipAddressesList.end(), [](const QHostAddress &addr) {
-            return addr != QHostAddress::LocalHost && addr.toIPv4Address();
+        ipAddress = "127.0.0.1";
+    }
+
+    currentQrText = QString("vsync2:%1:%2:%3")
+                    .arg(ipAddress)
+                    .arg(serverPort)
+                    .arg(QString::fromLatin1(pskToBase64Url(pairingSecret)));
+
+    generateQrCode(currentQrText);
+    statusLabel->setText(QString("Scan the QR code with your mobile app to start two-way sync.\n(Desktop IP: %1, Port: %2)\nNote: Ensure port %2 is allowed in your firewall.")
+                         .arg(ipAddress).arg(serverPort));
+}
+
+void SyncDialog::onIpIndexChanged(int /*index*/) {
+    if (state == State::AwaitingConnection) {
+        updateQrPayload();
+    }
+}
+
+void SyncDialog::onCopySyncCodeClicked() {
+    QClipboard *clipboard = QGuiApplication::clipboard();
+    if (clipboard && !currentQrText.isEmpty()) {
+        clipboard->setText(currentQrText);
+        copyButton->setText("Copied!");
+        QTimer::singleShot(2000, this, [this]() {
+            copyButton->setText("Copy Sync Code");
         });
-        if (itFallback != ipAddressesList.end()) {
-            ipAddress = itFallback->toString();
-        }
     }
-
-    if (ipAddress.isEmpty()) {
-        ipAddress = QHostAddress(QHostAddress::LocalHost).toString();
-    }
-
-    QString qrText = QString("vsync:%1:%2:%3")
-                     .arg(ipAddress)
-                     .arg(port)
-                     .arg(QString(syncKey.toHex()));
-
-    generateQrCode(qrText);
-    statusLabel->setText(QString("Scan QR code with your mobile app to sync.\n(Desktop IP: %1, Port: %2)\nNote: Ensure port %2 is allowed in your firewall.").arg(ipAddress).arg(port));
 }
 
 SyncDialog::~SyncDialog() {
+    if (sessionActive) {
+        sync_session_zero(&session);
+        sessionActive = false;
+    }
+    if (clientSocket) {
+        clientSocket->disconnectFromHost();
+    }
 }
 
 void SyncDialog::generateQrCode(const QString &text) {
@@ -122,45 +198,359 @@ void SyncDialog::generateQrCode(const QString &text) {
 }
 
 void SyncDialog::onNewConnection() {
-    QTcpSocket *clientConnection = tcpServer->nextPendingConnection();
-    connect(clientConnection, &QAbstractSocket::disconnected,
-            clientConnection, &QObject::deleteLater);
-
-    statusLabel->setText("Client connected. Encrypting and sending vault...");
-
-    std::vector<char> dirPath(4096);
-    get_config_path(dirPath.data(), dirPath.size());
-    QString dbPath = QString::fromUtf8(dirPath.data()) + "/vault.db";
-
-    QFile f1(dbPath);
-    if (!f1.exists()) {
-        statusLabel->setText("Error: Could not open vault for reading.");
-        clientConnection->disconnectFromHost();
-        return;
-    }
-    size_t db_size = (size_t)f1.size();
-
-    QString saltPath = dbPath + ".salt";
-    QFile f2(saltPath);
-    if (!f2.exists()) {
-        statusLabel->setText("Error: Could not open salt for reading.");
-        clientConnection->disconnectFromHost();
-        return;
-    }
-    size_t salt_size = (size_t)f2.size();
-
-    size_t total_size = 4 + db_size + 4 + salt_size;
-    size_t output_size = total_size + SYNC_NONCE_LEN + SYNC_TAG_LEN + 1024;
-    std::vector<unsigned char> output(output_size);
-
-    size_t actual_size = 0;
-    if (sync_encrypt_vault(dbPath.toUtf8().constData(), output.data(), &actual_size, (unsigned char*)syncKey.constData()) != 0) {
-        statusLabel->setText("Error: Encryption failed.");
-        clientConnection->disconnectFromHost();
+    if (clientSocket) {
+        // Already in a session; reject additional connections.
+        QTcpSocket *extra = tcpServer->nextPendingConnection();
+        extra->abort();
+        extra->deleteLater();
         return;
     }
 
-    clientConnection->write(reinterpret_cast<const char*>(output.data()), (qint64)actual_size);
-    clientConnection->disconnectFromHost();
-    statusLabel->setText("Sync complete.");
+    clientSocket = tcpServer->nextPendingConnection();
+    if (!clientSocket) return;
+    clientSocket->setSocketOption(QAbstractSocket::LowDelayOption, 1);
+
+    connect(clientSocket, &QTcpSocket::readyRead, this, &SyncDialog::onReadyRead);
+    connect(clientSocket, &QTcpSocket::disconnected, clientSocket, &QObject::deleteLater);
+    connect(clientSocket, &QTcpSocket::destroyed, this, [this](QObject *) {
+        clientSocket = nullptr;
+    });
+
+    statusLabel->setText("Mobile client connected. Performing authenticated handshake...");
+    state = State::AwaitClientHello;
+    sendServerHello();
+}
+
+void SyncDialog::sendServerHello() {
+    if (sync_ephemeral_keygen(serverPub, serverPriv) != 0) {
+        fail("Failed to generate handshake keys.");
+        return;
+    }
+
+    // Wire hello: [version u8][ephemeral pubkey 32B]
+    QByteArray hello;
+    hello.append(static_cast<char>(SPSYNC_VERSION));
+    hello.append(reinterpret_cast<const char *>(serverPub), SYNC_EPHEMERAL_LEN);
+    clientSocket->write(hello);
+}
+
+void SyncDialog::fail(const QString &message) {
+    state = State::Failed;
+    statusLabel->setText(QString("Sync failed: %1").arg(message));
+    detailBox->show();
+    if (sessionActive) {
+        sync_session_zero(&session);
+        sessionActive = false;
+    }
+    if (clientSocket) {
+        // Best-effort: tell the mobile side why we aborted (only possible
+        // once the AEAD session has actually been derived).
+        if (sessionActive) {
+            QByteArray msg = message.toUtf8();
+            std::vector<unsigned char> out(5 + (size_t)msg.size() + SYNC_TAG_LEN + 16);
+            size_t out_len = 0;
+            if (sync_frame_encrypt(&session, SYNC_FRAME_ERROR,
+                                   reinterpret_cast<const unsigned char *>(msg.constData()),
+                                   (size_t)msg.size(), out.data(), out.size(), &out_len) == 0 &&
+                clientSocket) {
+                clientSocket->write(reinterpret_cast<const char *>(out.data()), (qint64)out_len);
+                clientSocket->flush();
+            }
+            sync_session_zero(&session);
+            sessionActive = false;
+        }
+        clientSocket->disconnectFromHost();
+    }
+}
+
+void SyncDialog::onReadyRead() {
+    if (!clientSocket || state == State::Failed) return;
+    rxBuffer.append(clientSocket->readAll());
+    processRxBuffer();
+}
+
+void SyncDialog::processRxBuffer() {
+    // The client hello is a raw (unencrypted) message: [version u8][ephemeral 32B].
+    if (state == State::AwaitClientHello) {
+        if (rxBuffer.size() < 1 + SYNC_EPHEMERAL_LEN) return;
+        if ((unsigned char)rxBuffer.at(0) != SPSYNC_VERSION) {
+            fail("The mobile app uses an incompatible sync version. Please update both apps.");
+            return;
+        }
+        uint8_t clientPub[SYNC_EPHEMERAL_LEN];
+        memcpy(clientPub, rxBuffer.constData() + 1, SYNC_EPHEMERAL_LEN);
+        rxBuffer.remove(0, 1 + SYNC_EPHEMERAL_LEN);
+
+        if (sync_session_derive(SYNC_ROLE_SERVER,
+                                reinterpret_cast<const unsigned char *>(pairingSecret.constData()),
+                                clientPub, serverPub, serverPriv,
+                                &session) != 0) {
+            fail("Handshake key agreement failed.");
+            return;
+        }
+        sessionActive = true;
+
+        // Key confirmation: send our transcript hash encrypted under the
+        // freshly derived session keys. The client replies with its own.
+        std::vector<unsigned char> out(5 + 32 + SYNC_TAG_LEN + 16);
+        size_t out_len = 0;
+        if (sync_frame_encrypt(&session, SYNC_FRAME_CONFIRM,
+                               session.transcript_hash, 32,
+                               out.data(), out.size(), &out_len) != 0) {
+            fail("Failed to send key confirmation.");
+            return;
+        }
+        clientSocket->write(reinterpret_cast<const char *>(out.data()), (qint64)out_len);
+        clientSocket->flush();
+        state = State::AwaitConfirm;
+    }
+
+    while (clientSocket && state != State::Failed && state != State::Done) {
+        if (rxBuffer.size() < 5) return;
+
+        unsigned int ctLen = ((unsigned char)rxBuffer.at(1) << 24) |
+                             ((unsigned char)rxBuffer.at(2) << 16) |
+                             ((unsigned char)rxBuffer.at(3) << 8) |
+                             (unsigned char)rxBuffer.at(4);
+        if (ctLen > SYNC_FRAME_MAX) {
+            fail("Received an oversized frame.");
+            return;
+        }
+        if ((unsigned int)rxBuffer.size() < 5 + ctLen) return;
+
+        QByteArray frame = rxBuffer.left(5 + (int)ctLen);
+        rxBuffer.remove(0, 5 + (int)ctLen);
+        handleFrame(frame);
+    }
+}
+
+void SyncDialog::handleFrame(const QByteArray &frame) {
+    size_t expected = frame.size() > 5 ? (size_t)frame.size() - 5 - SYNC_TAG_LEN : 0;
+    std::vector<unsigned char> payload(expected + 16);
+
+    size_t payload_len = 0;
+    sync_frame_type_t expectedType;
+    switch (state) {
+        case State::AwaitConfirm:  expectedType = SYNC_FRAME_CONFIRM; break;
+        case State::AwaitSnapshot: expectedType = SYNC_FRAME_SNAPSHOT; break;
+        case State::AwaitAck:      expectedType = SYNC_FRAME_ACK; break;
+        default:
+            fail("Unexpected message during sync.");
+            return;
+    }
+    if (sync_frame_decrypt(&session, (uint8_t)expectedType,
+                           reinterpret_cast<const unsigned char *>(frame.constData()),
+                           (size_t)frame.size(), payload.data(), payload.size(),
+                           &payload_len) != 0) {
+        fail("Decryption failed (wrong pairing key, tampered data, or a replayed session).");
+        return;
+    }
+
+    switch (state) {
+    case State::AwaitConfirm: {
+        if (payload_len != 32 ||
+            memcmp(payload.data(), session.transcript_hash, 32) != 0) {
+            fail("Key confirmation failed. The mobile client used a different pairing key.");
+            return;
+        }
+        state = State::AwaitSnapshot;
+        statusLabel->setText("Session authenticated. Receiving vault from mobile...");
+        break;
+    }
+    case State::AwaitSnapshot: {
+        sync_entry_t *remote_entries = NULL;
+        int remote_count = 0;
+        sync_tombstone_t *remote_tombs = NULL;
+        int remote_tomb_count = 0;
+        if (sync_snapshot_deserialize(payload.data(), payload_len,
+                                      &remote_entries, &remote_count,
+                                      &remote_tombs, &remote_tomb_count) != 0) {
+            fail("Received an invalid vault snapshot.");
+            return;
+        }
+
+        int local_count = 0, local_tomb_count = 0;
+        PasswordEntry *local_full = database_get_all_entries_full(&local_count);
+        sync_tombstone_t *local_tombs = database_get_tombstones(&local_tomb_count);
+        if (!local_full) {
+            // database_get_all_entries_full returns NULL for an empty vault too.
+            local_full = NULL;
+            local_count = 0;
+        }
+
+        std::vector<sync_entry_t> local_entries((size_t)local_count);
+        for (int i = 0; i < local_count; i++) {
+            local_entries[(size_t)i].service = local_full[i].service;
+            local_entries[(size_t)i].username = local_full[i].username;
+            local_entries[(size_t)i].password = local_full[i].password;
+            local_entries[(size_t)i].totp_secret = local_full[i].totp_secret;
+            local_entries[(size_t)i].recovery_codes = local_full[i].recovery_codes;
+            local_entries[(size_t)i].updated_at = local_full[i].updated_at;
+        }
+
+        sync_merge_report_t report;
+        if (sync_merge_vaults(local_entries.data(), local_count,
+                              remote_entries, remote_count,
+                              local_tombs, local_tomb_count,
+                              remote_tombs, remote_tomb_count,
+                              &report) != 0) {
+            sync_entries_free(remote_entries, remote_count);
+            sync_tombstones_free(remote_tombs, remote_tomb_count);
+            sync_tombstones_free(local_tombs, local_tomb_count);
+            free_password_entries(local_full, local_count);
+            fail("Internal error while merging vaults.");
+            return;
+        }
+
+        QString summary;
+        if (!applyMergeReport(report, &summary)) {
+            sync_merge_report_free(&report);
+            sync_entries_free(remote_entries, remote_count);
+            sync_tombstones_free(remote_tombs, remote_tomb_count);
+            sync_tombstones_free(local_tombs, local_tomb_count);
+            free_password_entries(local_full, local_count);
+            fail("Failed to apply merged changes to the local vault.");
+            return;
+        }
+
+        sync_entries_free(remote_entries, remote_count);
+        sync_tombstones_free(remote_tombs, remote_tomb_count);
+        sync_tombstones_free(local_tombs, local_tomb_count);
+        free_password_entries(local_full, local_count);
+        sync_merge_report_free(&report);
+
+        sendMergedSnapshot();
+        if (state == State::Failed) return;
+
+        state = State::AwaitAck;
+        statusLabel->setText("Merged vault sent. Waiting for acknowledgement...");
+        detailBox->setPlainText(summary);
+        detailBox->show();
+        break;
+    }
+    case State::AwaitAck: {
+        state = State::Done;
+        statusLabel->setText("Two-way sync complete! Changes are merged on both devices.");
+        if (sessionActive) {
+            sync_session_zero(&session);
+            sessionActive = false;
+        }
+        clientSocket->disconnectFromHost();
+        break;
+    }
+    default:
+        break;
+    }
+}
+
+bool SyncDialog::applyMergeReport(const sync_merge_report_t &report, QString *summary) {
+    QStringList lines;
+    lines << QString("Added from mobile: %1").arg(report.added);
+    lines << QString("Updated from mobile: %1").arg(report.updated);
+    lines << QString("Deleted (removed on mobile): %1").arg(report.deleted);
+    lines << QString("Unchanged: %1").arg(report.identical);
+    lines << QString("Conflicts resolved (newer version kept): %1").arg(report.conflicts);
+
+    for (int i = 0; i < report.result_count; i++) {
+        const sync_merge_result_t *r = &report.results[i];
+        QString identity = QString("%1 / %2").arg(r->service).arg(r->username);
+        switch (r->action) {
+        case SYNC_MERGE_APPLY_REMOTE: {
+            // Winner data comes from the mobile side; preserve its timestamp.
+            PasswordEntry entry;
+            memset(&entry, 0, sizeof(entry));
+            entry.service = r->winner.service;
+            entry.username = r->winner.username;
+            entry.password = r->winner.password;
+            entry.totp_secret = r->winner.totp_secret;
+            entry.recovery_codes = r->winner.recovery_codes;
+            entry.updated_at = r->winner.updated_at;
+
+            PasswordEntry *existing = database_get_entry_by_identity(r->service, r->username);
+            if (existing) {
+                entry.id = existing->id;
+                free_password_entries(existing, 1);
+                if (database_update_entry(&entry) != 0) return false;
+            } else {
+                if (database_add_entry(&entry) < 0) return false;
+            }
+            if (r->is_conflict) {
+                lines << QString("  conflict: %1 — mobile version (newer) applied").arg(identity);
+            }
+            break;
+        }
+        case SYNC_MERGE_KEEP_LOCAL:
+            if (r->is_conflict) {
+                lines << QString("  conflict: %1 — desktop version (newer) kept").arg(identity);
+            }
+            break;
+        case SYNC_MERGE_DELETED: {
+            PasswordEntry *existing = database_get_entry_by_identity(r->service, r->username);
+            if (existing) {
+                int id = existing->id;
+                free_password_entries(existing, 1);
+                if (database_delete_entry(id) != 0) return false;
+            }
+            lines << QString("  deleted: %1 (removed on mobile)").arg(identity);
+            break;
+        }
+        case SYNC_MERGE_IDENTICAL:
+        case SYNC_MERGE_IGNORED:
+        default:
+            break;
+        }
+    }
+
+    *summary = lines.join('\n');
+    return true;
+}
+
+void SyncDialog::sendMergedSnapshot() {
+    // The full post-merge local state becomes the snapshot for the mobile side.
+    int local_count = 0, local_tomb_count = 0;
+    PasswordEntry *local_full = database_get_all_entries_full(&local_count);
+    sync_tombstone_t *local_tombs = database_get_tombstones(&local_tomb_count);
+
+    std::vector<sync_entry_t> entries((size_t)local_count);
+    for (int i = 0; i < local_count; i++) {
+        sync_entry_init(&entries[(size_t)i]);
+        entries[(size_t)i].service = strdup(local_full[i].service ? local_full[i].service : "");
+        entries[(size_t)i].username = strdup(local_full[i].username ? local_full[i].username : "");
+        entries[(size_t)i].password = strdup(local_full[i].password ? local_full[i].password : "");
+        entries[(size_t)i].totp_secret = strdup(local_full[i].totp_secret ? local_full[i].totp_secret : "");
+        entries[(size_t)i].recovery_codes = strdup(local_full[i].recovery_codes ? local_full[i].recovery_codes : "");
+        entries[(size_t)i].updated_at = local_full[i].updated_at;
+    }
+
+    uint8_t *snapshot = NULL;
+    size_t snapshot_len = 0;
+    int rc = sync_snapshot_serialize(entries.data(), local_count,
+                                     local_tombs, local_tomb_count,
+                                     &snapshot, &snapshot_len);
+
+    /* entries is a std::vector buffer: wipe elements only, do not free(). */
+    sync_entries_wipe(entries.data(), local_count);
+    sync_tombstones_free(local_tombs, local_tomb_count);
+    free_password_entries(local_full, local_count);
+
+    if (rc != 0) {
+        fail("Failed to serialize the merged vault.");
+        return;
+    }
+
+    std::vector<unsigned char> out(5 + snapshot_len + SYNC_TAG_LEN + 16);
+    size_t out_len = 0;
+    rc = sync_frame_encrypt(&session, SYNC_FRAME_SNAPSHOT, snapshot, snapshot_len,
+                            out.data(), out.size(), &out_len);
+    if (snapshot) {
+        memset(snapshot, 0, snapshot_len);
+        free(snapshot);
+    }
+    if (rc != 0) {
+        fail("Failed to encrypt the merged vault.");
+        return;
+    }
+
+    clientSocket->write(reinterpret_cast<const char *>(out.data()), (qint64)out_len);
+    clientSocket->flush();
 }
