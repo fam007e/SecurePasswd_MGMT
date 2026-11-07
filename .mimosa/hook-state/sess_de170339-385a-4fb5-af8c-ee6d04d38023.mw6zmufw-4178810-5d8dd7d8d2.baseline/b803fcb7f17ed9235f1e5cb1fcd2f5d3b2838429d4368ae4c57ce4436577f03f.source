@@ -132,8 +132,11 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt-get update
+        # libcsv-dev: the unconditional securepasswd_cli target links it, and
+        # CMake's generate step validates every target even when only the
+        # fuzz targets are built.
         sudo apt-get install -y clang libsqlcipher-dev libsodium-dev libargon2-dev \
-          libssl-dev libcurl4-openssl-dev libcmocka-dev cmake
+          libssl-dev libcurl4-openssl-dev libcmocka-dev libcsv-dev cmake
 
     - name: Configure (fuzzing + sanitizers)
       run: |
@@ -145,7 +148,7 @@ jobs:
           -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"
 
     - name: Build fuzz targets
-      run: cmake --build build-fuzz --target fuzz_snapshot fuzz_frames -j"$(nproc)"
+      run: cmake --build build-fuzz --target fuzz_snapshot fuzz_frames fuzz_totp fuzz_pwgen -j"$(nproc)"
 
     - name: Fuzz snapshot parser
       run: |
@@ -158,6 +161,18 @@ jobs:
         mkdir -p corpus_frames
         ./build-fuzz/tests/fuzz_frames -max_total_time=60 -max_len=65536 \
           -rss_limit_mb=4096 corpus_frames/
+
+    - name: Fuzz TOTP engine
+      run: |
+        mkdir -p corpus_totp
+        ./build-fuzz/tests/fuzz_totp -max_total_time=45 -max_len=4104 \
+          -rss_limit_mb=4096 corpus_totp/
+
+    - name: Fuzz password generator
+      run: |
+        mkdir -p corpus_pwgen
+        ./build-fuzz/tests/fuzz_pwgen -max_total_time=30 -max_len=8 \
+          -rss_limit_mb=4096 corpus_pwgen/
 
     - name: Upload crash artifacts
       if: failure()

@@ -1,4 +1,8 @@
 ---
+# tests/ excluded: cmocka suites and libFuzzer harnesses intentionally
+# feed adversarial buffers, tripping memcpy/strlen heuristics that don't
+# apply to test-only code. Production sources stay fully analyzed.
 exclude_paths:
   - "docs/api/**"
   - "gui/qrcodegen/**"
+  - "tests/**"

@@ -1,54 +1,43 @@
 {
   "schema_version": "mimosa-task-review/v2",
-  "run_id": "20261107T122445097Z-733520-23285eebc036",
-  "run_status": "inconclusive",
-  "errors": [
-    {
-      "stage": "baseline",
-      "target": ".",
-      "reason": "baseline_partial: baseline capture had enumeration or snapshot errors"
-    },
-    {
-      "stage": "agent-check",
-      "target": ".",
-      "reason": "spawnSync /usr/bin/node ETIMEDOUT"
-    }
-  ],
+  "run_id": "20261107T132142483Z-957493-21db87ba6c97",
+  "run_status": "completed",
+  "errors": [],
   "coverage": {
     "schema_version": "mimosa-hook-coverage/v1",
-    "status": "partial",
+    "status": "complete",
     "scope": "hook_observed_diff",
     "baseline": {
-      "complete": false,
-      "captured_files": 46,
+      "complete": true,
+      "captured_files": 48,
       "candidate_limit": 5000,
       "truncated": false,
       "enumeration_error_count": 0,
-      "snapshot_error_count": 1,
-      "compensated_target_count": 2
+      "snapshot_error_count": 0,
+      "compensated_target_count": 1
     },
     "change_tracking": {
-      "touched_observed": 2,
-      "touched_retained": 2,
+      "touched_observed": 1,
+      "touched_retained": 1,
       "truncated": false,
       "bash_mutation": true,
-      "bash_discovered": 2,
+      "bash_discovered": 1,
       "bash_discovery_limit": 80,
       "bash_discovery_truncated": false
     },
     "candidates": {
-      "eligible_files": 2,
-      "selected_files": 2,
+      "eligible_files": 1,
+      "selected_files": 1,
       "limit": 20,
       "truncated": false
     },
     "scanning": {
-      "required_files": 1,
-      "scanned_files": 1,
+      "required_files": 0,
+      "scanned_files": 0,
       "skipped_files": 0,
       "failed_files": 0,
       "project_checks_required": 2,
-      "project_checks_completed": 1
+      "project_checks_completed": 2
     },
     "notification": {
       "eligible_findings": 0,
@@ -56,81 +45,41 @@
       "detail_limit": 3,
       "truncated": false
     },
-    "reason_counts": {
-      "baseline_partial": 1,
-      "project_check_failed": 2
-    },
-    "reasons": [
-      {
-        "code": "baseline_partial",
-        "stage": "baseline",
-        "target": ".",
-        "detail": "baseline capture had enumeration or snapshot errors",
-        "affects_completion": true
-      },
-      {
-        "code": "project_check_failed",
-        "stage": "baseline",
-        "target": ".",
-        "detail": "baseline_partial: baseline capture had enumeration or snapshot errors",
-        "affects_completion": true
-      },
-      {
-        "code": "project_check_failed",
-        "stage": "agent-check",
-        "target": ".",
-        "detail": "spawnSync /usr/bin/node ETIMEDOUT",
-        "affects_completion": true
-      }
-    ],
+    "reason_counts": {},
+    "reasons": [],
     "reasons_truncated": false
   },
-  "generated_at": "2026-11-07T12:24:45.097Z",
+  "generated_at": "2026-11-07T13:21:42.483Z",
   "session_id": "sess_de170339-385a-4fb5-af8c-ee6d04d38023",
   "target": ".",
-  "revision": "174235cb4e0691cc07df0db2696928f59db3e325",
+  "revision": "548e32b76b843a8e2ea5e0d7a19856044b033bb2",
   "rules_version": "unavailable",
-  "diff_hash": "0ea8aeb886b0114e1fa91d137468eb11eeb68b754da3f94146fa4abaaf48b4a5",
+  "diff_hash": "ae3a654b0fea037f3d7150ccca333bd7e0e240adf1ecbbfd8d6b2a7b97bd03da",
   "diff": {
     "algorithm": "sha256",
-    "changed_file_count": 2,
+    "changed_file_count": 1,
     "changed_files": [
       {
         "file": ".github/workflows/ci.yml",
         "ranges": [
           {
-            "start": 140,
-            "end": 140
+            "start": 135,
+            "end": 137
           },
           {
-            "start": 142,
-            "end": 142
+            "start": 139,
+            "end": 139
           }
         ],
-        "before_hash": "ade2d2eafc7a8f221e1cc450f662ae51916d9e40eceae82532eaed638789898b",
-        "after_hash": "4712754492fd5860f9e160e7b461fff5877a5d51514dd0698b8e9b45485a0936"
-      },
-      {
-        "file": "core/sync_protocol.c",
-        "ranges": [
-          {
-            "start": 381,
-            "end": 381
-          },
-          {
-            "start": 387,
-            "end": 390
-          }
-        ],
-        "before_hash": "3389a4afc0490ea06576dfea72e76938a0150287f01790caf641adeba26789cb",
-        "after_hash": "ac062e55f047115673efd9295b405ec182d4882ca4f71d0a4a39a8d166227739"
+        "before_hash": "b55ebbdd353dbe037ad714d25d1e9751db266dab443e0ddd41278ef23b479626",
+        "after_hash": "80a63f3b2e98de0eb63b87e5aaeed34b9524c3fd662dad0c805ba5b4bb40e110"
       }
     ]
   },
   "timing": {
-    "started_at": "2026-11-07T12:24:42.397Z",
-    "completed_at": "2026-11-07T12:24:45.097Z",
-    "duration_ms": 2700,
+    "started_at": "2026-11-07T13:21:41.078Z",
+    "completed_at": "2026-11-07T13:21:42.483Z",
+    "duration_ms": 1405,
     "measurement": "hook_wall_clock"
   },
   "tokens": {
@@ -144,11 +93,11 @@
     "schemaVersion": "mimosa-gate-telemetry/v1",
     "profile": "gate",
     "operation": "Stop",
-    "outcome": "partial/INCONCLUSIVE",
-    "latencyMs": 2700,
-    "peakMemoryBytes": 182779904,
+    "outcome": "complete",
+    "latencyMs": 1405,
+    "peakMemoryBytes": 122630144,
     "memoryMeasurement": "max-observed-process-rss",
-    "scannedFiles": 1,
+    "scannedFiles": 0,
     "cache": {
       "hits": 0,
       "misses": 0,
@@ -173,8 +122,8 @@
   "finding_events": [],
   "findings": [],
   "artifacts": {
-    "immutable_report": ".mimosa/reports/task-review-sess_de170339-385a-4fb5-af8c-ee6d04d38023-20261107T122445097Z-733520-23285eebc036.json",
+    "immutable_report": ".mimosa/reports/task-review-sess_de170339-385a-4fb5-af8c-ee6d04d38023-20261107T132142483Z-957493-21db87ba6c97.json",
     "latest_report": ".mimosa/reports/task-review-sess_de170339-385a-4fb5-af8c-ee6d04d38023.json",
-    "history_summary": ".mimosa/history/run-20261107T122445097Z-733520-23285eebc036.json"
+    "history_summary": ".mimosa/history/run-20261107T132142483Z-957493-21db87ba6c97.json"
   }
 }

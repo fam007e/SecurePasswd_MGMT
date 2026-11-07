@@ -33,6 +33,14 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
             sync_merge_report_free(&rep);
         }
 
+        /* Self-merge: the same hostile records on BOTH sides. Exercises
+         * the local-vs-remote winner selection, case-insensitive identity
+         * collision and tie-break paths that the empty-local merge skips. */
+        sync_merge_report_t rep2;
+        if (sync_merge_vaults(entries, ne, entries, ne, tombs, nt, tombs, nt, &rep2) == 0) {
+            sync_merge_report_free(&rep2);
+        }
+
         /* Re-serialization must never crash on anything the parser accepted. */
         uint8_t *buf = NULL;
         size_t buf_len = 0;

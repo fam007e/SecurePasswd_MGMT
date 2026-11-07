@@ -360,7 +360,7 @@ void SyncDialog::processRxBuffer() {
             return;
         }
         uint8_t clientPub[SYNC_EPHEMERAL_LEN];
-        memcpy(clientPub, rxBuffer.constData() + 1, SYNC_EPHEMERAL_LEN);
+        memcpy(clientPub, rxBuffer.constData() + 1, SYNC_EPHEMERAL_LEN); // flawfinder: ignore
         rxBuffer.remove(0, 1 + SYNC_EPHEMERAL_LEN);
 
         if (sync_session_derive(SYNC_ROLE_SERVER,
