@@ -1,14 +1,14 @@
 {
   "schemaVersion": "mimosa-hook-status/v1",
-  "recordedAt": "2026-11-07T12:15:28.347Z",
+  "recordedAt": "2026-11-07T12:48:30.477Z",
   "sessionId": "sess_de170339-385a-4fb5-af8c-ee6d04d38023",
   "event": "PostToolUse",
   "toolName": "Edit",
-  "file": "/home/fam007e/Codeberg/securepasswd_mgmt_apk/core/sync_protocol.c",
-  "outcome": "inconclusive",
-  "coverage": "partial",
+  "file": ".github/workflows/ci.yml",
+  "outcome": "clear",
+  "coverage": "complete",
   "findingCount": 0,
-  "durationMs": 6,
+  "durationMs": 7,
   "hostState": "hook_complete",
   "reportHint": ".mimosa/reports/"
 }

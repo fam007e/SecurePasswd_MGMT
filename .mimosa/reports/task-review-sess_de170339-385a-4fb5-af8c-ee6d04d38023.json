@@ -1,6 +1,6 @@
 {
   "schema_version": "mimosa-task-review/v2",
-  "run_id": "20261107T115848943Z-605916-b7900625cf27",
+  "run_id": "20261107T122445097Z-733520-23285eebc036",
   "run_status": "inconclusive",
   "errors": [
     {
@@ -25,26 +25,26 @@
       "truncated": false,
       "enumeration_error_count": 0,
       "snapshot_error_count": 1,
-      "compensated_target_count": 3
+      "compensated_target_count": 2
     },
     "change_tracking": {
-      "touched_observed": 3,
-      "touched_retained": 3,
+      "touched_observed": 2,
+      "touched_retained": 2,
       "truncated": false,
       "bash_mutation": true,
-      "bash_discovered": 3,
+      "bash_discovered": 2,
       "bash_discovery_limit": 80,
       "bash_discovery_truncated": false
     },
     "candidates": {
-      "eligible_files": 3,
-      "selected_files": 3,
+      "eligible_files": 2,
+      "selected_files": 2,
       "limit": 20,
       "truncated": false
     },
     "scanning": {
-      "required_files": 2,
-      "scanned_files": 2,
+      "required_files": 1,
+      "scanned_files": 1,
       "skipped_files": 0,
       "failed_files": 0,
       "project_checks_required": 2,
@@ -85,63 +85,52 @@
     ],
     "reasons_truncated": false
   },
-  "generated_at": "2026-11-07T11:58:48.943Z",
+  "generated_at": "2026-11-07T12:24:45.097Z",
   "session_id": "sess_de170339-385a-4fb5-af8c-ee6d04d38023",
   "target": ".",
-  "revision": "d8bf60549f7543f33c86b651bf4ea84121a48439",
+  "revision": "174235cb4e0691cc07df0db2696928f59db3e325",
   "rules_version": "unavailable",
-  "diff_hash": "c81adba8fb3c8a437d7ad0237362051eb1b321f9ca845dc900b40744ad8d18df",
+  "diff_hash": "0ea8aeb886b0114e1fa91d137468eb11eeb68b754da3f94146fa4abaaf48b4a5",
   "diff": {
     "algorithm": "sha256",
-    "changed_file_count": 3,
+    "changed_file_count": 2,
     "changed_files": [
       {
         "file": ".github/workflows/ci.yml",
         "ranges": [
           {
-            "start": 79,
-            "end": 83
-          },
-          {
             "start": 140,
             "end": 140
+          },
+          {
+            "start": 142,
+            "end": 142
           }
         ],
-        "before_hash": "83c09867cb58bcc56d0e6d7885d934d2ce1a052a9c083342184161e434652b0c",
-        "after_hash": "ade2d2eafc7a8f221e1cc450f662ae51916d9e40eceae82532eaed638789898b"
+        "before_hash": "ade2d2eafc7a8f221e1cc450f662ae51916d9e40eceae82532eaed638789898b",
+        "after_hash": "4712754492fd5860f9e160e7b461fff5877a5d51514dd0698b8e9b45485a0936"
       },
       {
         "file": "core/sync_protocol.c",
         "ranges": [
           {
-            "start": 14,
-            "end": 15
-          }
-        ],
-        "before_hash": "36d9f71fd6f9d14f73b5af3ea6865d4f239c3e5d9fb4248e324ddddfe3a438e6",
-        "after_hash": "3389a4afc0490ea06576dfea72e76938a0150287f01790caf641adeba26789cb"
-      },
-      {
-        "file": "tests/test_sync_protocol.c",
-        "ranges": [
-          {
-            "start": 10,
-            "end": 10
+            "start": 381,
+            "end": 381
           },
           {
-            "start": 220,
-            "end": 220
+            "start": 387,
+            "end": 390
           }
         ],
-        "before_hash": "ca0c1be4a3b8d88d6e3323d7600d6bd28ac58d2f4a10e611b8cd705fb584d595",
-        "after_hash": "28859d49e03dae7b828547cd45dbfbc29e46f4a8180dd1a028964383ec80c3c6"
+        "before_hash": "3389a4afc0490ea06576dfea72e76938a0150287f01790caf641adeba26789cb",
+        "after_hash": "ac062e55f047115673efd9295b405ec182d4882ca4f71d0a4a39a8d166227739"
       }
     ]
   },
   "timing": {
-    "started_at": "2026-11-07T11:58:46.234Z",
-    "completed_at": "2026-11-07T11:58:48.943Z",
-    "duration_ms": 2709,
+    "started_at": "2026-11-07T12:24:42.397Z",
+    "completed_at": "2026-11-07T12:24:45.097Z",
+    "duration_ms": 2700,
     "measurement": "hook_wall_clock"
   },
   "tokens": {
@@ -156,10 +145,10 @@
     "profile": "gate",
     "operation": "Stop",
     "outcome": "partial/INCONCLUSIVE",
-    "latencyMs": 2709,
-    "peakMemoryBytes": 184508416,
+    "latencyMs": 2700,
+    "peakMemoryBytes": 182779904,
     "memoryMeasurement": "max-observed-process-rss",
-    "scannedFiles": 2,
+    "scannedFiles": 1,
     "cache": {
       "hits": 0,
       "misses": 0,
@@ -184,8 +173,8 @@
   "finding_events": [],
   "findings": [],
   "artifacts": {
-    "immutable_report": ".mimosa/reports/task-review-sess_de170339-385a-4fb5-af8c-ee6d04d38023-20261107T115848943Z-605916-b7900625cf27.json",
+    "immutable_report": ".mimosa/reports/task-review-sess_de170339-385a-4fb5-af8c-ee6d04d38023-20261107T122445097Z-733520-23285eebc036.json",
     "latest_report": ".mimosa/reports/task-review-sess_de170339-385a-4fb5-af8c-ee6d04d38023.json",
-    "history_summary": ".mimosa/history/run-20261107T115848943Z-605916-b7900625cf27.json"
+    "history_summary": ".mimosa/history/run-20261107T122445097Z-733520-23285eebc036.json"
   }
 }

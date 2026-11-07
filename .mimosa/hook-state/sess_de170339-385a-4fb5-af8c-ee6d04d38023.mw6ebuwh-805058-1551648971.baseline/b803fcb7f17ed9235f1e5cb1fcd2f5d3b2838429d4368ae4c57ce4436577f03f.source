@@ -137,8 +137,9 @@ jobs:
 
     - name: Configure (fuzzing + sanitizers)
       run: |
+        # BUILD_GUI=OFF: fuzz targets only need core_lib (pure C, no Qt).
         cmake -B build-fuzz -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-          -DENABLE_FUZZING=ON \
+          -DENABLE_FUZZING=ON -DBUILD_GUI=OFF \
           -DCMAKE_C_FLAGS="-fsanitize=address,undefined,fuzzer-no-link -fno-omit-frame-pointer" \
           -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined,fuzzer-no-link -fno-omit-frame-pointer" \
           -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"
