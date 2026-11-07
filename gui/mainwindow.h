@@ -16,6 +16,7 @@ class QListWidget;
 class QTextEdit;
 class QToolBar;
 class QAction;
+class QActionGroup;
 class QPushButton;
 class QToolButton;
 
@@ -80,6 +81,8 @@ private:
     QAction *themeAction;
     QAction *paletteAction = nullptr;
     QToolButton *paletteButton = nullptr;
+    QActionGroup *paletteGroup = nullptr;
+    void syncPaletteChecks();
     QAction *toggleRecoveryCodesAction;
     QAction *changePasswordAction;
     QString currentTheme;

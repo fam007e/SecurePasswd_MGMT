@@ -206,7 +206,7 @@ int sync_session_derive(sync_role_t role,
     size_t off = 0;
     memcpy(out_session->c2s_key, material + off, SYNC_KEY_LEN); off += SYNC_KEY_LEN; /* flawfinder: ignore */
     memcpy(out_session->s2c_key, material + off, SYNC_KEY_LEN); off += SYNC_KEY_LEN; /* flawfinder: ignore */
-    memcpy(out_session->c2c_iv, material + off, SYNC_IV_LEN); off += SYNC_IV_LEN; /* flawfinder: ignore */
+    memcpy(out_session->c2s_iv, material + off, SYNC_IV_LEN); off += SYNC_IV_LEN; /* flawfinder: ignore */
     memcpy(out_session->s2c_iv, material + off, SYNC_IV_LEN); /* flawfinder: ignore */
     sp_secure_zero(material, sizeof(material));
 

@@ -12,6 +12,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QToolBar>
+#include <QActionGroup>
 #include <QToolButton>
 #include <QMenu>
 #include <QGuiApplication>
@@ -569,11 +570,15 @@ void MainWindow::setupUI() {
     paletteButton->setToolTip("Color Palette");
     paletteButton->setPopupMode(QToolButton::InstantPopup);
     QMenu *paletteMenu = new QMenu(paletteButton);
+    // Exclusive group so selecting a palette unticks the previous one —
+    // plain checkable QActions in a menu never uncheck their siblings.
+    paletteGroup = new QActionGroup(this);
     for (int i = 0; i < paletteCount(); i++) {
         const Palette &p = paletteAt(i);
         QAction *act = paletteMenu->addAction(QString::fromUtf8(p.name));
         act->setCheckable(true);
         act->setData(QLatin1String(p.id));
+        paletteGroup->addAction(act);
         connect(act, &QAction::triggered, this, [this, act]() {
             currentPalette = act->data().toString();
             QSettings settings("SecurePasswd_MGMT", "SecurePasswd_MGMT");
@@ -583,6 +588,7 @@ void MainWindow::setupUI() {
     }
     paletteButton->setMenu(paletteMenu);
     paletteAction = toolBar->addWidget(paletteButton);
+    syncPaletteChecks();
 
     toggleRecoveryCodesAction = new QAction(this);
     toggleRecoveryCodesAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_R));
@@ -707,6 +713,15 @@ void MainWindow::loadTheme(const QString& theme) {
     const Palette &palette = paletteById(currentPalette);
     qApp->setStyleSheet(buildStyleSheet(palette, theme == QLatin1String("dark")));
     updateThemeIcon();
+    syncPaletteChecks();
+}
+
+void MainWindow::syncPaletteChecks() {
+    if (!paletteGroup) return;
+    const auto actions = paletteGroup->actions();
+    for (QAction *act : actions) {
+        act->setChecked(act->data().toString() == currentPalette);
+    }
 }
 
 void MainWindow::onChangePassword() {

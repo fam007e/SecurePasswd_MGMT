@@ -569,11 +569,15 @@ void MainWindow::setupUI() {
     paletteButton->setToolTip("Color Palette");
     paletteButton->setPopupMode(QToolButton::InstantPopup);
     QMenu *paletteMenu = new QMenu(paletteButton);
+    // Exclusive group so selecting a palette unticks the previous one —
+    // plain checkable QActions in a menu never uncheck their siblings.
+    paletteGroup = new QActionGroup(this);
     for (int i = 0; i < paletteCount(); i++) {
         const Palette &p = paletteAt(i);
         QAction *act = paletteMenu->addAction(QString::fromUtf8(p.name));
         act->setCheckable(true);
         act->setData(QLatin1String(p.id));
+        paletteGroup->addAction(act);
         connect(act, &QAction::triggered, this, [this, act]() {
             currentPalette = act->data().toString();
             QSettings settings("SecurePasswd_MGMT", "SecurePasswd_MGMT");
@@ -583,6 +587,7 @@ void MainWindow::setupUI() {
     }
     paletteButton->setMenu(paletteMenu);
     paletteAction = toolBar->addWidget(paletteButton);
+    syncPaletteChecks();
 
     toggleRecoveryCodesAction = new QAction(this);
     toggleRecoveryCodesAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_R));
