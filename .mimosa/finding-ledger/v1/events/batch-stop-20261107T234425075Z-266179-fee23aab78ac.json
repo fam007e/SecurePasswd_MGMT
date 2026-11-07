@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "mimosa-finding-ledger-batch/v1",
+  "batchId": "stop-20261107T234425075Z-266179-fee23aab78ac",
+  "runId": "20261107T234425075Z-266179-fee23aab78ac",
+  "runStatus": "inconclusive",
+  "coverage": {
+    "status": "partial",
+    "reasons": [
+      {
+        "code": "baseline_partial",
+        "stage": "baseline",
+        "target": ".",
+        "detail": "baseline capture had enumeration or snapshot errors",
+        "affectsCompletion": true
+      },
+      {
+        "code": "project_check_failed",
+        "stage": "baseline",
+        "target": ".",
+        "detail": "baseline_partial: baseline capture had enumeration or snapshot errors",
+        "affectsCompletion": true
+      }
+    ]
+  },
+  "source": {
+    "component": "zcode-hook",
+    "operationId": "Stop"
+  },
+  "revision": "6cf78d421da8d7db281365c8f6f61c41cfbb42bb",
+  "diffHash": "0a09de07018dab0d68594b8d2361b4f6889e6cdcc52b33c8c6a1646bcc2d32c4",
+  "rulesVersion": "unavailable",
+  "sessionHash": "d32ae71614b289b1b7831d1e3bea7f622e762b11573ebbd5accba2d7c97d591a",
+  "reportRef": ".mimosa/reports/task-review-sess_de170339-385a-4fb5-af8c-ee6d04d38023-20261107T234425075Z-266179-fee23aab78ac.json",
+  "events": [],
+  "observedFindingIds": [],
+  "verifiedFiles": [
+    {
+      "file": "gui/mainwindow.cpp",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "gui/mainwindow.h",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "core/sync_protocol.h",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "core/sync_protocol.c",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "core/database.h",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "core/database.c",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "gui/gpgkeysdialog.h",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "gui/gpgkeysdialog.cpp",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "gui/syncdialog.h",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "gui/syncdialog.cpp",
+      "direct": "complete",
+      "projectContext": "partial"
+    },
+    {
+      "file": "tests/test_sync_protocol.c",
+      "direct": "complete",
+      "projectContext": "partial"
+    }
+  ],
+  "recordedAt": "2026-11-07T23:44:25.750Z"
+}

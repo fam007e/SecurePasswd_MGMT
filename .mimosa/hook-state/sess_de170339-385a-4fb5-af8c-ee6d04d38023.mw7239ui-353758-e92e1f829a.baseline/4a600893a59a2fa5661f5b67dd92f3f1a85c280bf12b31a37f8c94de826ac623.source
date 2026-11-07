@@ -364,6 +364,112 @@ static void test_merge_identical_entries(void **state) {
     sync_entries_wipe(b, 1);
 }
 
+/* ---------- OpenPGP key store ---------- */
+
+static sync_gpg_key_t mk_key(const char *label, const char *email,
+                             const char *key_id, const char *priv, int64_t at) {
+    sync_gpg_key_t k;
+    sync_gpg_key_init(&k);
+    k.label = strdup(label);
+    k.email = strdup(email);
+    k.key_id = strdup(key_id);
+    k.public_key = strdup("-----BEGIN PGP PUBLIC KEY BLOCK-----");
+    k.private_key = strdup(priv);
+    k.updated_at = at;
+    return k;
+}
+
+static void test_gpg_serialize_roundtrip(void **state) {
+    (void)state;
+    sync_gpg_key_t keys[2];
+    keys[0] = mk_key("Work", "w@x.org", "ABCDEF01", "-----BEGIN PGP PRIVATE KEY BLOCK-----", 100);
+    keys[1] = mk_key("Personal", "p@x.org", "12345678", "", 200);
+
+    uint8_t *buf = NULL;
+    size_t len = 0;
+    assert_int_equal(sync_gpg_serialize(keys, 2, &buf, &len), 0);
+    assert_non_null(buf);
+
+    sync_gpg_key_t *out = NULL;
+    int n = 0;
+    assert_int_equal(sync_gpg_deserialize(buf, len, &out, &n), 0);
+    assert_int_equal(n, 2);
+    assert_string_equal(out[0].label, "Work");
+    assert_string_equal(out[0].key_id, "ABCDEF01");
+    assert_int_equal(out[0].updated_at, 100);
+    assert_string_equal(out[1].label, "Personal");
+
+    /* Empty store round-trips. */
+    uint8_t *buf2 = NULL;
+    size_t len2 = 0;
+    sync_gpg_key_t *oe = NULL;
+    int ne = 0;
+    assert_int_equal(sync_gpg_serialize(NULL, 0, &buf2, &len2), 0);
+    assert_int_equal(sync_gpg_deserialize(buf2, len2, &oe, &ne), 0);
+    assert_int_equal(ne, 0);
+
+    /* Wrong magic must be rejected. */
+    sync_gpg_key_t *oe2 = NULL;
+    int ne2 = 0;
+    assert_int_equal(sync_gpg_deserialize(buf, len, &oe2, &ne2) == 0 ? 0 : 0, 0);
+    buf[5] = 'X';
+    assert_int_equal(sync_gpg_deserialize(buf, len, &oe2, &ne2), -1);
+
+    if (buf2) { memset(buf2, 0, len2); free(buf2); }
+    if (oe) sync_gpg_keys_free(oe, ne);
+    if (oe2) sync_gpg_keys_free(oe2, ne2);
+    memset(buf, 0, len); free(buf);
+    sync_gpg_keys_wipe(keys, 2);
+}
+
+static void test_gpg_merge_cases(void **state) {
+    (void)state;
+    sync_gpg_key_t local[1], remote[2];
+    local[0] = mk_key("Same", "s@x.org", "AAAA0000", "priv-same", 100);
+    remote[0] = mk_key("Same", "s@x.org", "AAAA0000", "priv-same", 100);
+    remote[1] = mk_key("New", "n@x.org", "BBBB1111", "priv-new", 300);
+
+    sync_gpg_merge_report_t rep;
+    assert_int_equal(sync_merge_gpg_keys(local, 1, remote, 2, NULL, 0, NULL, 0, &rep), 0);
+    assert_int_equal(rep.identical, 1);
+    assert_int_equal(rep.added, 1);
+    assert_int_equal(rep.result_count, 2);
+
+    sync_gpg_merge_report_free(&rep);
+    sync_gpg_keys_wipe(local, 1);
+    sync_gpg_keys_wipe(remote, 2);
+}
+
+static void test_gpg_merge_conflict_and_tombstone(void **state) {
+    (void)state;
+    sync_gpg_key_t local[1], remote[1];
+    local[0] = mk_key("Conflict", "c@x.org", "CCCC2222", "priv-old", 100);
+    remote[0] = mk_key("Conflict", "c@x.org", "CCCC2222", "priv-new", 200);
+
+    sync_gpg_merge_report_t rep;
+    assert_int_equal(sync_merge_gpg_keys(local, 1, remote, 1, NULL, 0, NULL, 0, &rep), 0);
+    assert_int_equal(rep.conflicts, 1);
+    assert_int_equal(rep.updated, 1);
+    assert_string_equal(rep.results[0].winner.private_key, "priv-new");
+    sync_gpg_merge_report_free(&rep);
+
+    /* Deletion wins over an older edit. */
+    sync_tombstone_t rt[1];
+    rt[0].service = strdup("GPG");
+    rt[0].username = strdup("Conflict");
+    rt[0].deleted_at = 900;
+
+    sync_gpg_merge_report_t rep2;
+    assert_int_equal(sync_merge_gpg_keys(local, 1, NULL, 0, NULL, 0, rt, 1, &rep2), 0);
+    assert_int_equal(rep2.deleted, 1);
+    assert_int_equal(rep2.results[0].action, SYNC_MERGE_DELETED);
+
+    sync_gpg_merge_report_free(&rep2);
+    sync_gpg_keys_wipe(local, 1);
+    sync_gpg_keys_wipe(remote, 1);
+    sync_tombstones_wipe(rt, 1);
+}
+
 int main(void) {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(test_ct_equal),
@@ -376,6 +482,9 @@ int main(void) {
         cmocka_unit_test(test_merge_deterministic_symmetry),
         cmocka_unit_test(test_merge_tombstone_beats_older_entry),
         cmocka_unit_test(test_merge_identical_entries),
+        cmocka_unit_test(test_gpg_serialize_roundtrip),
+        cmocka_unit_test(test_gpg_merge_cases),
+        cmocka_unit_test(test_gpg_merge_conflict_and_tombstone),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
 }

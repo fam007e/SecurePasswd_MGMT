@@ -1,14 +1,14 @@
 {
   "schemaVersion": "mimosa-hook-status/v1",
-  "recordedAt": "2026-11-07T23:33:02.353Z",
+  "recordedAt": "2026-11-07T23:42:43.554Z",
   "sessionId": "sess_de170339-385a-4fb5-af8c-ee6d04d38023",
   "event": "PostToolUse",
   "toolName": "Edit",
-  "file": "tests/test_sync_protocol.c",
-  "outcome": "clear",
-  "coverage": "complete",
+  "file": "/home/fam007e/Codeberg/securepasswd_mgmt_apk/app/src/main/java/com/securepasswd/mgmt/MainActivity.kt",
+  "outcome": "inconclusive",
+  "coverage": "partial",
   "findingCount": 0,
-  "durationMs": 4,
+  "durationMs": 6,
   "hostState": "hook_complete",
   "reportHint": ".mimosa/reports/"
 }

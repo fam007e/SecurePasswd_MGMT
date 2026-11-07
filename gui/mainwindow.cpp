@@ -533,7 +533,7 @@ void MainWindow::setupUI() {
     healthCheckAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_H));
     healthCheckAction->setToolTip("Run password health check (Alt+H)");
     toolBar->addAction(healthCheckAction);
-    gpgKeysAction = new QAction(QIcon(":/icons/settings.svg"), "OpenPGP Keys", this);
+    gpgKeysAction = new QAction(QIcon(":/icons/key.svg"), "OpenPGP Keys", this);
     gpgKeysAction->setToolTip("Manage stored OpenPGP keys");
     toolBar->addAction(gpgKeysAction);
 
@@ -576,7 +576,7 @@ void MainWindow::setupUI() {
     toolBar->addAction(themeAction);
 
     paletteButton = new QToolButton(this);
-    paletteButton->setIcon(QIcon(":/icons/app_icon.svg"));
+    paletteButton->setIcon(QIcon(":/icons/palette.svg"));
     paletteButton->setToolTip("Color Palette");
     paletteButton->setPopupMode(QToolButton::InstantPopup);
     QMenu *paletteMenu = new QMenu(paletteButton);
