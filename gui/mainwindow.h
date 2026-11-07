@@ -17,6 +17,7 @@ class QTextEdit;
 class QToolBar;
 class QAction;
 class QPushButton;
+class QToolButton;
 
 /**
  * @class MainWindow
@@ -77,9 +78,13 @@ private:
     QAction *syncAction;
     QAction *healthCheckAction;
     QAction *themeAction;
+    QAction *paletteAction = nullptr;
+    QToolButton *paletteButton = nullptr;
     QAction *toggleRecoveryCodesAction;
     QAction *changePasswordAction;
     QString currentTheme;
+    QString currentPalette = QStringLiteral("nord");
+    bool systemTheme = false; /* true until the user picks a theme explicitly */
 
     // TOTP Display
     QLabel *totpLabel;

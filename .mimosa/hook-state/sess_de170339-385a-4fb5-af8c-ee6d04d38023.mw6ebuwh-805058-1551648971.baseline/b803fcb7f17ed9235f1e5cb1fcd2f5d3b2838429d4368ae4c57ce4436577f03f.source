@@ -1,0 +1,170 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+  pull_request:
+    branches: [ main ]
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+
+jobs:
+  build-and-test:
+    name: ${{ matrix.os == 'ubuntu-latest' && 'Build and Test (ASan/UBSan)' || format('Build and Test ({0})', matrix.os) }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # --- Linux Dependencies ---
+    - name: Install Dependencies (Linux)
+      if: runner.os == 'Linux'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential cmake libsodium-dev libargon2-dev \
+          libsqlcipher-dev libcsv-dev qt6-base-dev libqt6svg6-dev libssl-dev libcurl4-openssl-dev \
+          libcmocka-dev cppcheck dpkg-dev file
+
+    # --- Windows Dependencies (vcpkg) ---
+    - name: Cache vcpkg (Windows)
+      if: runner.os == 'Windows'
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ github.workspace }}/vcpkg
+          !${{ github.workspace }}/vcpkg/buildtrees
+          !${{ github.workspace }}/vcpkg/packages
+          !${{ github.workspace }}/vcpkg/downloads
+        key: ${{ runner.os }}-vcpkg-${{ hashFiles('vcpkg.json') }}-v4
+
+    - name: Setup vcpkg (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        if (-not (Test-Path "${{ github.workspace }}/vcpkg")) {
+          git clone https://github.com/microsoft/vcpkg.git "${{ github.workspace }}/vcpkg"
+          & "${{ github.workspace }}/vcpkg/bootstrap-vcpkg.bat" -disableMetrics
+        }
+
+    - name: Install vcpkg dependencies (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        $vcpkgRoot = "${{ github.workspace }}/vcpkg"
+        & "$vcpkgRoot/vcpkg.exe" install --triplet x64-windows --clean-after-build
+
+    # --- macOS Dependencies ---
+    - name: Install Dependencies (macOS)
+      if: runner.os == 'macOS'
+      run: |
+        brew install qt@6 libsodium argon2 sqlcipher cmocka curl openssl@3
+        git clone https://github.com/rgamble/libcsv.git
+        cd libcsv
+        # Prevent regeneration of build files by touching them
+        touch aclocal.m4 Makefile.in configure
+        ./configure && make && sudo make install
+
+    # --- Static Analysis (Linux Only) ---
+    - name: Static Analysis (Cppcheck)
+      if: runner.os == 'Linux'
+      run: |
+        # staticFunction: false positives on extern library exports that
+        # cppcheck cannot see across translation units.
+        # QT_VERSION_CHECK: defined inline because cppcheck does not parse
+        # the Qt headers (no Qt include dirs in this check).
+        cppcheck --enable=all --check-level=exhaustive --suppress=missingIncludeSystem --suppress=unusedFunction --suppress=cstyleCast --suppress=functionStatic --suppress=staticFunction --suppress=checkersReport --suppress=unmatchedSuppression --suppress=syntaxError -Dslots= "-DQT_VERSION_CHECK(major,minor,patch)=((major<<16)|(minor<<8)|(patch))" -I . -I core/ -I tests/ -I gui/qrcodegen/ --error-exitcode=1 cli/ core/ gui/ tests/
+
+    # --- Build ---
+    - name: Configure CMake (Linux/macOS)
+      if: runner.os != 'Windows'
+      run: |
+        cmake -B build -DCMAKE_BUILD_TYPE=Release \
+          ${{ runner.os == 'Linux' && '-DCMAKE_C_FLAGS="-fsanitize=address,undefined" -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined"' || '' }} \
+          ${{ runner.os == 'macOS' && '-DLIBSODIUM_ROOT=$(brew --prefix libsodium) -DARGON2_ROOT=$(brew --prefix argon2)' || '' }}
+
+    - name: Configure CMake (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        $vcpkgRoot = "${{ github.workspace }}/vcpkg"
+        cmake -B build `
+          -DCMAKE_BUILD_TYPE=Release `
+          -DCMAKE_TOOLCHAIN_FILE="$vcpkgRoot\scripts\buildsystems\vcpkg.cmake" `
+          -DVCPKG_TARGET_TRIPLET=x64-windows
+
+    - name: Build
+      run: cmake --build build --config Release
+
+    # --- Test ---
+    - name: Run Tests
+      shell: bash
+      run: |
+        cd build
+        if [[ "${{ runner.os }}" == "Windows" ]]; then
+          ./tests/Release/core_tests.exe
+          ./tests/Release/cmocka_tests.exe
+          ./tests/Release/sync_protocol_tests.exe
+        else
+          ./tests/core_tests
+          ./tests/cmocka_tests
+          ./tests/sync_protocol_tests
+        fi
+
+  # Memory-safety fuzzing of the sync protocol parsers (untrusted input
+  # surface): snapshot deserialization + AEAD frame parsing, chained like
+  # the real server. libFuzzer + ASan + UBSan + LeakSanitizer.
+  fuzz:
+    name: Fuzz Sync Protocol (ASan/UBSan/libFuzzer)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang libsqlcipher-dev libsodium-dev libargon2-dev \
+          libssl-dev libcurl4-openssl-dev libcmocka-dev cmake
+
+    - name: Configure (fuzzing + sanitizers)
+      run: |
+        # BUILD_GUI=OFF: fuzz targets only need core_lib (pure C, no Qt).
+        cmake -B build-fuzz -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+          -DENABLE_FUZZING=ON -DBUILD_GUI=OFF \
+          -DCMAKE_C_FLAGS="-fsanitize=address,undefined,fuzzer-no-link -fno-omit-frame-pointer" \
+          -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined,fuzzer-no-link -fno-omit-frame-pointer" \
+          -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"
+
+    - name: Build fuzz targets
+      run: cmake --build build-fuzz --target fuzz_snapshot fuzz_frames -j"$(nproc)"
+
+    - name: Fuzz snapshot parser
+      run: |
+        mkdir -p corpus_snapshot
+        ./build-fuzz/tests/fuzz_snapshot -max_total_time=60 -max_len=262144 \
+          -rss_limit_mb=4096 corpus_snapshot/
+
+    - name: Fuzz AEAD frame parser
+      run: |
+        mkdir -p corpus_frames
+        ./build-fuzz/tests/fuzz_frames -max_total_time=60 -max_len=65536 \
+          -rss_limit_mb=4096 corpus_frames/
+
+    - name: Upload crash artifacts
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: fuzz-crashes
+        path: |
+          crash-*
+          leak-*
+          oom-*

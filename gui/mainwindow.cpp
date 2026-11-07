@@ -2,6 +2,7 @@
 #include "entrydialog.h"
 #include "syncdialog.h"
 #include "healthcheckdialog.h"
+#include "themes.h"
 #include "database.h"
 #include "totp.h"
 #include "platform_paths.h"
@@ -11,6 +12,11 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QToolBar>
+#include <QToolButton>
+#include <QMenu>
+#include <QGuiApplication>
+#include <QStyleHints>
+#include <QSettings>
 #include <QAction>
 #include <QMessageBox>
 #include <QFileDialog>
@@ -109,8 +115,30 @@ MainWindow::MainWindow(const QString& password, QWidget *parent) : QMainWindow(p
     setupUI();
     refreshEntryList();
 
-    currentTheme = settings.value("theme", "light").toString();
+    // Theme: follow the system color scheme by default (matching the
+    // mobile app); an explicit toggle stores "light"/"dark" permanently.
+    currentPalette = settings.value("palette", "nord").toString();
+    currentTheme = settings.value("theme").toString();
+    if (currentTheme.isEmpty()) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+        currentTheme = (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark)
+                           ? "dark" : "light";
+#else
+        currentTheme = "light";
+#endif
+        systemTheme = true;
+    }
     loadTheme(currentTheme);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    connect(QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged, this, [this]() {
+        if (systemTheme) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+            loadTheme((QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark)
+                          ? "dark" : "light");
+#endif
+        }
+    });
+#endif
 }
 
 MainWindow::~MainWindow() {
@@ -536,6 +564,26 @@ void MainWindow::setupUI() {
     themeAction->setShortcut(QKeySequence(Qt::ALT | Qt::SHIFT | Qt::Key_T));
     toolBar->addAction(themeAction);
 
+    paletteButton = new QToolButton(this);
+    paletteButton->setIcon(QIcon(":/icons/app_icon.svg"));
+    paletteButton->setToolTip("Color Palette");
+    paletteButton->setPopupMode(QToolButton::InstantPopup);
+    QMenu *paletteMenu = new QMenu(paletteButton);
+    for (int i = 0; i < paletteCount(); i++) {
+        const Palette &p = paletteAt(i);
+        QAction *act = paletteMenu->addAction(QString::fromUtf8(p.name));
+        act->setCheckable(true);
+        act->setData(QLatin1String(p.id));
+        connect(act, &QAction::triggered, this, [this, act]() {
+            currentPalette = act->data().toString();
+            QSettings settings("SecurePasswd_MGMT", "SecurePasswd_MGMT");
+            settings.setValue("palette", currentPalette);
+            loadTheme(currentTheme);
+        });
+    }
+    paletteButton->setMenu(paletteMenu);
+    paletteAction = toolBar->addWidget(paletteButton);
+
     toggleRecoveryCodesAction = new QAction(this);
     toggleRecoveryCodesAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_R));
     toolBar->addAction(toggleRecoveryCodesAction);
@@ -642,6 +690,8 @@ void MainWindow::onDelete() {
 }
 
 void MainWindow::onToggleTheme() {
+    // Toggling escapes follow-system mode and stores an explicit choice.
+    systemTheme = false;
     if (currentTheme == "light") {
         currentTheme = "dark";
     } else {
@@ -653,11 +703,9 @@ void MainWindow::onToggleTheme() {
 }
 
 void MainWindow::loadTheme(const QString& theme) {
-    QFile file(QString(":/%1.qss").arg(theme));
-    if (file.open( /* flawfinder: ignore */ QFile::ReadOnly | QFile::Text)) {
-        qApp->setStyleSheet(file.readAll());
-        file.close();
-    }
+    currentTheme = theme;
+    const Palette &palette = paletteById(currentPalette);
+    qApp->setStyleSheet(buildStyleSheet(palette, theme == QLatin1String("dark")));
     updateThemeIcon();
 }
 

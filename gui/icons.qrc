@@ -18,7 +18,6 @@
     <file>icons/recovery-enabled.svg</file>
     <file>icons/recovery-disabled.svg</file>
     <file>icons/settings.svg</file>
-    <file>dark.qss</file>
-    <file>light.qss</file>
+    <file>theme_template.qss</file>
 </qresource>
 </RCC>
