@@ -1,0 +1,14 @@
+{
+  "schemaVersion": "mimosa-hook-status/v1",
+  "recordedAt": "2026-11-07T11:56:33.177Z",
+  "sessionId": "sess_de170339-385a-4fb5-af8c-ee6d04d38023",
+  "event": "PostToolUse",
+  "toolName": "Edit",
+  "file": "/home/fam007e/Codeberg/securepasswd_mgmt_apk/core/sync_protocol.c",
+  "outcome": "inconclusive",
+  "coverage": "partial",
+  "findingCount": 0,
+  "durationMs": 6,
+  "hostState": "hook_complete",
+  "reportHint": ".mimosa/reports/"
+}

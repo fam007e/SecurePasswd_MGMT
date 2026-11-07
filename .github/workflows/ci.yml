@@ -76,7 +76,11 @@ jobs:
     - name: Static Analysis (Cppcheck)
       if: runner.os == 'Linux'
       run: |
-        cppcheck --enable=all --check-level=exhaustive --suppress=missingIncludeSystem --suppress=unusedFunction --suppress=cstyleCast --suppress=functionStatic --suppress=checkersReport --suppress=unmatchedSuppression -Dslots= -I . -I core/ -I tests/ -I gui/qrcodegen/ --error-exitcode=1 cli/ core/ gui/ tests/
+        # staticFunction: false positives on extern library exports that
+        # cppcheck cannot see across translation units.
+        # QT_VERSION_CHECK: defined inline because cppcheck does not parse
+        # the Qt headers (no Qt include dirs in this check).
+        cppcheck --enable=all --check-level=exhaustive --suppress=missingIncludeSystem --suppress=unusedFunction --suppress=cstyleCast --suppress=functionStatic --suppress=staticFunction --suppress=checkersReport --suppress=unmatchedSuppression --suppress=syntaxError -Dslots= "-DQT_VERSION_CHECK(major,minor,patch)=((major<<16)|(minor<<8)|(patch))" -I . -I core/ -I tests/ -I gui/qrcodegen/ --error-exitcode=1 cli/ core/ gui/ tests/
 
     # --- Build ---
     - name: Configure CMake (Linux/macOS)
@@ -133,7 +137,7 @@ jobs:
 
     - name: Configure (fuzzing + sanitizers)
       run: |
-        cmake -B build-fuzz -DCMAKE_C_COMPILER=clang -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+        cmake -B build-fuzz -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=RelWithDebInfo \
           -DENABLE_FUZZING=ON \
           -DCMAKE_C_FLAGS="-fsanitize=address,undefined,fuzzer-no-link -fno-omit-frame-pointer" \
           -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined,fuzzer-no-link -fno-omit-frame-pointer" \
