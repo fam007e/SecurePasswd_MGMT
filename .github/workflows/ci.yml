@@ -132,8 +132,11 @@ jobs:
     - name: Install Dependencies
       run: |
         sudo apt-get update
+        # libcsv-dev: the unconditional securepasswd_cli target links it, and
+        # CMake's generate step validates every target even when only the
+        # fuzz targets are built.
         sudo apt-get install -y clang libsqlcipher-dev libsodium-dev libargon2-dev \
-          libssl-dev libcurl4-openssl-dev libcmocka-dev cmake
+          libssl-dev libcurl4-openssl-dev libcmocka-dev libcsv-dev cmake
 
     - name: Configure (fuzzing + sanitizers)
       run: |
