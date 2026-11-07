@@ -7,6 +7,7 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
+#include <assert.h>
 #include <cmocka.h>
 #include <openssl/rand.h>
 #include "core/sync_protocol.h"
@@ -216,6 +217,7 @@ static void test_snapshot_roundtrip(void **state) {
 
     /* Trailing garbage must be rejected. */
     uint8_t *evil = malloc(len + 1);
+    assert(evil != NULL);
     memcpy(evil, buf, len);
     evil[len] = 0x41;
     sync_entry_t *oe3 = NULL;
