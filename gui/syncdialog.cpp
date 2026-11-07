@@ -241,6 +241,12 @@ SyncDialog::~SyncDialog() {
     if (sessionTimer) {
         sessionTimer->stop();
     }
+    // Client tombstones kept for the GPG phase must not leak either.
+    if (pendingRemoteTombs) {
+        sync_tombstones_free(pendingRemoteTombs, pendingRemoteTombCount);
+        pendingRemoteTombs = NULL;
+        pendingRemoteTombCount = 0;
+    }
 }
 
 void SyncDialog::generateQrCode(const QString &text) {
@@ -342,6 +348,12 @@ void SyncDialog::fail(const QString &message) {
     if (clientSocket) {
         clientSocket->disconnectFromHost();
     }
+    // The client tombstones kept for the GPG phase must not leak either.
+    if (pendingRemoteTombs) {
+        sync_tombstones_free(pendingRemoteTombs, pendingRemoteTombCount);
+        pendingRemoteTombs = NULL;
+        pendingRemoteTombCount = 0;
+    }
 }
 
 void SyncDialog::onReadyRead() {
@@ -415,6 +427,7 @@ void SyncDialog::handleFrame(const QByteArray &frame) {
     switch (state) {
         case State::AwaitConfirm:  expectedType = SYNC_FRAME_CONFIRM; break;
         case State::AwaitSnapshot: expectedType = SYNC_FRAME_SNAPSHOT; break;
+        case State::AwaitGpg:      expectedType = SYNC_FRAME_GPG; break;
         case State::AwaitAck:      expectedType = SYNC_FRAME_ACK; break;
         default:
             fail("Unexpected message during sync.");
@@ -496,20 +509,98 @@ void SyncDialog::handleFrame(const QByteArray &frame) {
         }
 
         sync_entries_free(remote_entries, remote_count);
-        sync_tombstones_free(remote_tombs, remote_tomb_count);
-        sync_tombstones_free(local_tombs, local_tomb_count);
         free_password_entries(local_full, local_count);
         sync_merge_report_free(&report);
 
+        /* Client tombstones are still needed by the GPG phase (they carry
+         * the client's GPG deletions) — keep them, free local ones (the
+         * GPG phase re-reads fresh tombstones after the apply above). */
+        pendingRemoteTombs = remote_tombs;
+        pendingRemoteTombCount = remote_tomb_count;
+        pendingSummary = summary;
+
+        state = State::AwaitGpg;
+        statusLabel->setText("Merged vault. Receiving OpenPGP keys…");
+        break;
+    }
+    case State::AwaitGpg: {
+        /* Client's OpenPGP key store section (SPSNAP03). */
+        sync_gpg_key_t *remote_keys = NULL;
+        int remote_key_count = 0;
+        if (sync_gpg_deserialize(payload.data(), payload_len,
+                                 &remote_keys, &remote_key_count) != 0) {
+            fail("Received an invalid OpenPGP key section.");
+            return;
+        }
+
+        int local_key_count = 0, tomb_count = 0;
+        GpgKey *local_keys = database_gpg_get_all(&local_key_count);
+        sync_tombstone_t *tombs = database_get_tombstones(&tomb_count);
+
+        std::vector<sync_gpg_key_t> local_section((size_t)local_key_count);
+        for (int i = 0; i < local_key_count; i++) {
+            sync_gpg_key_init(&local_section[(size_t)i]);
+            local_section[(size_t)i].label = strdup(local_keys[i].label ? local_keys[i].label : "");
+            local_section[(size_t)i].email = strdup(local_keys[i].email ? local_keys[i].email : "");
+            local_section[(size_t)i].key_id = strdup(local_keys[i].key_id ? local_keys[i].key_id : "");
+            local_section[(size_t)i].public_key = strdup(local_keys[i].public_key ? local_keys[i].public_key : "");
+            local_section[(size_t)i].private_key = strdup(local_keys[i].private_key ? local_keys[i].private_key : "");
+            local_section[(size_t)i].updated_at = local_keys[i].updated_at;
+        }
+
+        sync_gpg_merge_report_t grep;
+        if (sync_merge_gpg_keys(local_section.data(), local_key_count,
+                                remote_keys, remote_key_count,
+                                tombs, tomb_count,
+                                pendingRemoteTombs, pendingRemoteTombCount,
+                                &grep) != 0) {
+            sync_gpg_keys_free(remote_keys, remote_key_count);
+            sync_gpg_keys_wipe(local_section.data(), local_key_count);
+            sync_tombstones_free(tombs, tomb_count);
+            database_gpg_free(local_keys, local_key_count);
+            fail("Internal error while merging OpenPGP keys.");
+            return;
+        }
+
+        QString summary;
+        if (!applyGpgMergeReport(grep, &summary)) {
+            sync_gpg_merge_report_free(&grep);
+            sync_gpg_keys_free(remote_keys, remote_key_count);
+            sync_gpg_keys_wipe(local_section.data(), local_key_count);
+            sync_tombstones_free(tombs, tomb_count);
+            sync_tombstones_free(pendingRemoteTombs, pendingRemoteTombCount);
+            pendingRemoteTombs = NULL;
+            pendingRemoteTombCount = 0;
+            database_gpg_free(local_keys, local_key_count);
+            fail("Failed to apply merged OpenPGP key changes.");
+            return;
+        }
+        QString fullSummary = pendingSummary;
+        if (!summary.isEmpty()) {
+            if (!fullSummary.isEmpty()) fullSummary += '\n';
+            fullSummary += summary;
+        }
+        detailBox->setPlainText(fullSummary);
+        detailBox->show();
+        summaryCard->show();
+        setSummaryVariant("success");
+
+        sync_gpg_keys_free(remote_keys, remote_key_count);
+        sync_gpg_keys_wipe(local_section.data(), local_key_count);
+        sync_tombstones_free(tombs, tomb_count);
+        sync_tombstones_free(pendingRemoteTombs, pendingRemoteTombCount);
+        pendingRemoteTombs = NULL;
+        pendingRemoteTombCount = 0;
+        database_gpg_free(local_keys, local_key_count);
+        sync_gpg_merge_report_free(&grep);
+
         sendMergedSnapshot();
+        if (state == State::Failed) return;
+        sendMergedGpgKeys();
         if (state == State::Failed) return;
 
         state = State::AwaitAck;
         statusLabel->setText("Merging complete. Sending merged vault…");
-        detailBox->setPlainText(summary);
-        detailBox->show();
-        summaryCard->show();
-        setSummaryVariant("success");
         break;
     }
     case State::AwaitAck: {
@@ -635,6 +726,128 @@ void SyncDialog::sendMergedSnapshot() {
     }
     if (rc != 0) {
         fail("Failed to encrypt the merged vault.");
+        return;
+    }
+
+    clientSocket->write(reinterpret_cast<const char *>(out.data()), (qint64)out_len);
+    clientSocket->flush();
+}
+
+bool SyncDialog::applyGpgMergeReport(const sync_gpg_merge_report_t &report, QString *summary) {
+    QStringList lines;
+    lines << QString("Keys added %1 · Updated %2 · Deleted %3 · Conflicts %4")
+                 .arg(report.added).arg(report.updated)
+                 .arg(report.deleted).arg(report.conflicts);
+
+    for (int i = 0; i < report.result_count; i++) {
+        const sync_gpg_merge_result_t *r = &report.results[i];
+        switch (r->action) {
+        case SYNC_MERGE_APPLY_REMOTE: {
+            // Winner data comes from the mobile side; preserve its timestamp.
+            GpgKey key;
+            memset(&key, 0, sizeof(key));
+            key.label = r->winner.label;
+            key.email = r->winner.email;
+            key.key_id = r->winner.key_id;
+            key.public_key = r->winner.public_key;
+            key.private_key = r->winner.private_key;
+            key.updated_at = r->winner.updated_at;
+
+            // Find the local row by label (labels are the merge identity).
+            int count = 0;
+            GpgKey *keys = database_gpg_get_all(&count);
+            int localId = 0;
+            for (int j = 0; j < count; j++) {
+                if (keys[j].label && r->winner.label &&
+                    strcasecmp(keys[j].label, r->winner.label) == 0) {
+                    localId = keys[j].id;
+                    break;
+                }
+            }
+            database_gpg_free(keys, count);
+
+            if (localId > 0) {
+                key.id = localId;
+                if (database_gpg_update(&key) != 0) return false;
+            } else {
+                if (database_gpg_add(&key) < 0) return false;
+            }
+            if (r->is_conflict) {
+                lines << QString("  conflict: %1 — mobile version (newer) applied").arg(r->label);
+            }
+            break;
+        }
+        case SYNC_MERGE_KEEP_LOCAL:
+            if (r->is_conflict) {
+                lines << QString("  conflict: %1 — desktop version (newer) kept").arg(r->label);
+            }
+            break;
+        case SYNC_MERGE_DELETED: {
+            // Locate by label; database_gpg_delete records the tombstone.
+            int count = 0;
+            GpgKey *keys = database_gpg_get_all(&count);
+            int localId = 0;
+            for (int j = 0; j < count; j++) {
+                if (keys[j].label && strcasecmp(keys[j].label, r->label) == 0) {
+                    localId = keys[j].id;
+                    break;
+                }
+            }
+            database_gpg_free(keys, count);
+            if (localId > 0 && database_gpg_delete(localId) != 0) return false;
+            lines << QString("  deleted: %1 (removed on mobile)").arg(r->label);
+            break;
+        }
+        case SYNC_MERGE_IDENTICAL:
+        case SYNC_MERGE_IGNORED:
+        default:
+            break;
+        }
+    }
+
+    *summary = lines.join('\n');
+    return true;
+}
+
+void SyncDialog::sendMergedGpgKeys() {
+    /* The full post-merge local key store becomes the client's merged view. */
+    int key_count = 0;
+    GpgKey *local_keys = database_gpg_get_all(&key_count);
+
+    std::vector<sync_gpg_key_t> keys((size_t)key_count);
+    for (int i = 0; i < key_count; i++) {
+        sync_gpg_key_init(&keys[(size_t)i]);
+        keys[(size_t)i].label = strdup(local_keys[i].label ? local_keys[i].label : "");
+        keys[(size_t)i].email = strdup(local_keys[i].email ? local_keys[i].email : "");
+        keys[(size_t)i].key_id = strdup(local_keys[i].key_id ? local_keys[i].key_id : "");
+        keys[(size_t)i].public_key = strdup(local_keys[i].public_key ? local_keys[i].public_key : "");
+        keys[(size_t)i].private_key = strdup(local_keys[i].private_key ? local_keys[i].private_key : "");
+        keys[(size_t)i].updated_at = local_keys[i].updated_at;
+    }
+
+    uint8_t *section = NULL;
+    size_t section_len = 0;
+    int rc = sync_gpg_serialize(keys.data(), key_count, &section, &section_len);
+
+    /* keys is a std::vector buffer: wipe elements only, do not free(). */
+    sync_gpg_keys_wipe(keys.data(), key_count);
+    database_gpg_free(local_keys, key_count);
+
+    if (rc != 0) {
+        fail("Failed to serialize the OpenPGP key store.");
+        return;
+    }
+
+    std::vector<unsigned char> out(5 + section_len + SYNC_TAG_LEN + 16);
+    size_t out_len = 0;
+    rc = sync_frame_encrypt(&session, SYNC_FRAME_GPG, section, section_len,
+                            out.data(), out.size(), &out_len);
+    if (section) {
+        memset(section, 0, section_len);
+        free(section);
+    }
+    if (rc != 0) {
+        fail("Failed to encrypt the OpenPGP key store.");
         return;
     }
 

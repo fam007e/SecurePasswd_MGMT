@@ -52,6 +52,7 @@ private:
         AwaitClientHello, /* raw [version u8][client ephemeral 32B] */
         AwaitConfirm,     /* waiting for client key-confirmation frame */
         AwaitSnapshot,    /* waiting for the client's vault snapshot */
+        AwaitGpg,         /* waiting for the client's OpenPGP key section */
         AwaitAck,         /* waiting for the final acknowledgement */
         Done,
         Failed
@@ -65,7 +66,15 @@ private:
     void fail(const QString &message);
     void setSummaryVariant(const QString &variant);
     bool applyMergeReport(const sync_merge_report_t &report, QString *summary);
+    bool applyGpgMergeReport(const sync_gpg_merge_report_t &report, QString *summary);
     void sendMergedSnapshot();
+    void sendMergedGpgKeys();
+
+    /* Client tombstones from the snapshot phase, kept alive until the GPG
+     * phase (they carry the client's GPG deletions), then freed. */
+    sync_tombstone_t *pendingRemoteTombs = NULL;
+    int pendingRemoteTombCount = 0;
+    QString pendingSummary;
 
     QLabel *qrLabel;
     QLabel *statusLabel;

@@ -64,6 +64,28 @@ PasswordEntry* database_get_all_entries_full(int *count);
 sync_tombstone_t* database_get_tombstones(int *count);
 
 /**
+ * @brief OpenPGP key store: armored public/secret keys stored alongside
+ *        the passwords. The label is the identity used by 2-way sync;
+ *        deletions reuse the deleted_entries tombstone table with
+ *        service == "GPG".
+ */
+typedef struct {
+    int id;
+    char *label;
+    char *email;
+    char *key_id;
+    char *public_key;   /* ASCII-armored public key */
+    char *private_key;  /* ASCII-armored secret key (may be empty) */
+    long long updated_at;
+} GpgKey;
+
+int database_gpg_add(const GpgKey *key);
+int database_gpg_update(const GpgKey *key);
+int database_gpg_delete(int id);
+GpgKey* database_gpg_get_all(int *count);
+void database_gpg_free(GpgKey *keys, int count);
+
+/**
  * @brief Searches for password entries by service or username.
  *
  * @param query The search query string.

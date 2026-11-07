@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "entrydialog.h"
 #include "syncdialog.h"
+#include "gpgkeysdialog.h"
 #include "healthcheckdialog.h"
 #include "themes.h"
 #include "database.h"
@@ -216,6 +217,12 @@ void MainWindow::onExport() {
 void MainWindow::onSync() {
     SyncDialog dialog(this);
     dialog.exec();
+}
+
+void MainWindow::onOpenGpgKeys() {
+    GpgKeysDialog dialog(this);
+    dialog.exec();
+    refreshEntryList(); /* no-op for entries, but keeps future state fresh */
 }
 
 void MainWindow::onSearchChanged(const QString &text) {
@@ -526,6 +533,9 @@ void MainWindow::setupUI() {
     healthCheckAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_H));
     healthCheckAction->setToolTip("Run password health check (Alt+H)");
     toolBar->addAction(healthCheckAction);
+    gpgKeysAction = new QAction(QIcon(":/icons/settings.svg"), "OpenPGP Keys", this);
+    gpgKeysAction->setToolTip("Manage stored OpenPGP keys");
+    toolBar->addAction(gpgKeysAction);
 
     changePasswordAction = new QAction(QIcon(":/icons/settings.svg"), "Change Master Password", this);
     changePasswordAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_S));
@@ -648,6 +658,7 @@ void MainWindow::setupUI() {
     connect(exportAction, &QAction::triggered, this, &MainWindow::onExport);
     connect(syncAction, &QAction::triggered, this, &MainWindow::onSync);
     connect(healthCheckAction, &QAction::triggered, this, &MainWindow::onHealthCheck);
+    connect(gpgKeysAction, &QAction::triggered, this, &MainWindow::onOpenGpgKeys);
     connect(changePasswordAction, &QAction::triggered, this, &MainWindow::onChangePassword);
     connect(listWidget, &QListWidget::currentRowChanged, this, &MainWindow::onCurrentRowChanged);
     connect(themeAction, &QAction::triggered, this, &MainWindow::onToggleTheme);

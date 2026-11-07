@@ -47,6 +47,7 @@ private slots:
     void onImport();
     void onExport();
     void onSync();
+    void onOpenGpgKeys();
     void onDelete();
     void onHealthCheck();
     void onToggleTheme();
@@ -79,6 +80,7 @@ private:
     QAction *syncAction;
     QAction *healthCheckAction;
     QAction *themeAction;
+    QAction *gpgKeysAction = nullptr;
     QAction *paletteAction = nullptr;
     QToolButton *paletteButton = nullptr;
     QActionGroup *paletteGroup = nullptr;
