@@ -59,3 +59,6 @@ docs/api/
 
 # Termux error log
 termux-err-log/
+
+# Mimosa security-hook session state (plugin working files)
+.mimosa/
