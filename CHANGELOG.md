@@ -5,7 +5,7 @@ All notable changes to SecurePasswd_MGMT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to date-based versioning (YYYY.MM.DD).
 
-## [Unreleased]
+## [2026.11.08]
 
 ### Added
 - **Two-Way Mobile Sync (v2):** Complete rewrite of mobile sync as an interactive, mutually-authenticated session: 512-bit pairing secret (vsync2 QR), ephemeral X25519 + HKDF-SHA256 key derivation bound to the handshake transcript, ChaCha20-Poly1305 frames with sequence-number nonces and type-bound AAD, key-confirmation exchange, and deterministic newer-wins merge with deletion tombstones (`updated_at` column + `deleted_entries` table).
