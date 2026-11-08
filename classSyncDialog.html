@@ -93,7 +93,7 @@ $(function(){initNavTree('classSyncDialog.html','','classSyncDialog-members'); }
 </div><!--header-->
 <div class="contents">
 
-<p>Manages the secure mobile synchronization process.  
+<p>Manages the secure 2-way mobile synchronization process.  
  <a href="#details">More...</a></p>
 
 <p><code>#include &lt;syncdialog.h&gt;</code></p>
@@ -114,8 +114,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a9b6b0b3ea391cdbb3988241e69b714e2" id="r_a9b6b0b3ea391cdbb3988241e69b714e2"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9b6b0b3ea391cdbb3988241e69b714e2">~SyncDialog</a> ()</td></tr>
 </table>
 <a name="details" id="details"></a><h2 id="header-details" class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Manages the secure mobile synchronization process. </p>
-<p>Generates a one-time synchronization key, displays it as a QR code, and starts a temporary encrypted server to transfer the vault to a mobile device. </p>
+<div class="textblock"><p>Manages the secure 2-way mobile synchronization process. </p>
+<p>Generates a fresh 512-bit pairing secret, displays it as a QR code (vsync2: payload), and runs an authenticated encrypted session with the mobile client: the mobile sends its vault snapshot, the desktop merges it into the local vault (newer-wins, conflicts reviewed in the summary) and sends the merged snapshot back. All traffic is protected by an X25519 + PSK-authenticated handshake with per-direction AEAD frames. </p>
 </div><a name="doc-constructors" id="doc-constructors"></a><h2 id="header-doc-constructors" class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a726b54b0252657f0783c0e0d11bb89ad" name="a726b54b0252657f0783c0e0d11bb89ad"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a726b54b0252657f0783c0e0d11bb89ad">&#9670;&#160;</a></span>SyncDialog()</h2>

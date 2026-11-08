@@ -1,10 +1,14 @@
 var searchData=
 [
   ['kanji_0',['KANJI',['../classqrcodegen_1_1QrSegment_1_1Mode.html#a36b33d4af43c2c3b4026e07dbe95f62a',1,'qrcodegen::QrSegment::Mode']]],
-  ['kdf_1',['Key Derivation Function (KDF)',['../md_SECURITY.html#autotoc_md30',1,'']]],
-  ['key_20derivation_20function_20kdf_2',['Key Derivation Function (KDF)',['../md_SECURITY.html#autotoc_md30',1,'']]],
+  ['kdf_1',['Key Derivation Function (KDF)',['../md_SECURITY.html#autotoc_md31',1,'']]],
+  ['key_20derivation_20function_20kdf_2',['Key Derivation Function (KDF)',['../md_SECURITY.html#autotoc_md31',1,'']]],
   ['key_20security_20features_3',['Key Security Features',['../index.html#autotoc_md1',1,'']]],
-  ['key_5fderivation_2ec_4',['key_derivation.c',['../key__derivation_8c.html',1,'']]],
-  ['key_5fderivation_2eh_5',['key_derivation.h',['../key__derivation_8h.html',1,'']]],
-  ['key_5flen_6',['KEY_LEN',['../key__derivation_8h.html#a32a183eeadf922d255d06a4e4f2aca66',1,'key_derivation.h']]]
+  ['key_20store_4',['OpenPGP Key Store',['../index.html#autotoc_md6',1,'']]],
+  ['key_5fderivation_2ec_5',['key_derivation.c',['../key__derivation_8c.html',1,'']]],
+  ['key_5fderivation_2eh_6',['key_derivation.h',['../key__derivation_8h.html',1,'']]],
+  ['key_5fid_7',['key_id',['../structGpgKey.html#aa3dee0ca5eb969269f21efe89a550d19',1,'GpgKey::key_id'],['../structsync__gpg__key__t.html#a75ac95e6af7e6cabd7bb9d850af27600',1,'sync_gpg_key_t::key_id']]],
+  ['key_5flen_8',['KEY_LEN',['../key__derivation_8h.html#a32a183eeadf922d255d06a4e4f2aca66',1,'key_derivation.h']]],
+  ['kpalettecount_9',['kPaletteCount',['../themes_8cpp.html#a63ea8a4b01de4182cc2871cd6b2df10d',1,'themes.cpp']]],
+  ['kpalettes_10',['kPalettes',['../themes_8cpp.html#a74997eb6e8a6842914a4d8ecc6908044',1,'themes.cpp']]]
 ];

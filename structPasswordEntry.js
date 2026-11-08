@@ -5,5 +5,6 @@ var structPasswordEntry =
     [ "recovery_codes", "structPasswordEntry.html#ab20f4bcf8cc4fa6ef69e4d07ac41dec9", null ],
     [ "service", "structPasswordEntry.html#a7efd3f2f980acb7d38669e9074f4a85a", null ],
     [ "totp_secret", "structPasswordEntry.html#a6c74fecfdd830886fe688d2f38fabdfa", null ],
+    [ "updated_at", "structPasswordEntry.html#ac37b1c7ab35ea6443a31d01a91afd74a", null ],
     [ "username", "structPasswordEntry.html#ac010387094106edd5158adf122543d5a", null ]
 ];

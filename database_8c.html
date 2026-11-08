@@ -99,11 +99,12 @@ $(function(){initNavTree('database_8c.html','',''); });
 <code>#include &lt;stdlib.h&gt;</code><br />
 <code>#include &lt;string.h&gt;</code><br />
 <code>#include &lt;stdbool.h&gt;</code><br />
+<code>#include &lt;time.h&gt;</code><br />
 <code>#include &lt;sodium.h&gt;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for database.c:</div>
 <div class="dyncontent">
-<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="database_8c__incl.svg" width="850" height="190"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" loading="lazy" frameborder="0" src="database_8c__incl.svg" width="904" height="266"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 id="header-func-members" class="groupheader"><a id="func-members" name="func-members"></a>
@@ -115,6 +116,10 @@ Functions</h2></td></tr>
 <tr class="memdesc:a87a371db10ba025e787c86c407b52419"><td class="mdescLeft">&#160;</td><td class="mdescRight">Closes the database.  <br /></td></tr>
 <tr class="memitem:ab02c638ac9d3276e12ed84cfeb92a5e6" id="r_ab02c638ac9d3276e12ed84cfeb92a5e6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structPasswordEntry.html">PasswordEntry</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab02c638ac9d3276e12ed84cfeb92a5e6">database_get_all_entries</a> (int *count)</td></tr>
 <tr class="memdesc:ab02c638ac9d3276e12ed84cfeb92a5e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves all password entries from the database.  <br /></td></tr>
+<tr class="memitem:aa21df9515649d22e0718fdcb7e0e4ca4" id="r_aa21df9515649d22e0718fdcb7e0e4ca4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structPasswordEntry.html">PasswordEntry</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aa21df9515649d22e0718fdcb7e0e4ca4">database_get_all_entries_full</a> (int *count)</td></tr>
+<tr class="memdesc:aa21df9515649d22e0718fdcb7e0e4ca4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves all password entries including all fields (secrets and updated_at). Used by the sync engine; do not use for list views.  <br /></td></tr>
+<tr class="memitem:a36484a795f6fa7c6c0cb4f3d58d6520d" id="r_a36484a795f6fa7c6c0cb4f3d58d6520d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structsync__tombstone__t.html">sync_tombstone_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a36484a795f6fa7c6c0cb4f3d58d6520d">database_get_tombstones</a> (int *count)</td></tr>
+<tr class="memdesc:a36484a795f6fa7c6c0cb4f3d58d6520d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves all deletion tombstones recorded in the database.  <br /></td></tr>
 <tr class="memitem:a29a286c5d2cd13834e957ffc743fb092" id="r_a29a286c5d2cd13834e957ffc743fb092"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structPasswordEntry.html">PasswordEntry</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a29a286c5d2cd13834e957ffc743fb092">database_search</a> (const char *query, int *count)</td></tr>
 <tr class="memdesc:a29a286c5d2cd13834e957ffc743fb092"><td class="mdescLeft">&#160;</td><td class="mdescRight">Searches for password entries by service or username.  <br /></td></tr>
 <tr class="memitem:a2711c92b76f8eacd5d6a99da3db8aeaa" id="r_a2711c92b76f8eacd5d6a99da3db8aeaa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structPasswordEntry.html">PasswordEntry</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2711c92b76f8eacd5d6a99da3db8aeaa">database_get_entry_by_identity</a> (const char *service, const char *username)</td></tr>
@@ -129,6 +134,11 @@ Functions</h2></td></tr>
 <tr class="memdesc:a0e3e8a52eb56707ad33ea6a1c47ff028"><td class="mdescLeft">&#160;</td><td class="mdescRight">Deletes a password entry from the database by its ID.  <br /></td></tr>
 <tr class="memitem:a77a357353e4cf3b50bc41fb6727485dc" id="r_a77a357353e4cf3b50bc41fb6727485dc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a77a357353e4cf3b50bc41fb6727485dc">free_password_entries</a> (<a class="el" href="structPasswordEntry.html">PasswordEntry</a> *entries, int count)</td></tr>
 <tr class="memdesc:a77a357353e4cf3b50bc41fb6727485dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees a list of <a class="el" href="structPasswordEntry.html" title="A struct representing a password entry.">PasswordEntry</a> structs.  <br /></td></tr>
+<tr class="memitem:ae27b69ea01c65dd5aa9b7d9a079e4988" id="r_ae27b69ea01c65dd5aa9b7d9a079e4988"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae27b69ea01c65dd5aa9b7d9a079e4988">database_gpg_add</a> (const <a class="el" href="structGpgKey.html">GpgKey</a> *key)</td></tr>
+<tr class="memitem:adcede67d0bdc11f51470991ed9f52d46" id="r_adcede67d0bdc11f51470991ed9f52d46"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adcede67d0bdc11f51470991ed9f52d46">database_gpg_update</a> (const <a class="el" href="structGpgKey.html">GpgKey</a> *key)</td></tr>
+<tr class="memitem:a13da3848aeb2e7276b32a181f289c671" id="r_a13da3848aeb2e7276b32a181f289c671"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a13da3848aeb2e7276b32a181f289c671">database_gpg_delete</a> (int id)</td></tr>
+<tr class="memitem:a64cb21c553677dfa2611b37f37b5ddba" id="r_a64cb21c553677dfa2611b37f37b5ddba"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structGpgKey.html">GpgKey</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a64cb21c553677dfa2611b37f37b5ddba">database_gpg_get_all</a> (int *count)</td></tr>
+<tr class="memitem:a7695be229ea9843a60f75c49c2b41be4" id="r_a7695be229ea9843a60f75c49c2b41be4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7695be229ea9843a60f75c49c2b41be4">database_gpg_free</a> (<a class="el" href="structGpgKey.html">GpgKey</a> *keys, int count)</td></tr>
 <tr class="memitem:a4bc5a926ac2d7904c49b7b036fae514f" id="r_a4bc5a926ac2d7904c49b7b036fae514f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4bc5a926ac2d7904c49b7b036fae514f">database_rekey</a> (const char *new_password)</td></tr>
 <tr class="memdesc:a4bc5a926ac2d7904c49b7b036fae514f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Changes the master password of the database.  <br /></td></tr>
 </table><table class="memberdecls">
@@ -235,6 +245,32 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="aa21df9515649d22e0718fdcb7e0e4ca4" name="aa21df9515649d22e0718fdcb7e0e4ca4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa21df9515649d22e0718fdcb7e0e4ca4">&#9670;&#160;</a></span>database_get_all_entries_full()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structPasswordEntry.html">PasswordEntry</a> * database_get_all_entries_full </td>
+          <td>(</td>
+          <td class="paramtype">int *</td>          <td class="paramname"><span class="paramname"><em>count</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Retrieves all password entries including all fields (secrets and updated_at). Used by the sync engine; do not use for list views. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">count</td><td>A pointer to an integer that will be filled with the number of entries. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A dynamically allocated array of <a class="el" href="structPasswordEntry.html" title="A struct representing a password entry.">PasswordEntry</a> structs. </dd></dl>
+
+</div>
+</div>
 <a id="a2711c92b76f8eacd5d6a99da3db8aeaa" name="a2711c92b76f8eacd5d6a99da3db8aeaa"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2711c92b76f8eacd5d6a99da3db8aeaa">&#9670;&#160;</a></span>database_get_entry_by_identity()</h2>
 
@@ -289,6 +325,122 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A dynamically allocated <a class="el" href="structPasswordEntry.html" title="A struct representing a password entry.">PasswordEntry</a> struct containing full details, or NULL if not found/error. The caller is responsible for freeing this struct using free_password_entry() (to be added) or manual free. </dd></dl>
+
+</div>
+</div>
+<a id="a36484a795f6fa7c6c0cb4f3d58d6520d" name="a36484a795f6fa7c6c0cb4f3d58d6520d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36484a795f6fa7c6c0cb4f3d58d6520d">&#9670;&#160;</a></span>database_get_tombstones()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structsync__tombstone__t.html">sync_tombstone_t</a> * database_get_tombstones </td>
+          <td>(</td>
+          <td class="paramtype">int *</td>          <td class="paramname"><span class="paramname"><em>count</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Retrieves all deletion tombstones recorded in the database. </p>
+<p>Tombstones remember which (service, username) pairs were deleted and when, so deletions can propagate during 2-way sync.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">count</td><td>A pointer to an integer that will be filled with the number of tombstones. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A dynamically allocated array of <a class="el" href="structsync__tombstone__t.html">sync_tombstone_t</a> structs. </dd></dl>
+
+</div>
+</div>
+<a id="ae27b69ea01c65dd5aa9b7d9a079e4988" name="ae27b69ea01c65dd5aa9b7d9a079e4988"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae27b69ea01c65dd5aa9b7d9a079e4988">&#9670;&#160;</a></span>database_gpg_add()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int database_gpg_add </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structGpgKey.html">GpgKey</a> *</td>          <td class="paramname"><span class="paramname"><em>key</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a13da3848aeb2e7276b32a181f289c671" name="a13da3848aeb2e7276b32a181f289c671"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a13da3848aeb2e7276b32a181f289c671">&#9670;&#160;</a></span>database_gpg_delete()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int database_gpg_delete </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>id</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a7695be229ea9843a60f75c49c2b41be4" name="a7695be229ea9843a60f75c49c2b41be4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7695be229ea9843a60f75c49c2b41be4">&#9670;&#160;</a></span>database_gpg_free()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void database_gpg_free </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="structGpgKey.html">GpgKey</a> *</td>          <td class="paramname"><span class="paramname"><em>keys</em></span>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>count</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="a64cb21c553677dfa2611b37f37b5ddba" name="a64cb21c553677dfa2611b37f37b5ddba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a64cb21c553677dfa2611b37f37b5ddba">&#9670;&#160;</a></span>database_gpg_get_all()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structGpgKey.html">GpgKey</a> * database_gpg_get_all </td>
+          <td>(</td>
+          <td class="paramtype">int *</td>          <td class="paramname"><span class="paramname"><em>count</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="adcede67d0bdc11f51470991ed9f52d46" name="adcede67d0bdc11f51470991ed9f52d46"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adcede67d0bdc11f51470991ed9f52d46">&#9670;&#160;</a></span>database_gpg_update()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int database_gpg_update </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="structGpgKey.html">GpgKey</a> *</td>          <td class="paramname"><span class="paramname"><em>key</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>

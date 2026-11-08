@@ -30,6 +30,11 @@
 <area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="239,107,363,150,358,152,238,112"/>
 <area shape="rect" id="Node000007" title=" " alt="" coords="378,232,447,260"/>
 <area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="415,183,415,218,411,215,411,187"/>
-<area shape="rect" id="Node000017" title=" " alt="" coords="1412,157,1485,184"/>
-<area shape="poly" id="edge16_Node000016_Node000017" title=" " alt="" coords="1450,107,1451,143,1447,139,1447,111"/>
+<area shape="rect" id="Node000017" title=" " alt="" coords="1364,232,1437,260"/>
+<area shape="poly" id="edge16_Node000016_Node000017" title=" " alt="" coords="1445,107,1427,158,1409,219,1406,215,1422,156,1441,111"/>
+<area shape="rect" id="Node000018" href="$sync__protocol_8h.html" title=" " alt="" coords="1436,157,1560,184"/>
+<area shape="poly" id="edge17_Node000016_Node000018" title=" " alt="" coords="1459,107,1483,145,1478,143,1456,112"/>
+<area shape="poly" id="edge18_Node000018_Node000017" title=" " alt="" coords="1483,184,1431,226,1429,221,1478,186"/>
+<area shape="rect" id="Node000019" title=" " alt="" coords="1463,232,1533,260"/>
+<area shape="poly" id="edge19_Node000018_Node000019" title=" " alt="" coords="1500,183,1500,218,1496,215,1496,187"/>
 </map>

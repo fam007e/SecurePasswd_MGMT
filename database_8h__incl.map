@@ -1,5 +1,10 @@
 <map id="core/database.h" name="core/database.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,131,33"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="31,81,105,109"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="70,32,71,66,65,65,66,36"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="27,5,153,33"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="5,157,79,184"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="86,31,69,82,51,143,46,141,63,80,83,36"/>
+<area shape="rect" id="Node000003" href="$sync__protocol_8h.html" title=" " alt="" coords="78,81,201,109"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="99,31,125,68,119,68,98,36"/>
+<area shape="poly" id="edge3_Node000003_Node000002" title=" " alt="" coords="124,108,73,150,69,145,119,110"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="104,157,174,184"/>
+<area shape="poly" id="edge4_Node000003_Node000004" title=" " alt="" coords="141,107,142,142,137,140,138,111"/>
 </map>

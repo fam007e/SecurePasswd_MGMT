@@ -1,3 +1,15 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classqrcodegen_1_1QrCode.html" title=" " alt="" coords="5,5,151,33"/>
+<area shape="rect" id="Node000000" title=" " alt="" coords="5,136,79,164"/>
+<area shape="rect" id="Node000001" href="$classEntryDialog.html" title=" " alt="" coords="173,5,270,33"/>
+<area shape="poly" id="edge1_Node000000_Node000001" title=" " alt="" coords="56,121,85,81,104,61,125,44,148,32,174,25,170,29,150,37,128,48,107,65,89,85,61,124"/>
+<area shape="rect" id="Node000002" href="$classGpgKeysDialog.html" title="Manages the OpenPGP key store inside the vault." alt="" coords="161,57,282,85"/>
+<area shape="poly" id="edge2_Node000000_Node000002" title=" " alt="" coords="73,125,126,95,163,84,159,87,128,100,77,129"/>
+<area shape="rect" id="Node000003" href="$classHealthCheckDialog.html" title="Performs security audits on the user&#39;s password database." alt="" coords="148,109,294,137"/>
+<area shape="poly" id="edge3_Node000000_Node000003" title=" " alt="" coords="93,140,150,132,146,136,95,145"/>
+<area shape="rect" id="Node000004" href="$classPasswordDialog.html" title=" " alt="" coords="159,161,284,189"/>
+<area shape="poly" id="edge4_Node000000_Node000004" title=" " alt="" coords="93,154,161,165,156,168,94,160"/>
+<area shape="rect" id="Node000005" href="$classPasswordGeneratorDialog.html" title=" " alt="" coords="127,213,316,241"/>
+<area shape="poly" id="edge5_Node000000_Node000005" title=" " alt="" coords="76,170,128,198,163,212,158,213,126,203,76,175"/>
+<area shape="rect" id="Node000006" href="$classSyncDialog.html" title="Manages the secure 2&#45;way mobile synchronization process." alt="" coords="174,265,268,293"/>
+<area shape="poly" id="edge6_Node000000_Node000006" title=" " alt="" coords="60,175,89,215,108,234,128,250,151,262,177,272,171,272,149,267,125,255,104,238,85,218,58,180"/>
 </map>

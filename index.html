@@ -132,19 +132,28 @@ Graphical User Interface (GUI)</h2>
 <li><b>Real-time TOTP:</b> Displays TOTP codes with a progress bar indicating the time until the next code is generated.</li>
 <li><b>Password Health Check:</b> Analyzes your passwords for weaknesses (e.g., reuse, short length) and provides recommendations.</li>
 <li><b>Integrated Pwned Check:</b> Check the status of your passwords against public breach databases directly from the GUI.</li>
+<li><b>OpenPGP Key Manager:</b> Import, edit and copy armored GPG keys from a dedicated dialog.</li>
+<li><b>Palettes &amp; Tri-State Theme:</b> Three curated color palettes (Nord, Dracula, Solarized), each with dark and light variants, plus Follow System / Light / Dark theme selection.</li>
+<li><b>Configurable Sync Port:</b> Preferred LAN port (default 33261) with automatic fallback.</li>
 </ul>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md5"></a>
 Cross-Platform Sync</h2>
 <ul>
-<li><b>Secure Mobile Sync:</b> Synchronize your vault securely between desktop and mobile devices using Chacha20-Poly1305 authenticated encryption.</li>
+<li><b>Two-Way Vault Sync:</b> Synchronize bidirectionally with the Android companion app over your LAN. A 512-bit one-time pairing secret (QR code) drives an ephemeral X25519 handshake with HKDF-SHA256 (forward secrecy + mutual authentication) and ChaCha20-Poly1305 AEAD frames with replay protection.</li>
+<li><b>Deterministic Merge:</b> Entries and deletions reconcile on both devices via a newer-wins merge engine with deletion tombstones — both sides converge without data loss, and conflicts are summarized after every session.</li>
 </ul>
 <h2 class="doxsection"><a class="anchor" id="autotoc_md6"></a>
+OpenPGP Key Store</h2>
+<ul>
+<li><b>GPG Keys in the Vault:</b> Store ASCII-armored public and secret keys (label, email, key ID) as first-class vault records — encrypted with everything else, searchable in the dedicated manager, and synced with the same newer-wins/tombstone rules as password entries.</li>
+</ul>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md7"></a>
 Desktop Integration</h2>
 <ul>
 <li><b>Linux:</b> Provides a <span class="tt">.desktop</span> file and multiple icon formats (SVG and PNG) for seamless desktop integration across various desktop environments.</li>
 <li><b>Windows:</b> Includes an installer and a proper application icon.</li>
 </ul>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md7"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md8"></a>
 Requirements</h1>
 <ul>
 <li><b>C/C++ Compiler</b> (GCC, Clang, MSVC)</li>
@@ -157,7 +166,7 @@ Requirements</h1>
 <li><b>OpenSSL</b></li>
 <li><b>cURL</b></li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md8"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md9"></a>
 Installation of Dependencies</h2>
 <p><b>Ubuntu/Debian:</b> </p><div class="fragment"><div class="line">sudo apt-get update</div>
 <div class="line">sudo apt-get install -y build-essential cmake libsodium-dev libargon2-dev \</div>
@@ -181,14 +190,14 @@ Installation of Dependencies</h2>
 <p class="startli"><div class="fragment"><div class="line">cmake .. -G "Visual Studio 17 2022" -A x64 -DCMAKE_TOOLCHAIN_FILE=path/to/your/vcpkg/scripts/buildsystems/vcpkg.cmake</div></div></p>
 </li>
 </ol>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md9"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md10"></a>
 Installation</h1>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md10"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md11"></a>
 Pre-built Packages</h2>
 <p>Pre-built packages for various platforms are available on the <a href="https://github.com/fam007e/SecurePasswd_MGMT/releases">GitHub Releases</a> page.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md11"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md12"></a>
 Build from Source</h2>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md12"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md13"></a>
 Linux (Ubuntu)</h3>
 <ol type="1">
 <li><p class="startli"><b>Install Dependencies:</b></p>
@@ -198,12 +207,12 @@ Linux (Ubuntu)</h3>
 <p class="startli"><div class="fragment"><div class="line">mkdir build &amp;&amp; cd build</div><div class="line">    cmake .. -DCMAKE_BUILD_TYPE=Release</div><div class="line">    cmake --build . --config Release</div></div></p>
 </li>
 </ol>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md13"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md14"></a>
 CLI-Only Build (No GUI)</h3>
 <p>If you do not want to build the GUI and wish to avoid installing Qt dependencies, use the following: </p><div class="fragment"><div class="line">mkdir build &amp;&amp; cd build</div>
 <div class="line">cmake .. -DBUILD_GUI=OFF -DCMAKE_BUILD_TYPE=Release</div>
 <div class="line">cmake --build . --config Release</div>
-</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md14"></a>
+</div><!-- fragment --><h3 class="doxsection"><a class="anchor" id="autotoc_md15"></a>
 macOS</h3>
 <ol type="1">
 <li><p class="startli"><b>Install Dependencies:</b></p>
@@ -213,7 +222,7 @@ macOS</h3>
 <p class="startli"><div class="fragment"><div class="line">mkdir build &amp;&amp; cd build</div><div class="line">    cmake .. -DCMAKE_BUILD_TYPE=Release \</div><div class="line">      -DLIBCSV_INCLUDE_DIRS=/usr/local/include \</div><div class="line">      -DLIBCSV_LIBRARIES=/usr/local/lib/libcsv.a</div><div class="line">    cmake --build . --config Release</div></div></p>
 </li>
 </ol>
-<h3 class="doxsection"><a class="anchor" id="autotoc_md15"></a>
+<h3 class="doxsection"><a class="anchor" id="autotoc_md16"></a>
 Windows</h3>
 <ol type="1">
 <li><b>Install Dependencies with vcpkg:</b> Follow the instructions in the "Windows (vcpkg)" section above to install the required dependencies.</li>
@@ -222,22 +231,22 @@ Windows</h3>
 <p class="startli">The compiled binaries (<span class="tt">securepasswd_cli.exe</span> and <span class="tt">securepasswd_gui.exe</span>) will be created in the <span class="tt">build/bin/Release</span> directory.</p>
 </li>
 </ol>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md16"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md17"></a>
 Usage</h1>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md17"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md18"></a>
 GUI Application</h2>
 <p>To run the graphical interface, execute the <span class="tt">securepasswd_gui</span> binary from within your build directory: </p><div class="fragment"><div class="line"># From the project root directory</div>
 <div class="line">./build/bin/securepasswd_gui</div>
 </div><!-- fragment --><p> On the first run, you will be prompted to create a new master password, which will be used to encrypt your vault.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md18"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md19"></a>
 Command-Line Interface</h2>
 <p>To run the command-line interface, execute the <span class="tt">securepasswd_cli</span> binary: </p><div class="fragment"><div class="line"># From the project root directory</div>
 <div class="line">./build/bin/securepasswd_cli</div>
 </div><!-- fragment --><p> The CLI provides an interactive menu for managing your passwords and TOTP secrets.</p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md19"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md20"></a>
 Security</h1>
 <p>This project was designed with a security-first mindset, incorporating modern, vetted cryptographic primitives. For a detailed breakdown of the security architecture, see our <b><a class="el" href="md_SECURITY.html">Security Policy</a></b>.</p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md20"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md21"></a>
 Project Structure</h1>
 <div class="fragment"><div class="line">SecurePasswd_MGMT/</div>
 <div class="line">├── .github/          # GitHub Actions workflows and issue templates</div>
@@ -245,13 +254,15 @@ Project Structure</h1>
 <div class="line">├── core/             # Core C library (encryption, password management)</div>
 <div class="line">├── cli/              # C command-line interface</div>
 <div class="line">├── gui/              # C++ Qt Graphical User Interface</div>
-<div class="line">├── tests/            # Unit and integration tests</div>
+<div class="line">├── tests/            # cmocka suites + libFuzzer targets for the sync protocol</div>
+<div class="line">├── docs/             # Threat model, testing summary, design tokens</div>
+<div class="line">├── Android: https://codeberg.org/fam007e/securepasswd_mgmt_apk (F-Droid)</div>
 <div class="line">├── CMakeLists.txt    # Root CMake build script</div>
 <div class="line">├── README.md         # This file</div>
 <div class="line">├── CONTRIBUTING.md   # Guidelines for contributing</div>
 <div class="line">├── SECURITY.md       # Detailed security policy</div>
 <div class="line">└── LICENSE           # Project license</div>
-</div><!-- fragment --><h1 class="doxsection"><a class="anchor" id="autotoc_md21"></a>
+</div><!-- fragment --><h1 class="doxsection"><a class="anchor" id="autotoc_md22"></a>
 API Documentation</h1>
 <p>The API documentation for the <span class="tt">core</span> library can be generated using Doxygen.</p>
 <ol type="1">
@@ -273,13 +284,13 @@ API Documentation</h1>
 </ol>
 <div class="fragment"><div class="line">doxygen Doxyfile</div>
 </div><!-- fragment --> <pre class="fragment">The documentation will be generated in the `docs/api` directory. Open `docs/api/html/index.html` in your web browser to view the documentation.
-</pre><h1 class="doxsection"><a class="anchor" id="autotoc_md22"></a>
+</pre><h1 class="doxsection"><a class="anchor" id="autotoc_md23"></a>
 Contribution</h1>
 <p>We welcome contributions! Please read our <a class="el" href="md_CONTRIBUTING.html">Contribution Guidelines</a> for details on the process for submitting pull requests.</p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md23"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md24"></a>
 Code of Conduct</h1>
 <p>We are committed to providing a friendly, safe, and welcoming environment for all. Please read and respect our <a class="el" href="md_CODE__OF__CONDUCT.html">Code of Conduct</a>.</p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md24"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md25"></a>
 License</h1>
 <p>This project is licensed under the <b>MIT License</b> - see the <a href="https://github.com/fam007e/SecurePasswd_MGMT/blob/main/LICENSE">LICENSE</a> file for details. </p>
 </div></div><!-- PageDoc -->

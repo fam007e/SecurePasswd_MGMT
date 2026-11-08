@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['healthcheckdialog_2ecpp_0',['healthcheckdialog.cpp',['../healthcheckdialog_8cpp.html',1,'']]],
-  ['healthcheckdialog_2eh_1',['healthcheckdialog.h',['../healthcheckdialog_8h.html',1,'']]]
+  ['gpgkeysdialog_2ecpp_0',['gpgkeysdialog.cpp',['../gpgkeysdialog_8cpp.html',1,'']]],
+  ['gpgkeysdialog_2eh_1',['gpgkeysdialog.h',['../gpgkeysdialog_8h.html',1,'']]]
 ];

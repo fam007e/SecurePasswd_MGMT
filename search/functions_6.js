@@ -22,5 +22,6 @@ var searchData=
   ['getusername_19',['getUsername',['../classEntryDialog.html#ae38689527e857ed4f082e9721fba6516',1,'EntryDialog']]],
   ['getusespecial_20',['getUseSpecial',['../classPasswordGeneratorDialog.html#aa887d4df77d09a715697acbd97d2c1cf',1,'PasswordGeneratorDialog']]],
   ['getuseuppercase_21',['getUseUppercase',['../classPasswordGeneratorDialog.html#aae8d4ec405d67650f36d216a098c6dad',1,'PasswordGeneratorDialog']]],
-  ['getversion_22',['getVersion',['../classqrcodegen_1_1QrCode.html#a2f473df995c683a0f3e63a6d83b6b2cb',1,'qrcodegen::QrCode']]]
+  ['getversion_22',['getVersion',['../classqrcodegen_1_1QrCode.html#a2f473df995c683a0f3e63a6d83b6b2cb',1,'qrcodegen::QrCode']]],
+  ['gpgkeysdialog_23',['GpgKeysDialog',['../classGpgKeysDialog.html#aace5110096211eab1dcfb1c93c0212a4',1,'GpgKeysDialog']]]
 ];
