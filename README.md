@@ -42,9 +42,16 @@
 - **Real-time TOTP:** Displays TOTP codes with a progress bar indicating the time until the next code is generated.
 - **Password Health Check:** Analyzes your passwords for weaknesses (e.g., reuse, short length) and provides recommendations.
 - **Integrated Pwned Check:** Check the status of your passwords against public breach databases directly from the GUI.
+- **OpenPGP Key Manager:** Import, edit and copy armored GPG keys from a dedicated dialog.
+- **Palettes & Tri-State Theme:** Three curated color palettes (Nord, Dracula, Solarized), each with dark and light variants, plus Follow System / Light / Dark theme selection.
+- **Configurable Sync Port:** Preferred LAN port (default 33261) with automatic fallback.
 
 ### Cross-Platform Sync
-- **Secure Mobile Sync:** Synchronize your vault securely between desktop and mobile devices using Chacha20-Poly1305 authenticated encryption.
+- **Two-Way Vault Sync:** Synchronize bidirectionally with the Android companion app over your LAN. A 512-bit one-time pairing secret (QR code) drives an ephemeral X25519 handshake with HKDF-SHA256 (forward secrecy + mutual authentication) and ChaCha20-Poly1305 AEAD frames with replay protection.
+- **Deterministic Merge:** Entries and deletions reconcile on both devices via a newer-wins merge engine with deletion tombstones — both sides converge without data loss, and conflicts are summarized after every session.
+
+### OpenPGP Key Store
+- **GPG Keys in the Vault:** Store ASCII-armored public and secret keys (label, email, key ID) as first-class vault records — encrypted with everything else, searchable in the dedicated manager, and synced with the same newer-wins/tombstone rules as password entries.
 
 ### Desktop Integration
 - **Linux:** Provides a `.desktop` file and multiple icon formats (SVG and PNG) for seamless desktop integration across various desktop environments.
@@ -217,7 +224,9 @@ SecurePasswd_MGMT/
 ├── core/             # Core C library (encryption, password management)
 ├── cli/              # C command-line interface
 ├── gui/              # C++ Qt Graphical User Interface
-├── tests/            # Unit and integration tests
+├── tests/            # cmocka suites + libFuzzer targets for the sync protocol
+├── docs/             # Threat model, testing summary, design tokens
+├── Android: https://codeberg.org/fam007e/securepasswd_mgmt_apk (F-Droid)
 ├── CMakeLists.txt    # Root CMake build script
 ├── README.md         # This file
 ├── CONTRIBUTING.md   # Guidelines for contributing

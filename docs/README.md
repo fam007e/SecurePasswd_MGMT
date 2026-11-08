@@ -4,14 +4,20 @@ This directory contains detailed documentation for SecurePasswd_MGMT development
 
 ## Documentation Files
 
-### CHANGES_SUMMARY.md
-Comprehensive summary of all changes made to fix bugs and enhance security features, including:
-- Core library fixes (database delete verification)
-- CLI enhancements (password health check with 16+ char requirement, entropy validation, reuse detection)
-- GUI fixes (segfault prevention, missing toolbar buttons, entry validation)
-- Test additions and coverage
-- Security impact analysis
-- Compliance standards alignment
+### DESIGN_TOKENS.md
+The shared design contract for desktop and Android: color palettes (Nord,
+Dracula, Solarized — each dark and light), shape scale, theme behavior
+(tri-state: Follow System / Light / Dark), and user-visible copy.
+
+### THREAT_MODEL.md
+STRIDE threat model, including the LAN 2-way sync session and the Android
+companion attack surface.
+
+### TESTING.md
+Test suites, sanitizer runs, fuzz targets and CI verification summary.
+
+### USER_GUIDE.md
+GUI walkthrough: entries, TOTP, OpenPGP keys, palettes/themes, two-way sync.
 
 ## Main Documentation
 
@@ -67,8 +73,9 @@ Guidelines for contributing to the project, including security-focused developme
 - Tests: All passing
 
 ### Testing Locations
-- Unit tests: `tests/test_core.c`
-- Test execution: `cd build/tests && ./core_tests`
+- Unit tests: `tests/test_core.c`, `tests/test_cmocka.c`, `tests/test_sync_protocol.c` (13 protocol tests)
+- Fuzz targets: `tests/fuzz/` (snapshot, frames, TOTP, password generator)
+- Test execution: `ctest --test-dir build`
 
 ## Additional Resources
 
@@ -83,4 +90,4 @@ Report bugs and request features via GitHub Issues.
 
 ---
 
-Last Updated: 2025
+Last Updated: November 2026
