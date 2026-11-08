@@ -81,6 +81,11 @@ private:
     QAction *healthCheckAction;
     QAction *themeAction;
     QAction *gpgKeysAction = nullptr;
+    QActionGroup *themeGroup = nullptr;
+    QToolButton *themeButton = nullptr;
+    QString uiMode = QStringLiteral("system"); /* system | light | dark */
+    QString resolvedTheme() const;
+    void syncThemeChecks();
     QAction *paletteAction = nullptr;
     QToolButton *paletteButton = nullptr;
     QActionGroup *paletteGroup = nullptr;

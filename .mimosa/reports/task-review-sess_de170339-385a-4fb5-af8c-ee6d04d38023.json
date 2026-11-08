@@ -1,45 +1,39 @@
 {
   "schema_version": "mimosa-task-review/v2",
-  "run_id": "20261107T234425075Z-266179-fee23aab78ac",
-  "run_status": "inconclusive",
-  "errors": [
-    {
-      "stage": "baseline",
-      "target": ".",
-      "reason": "baseline_partial: baseline capture had enumeration or snapshot errors"
-    }
-  ],
+  "run_id": "20261108T013206489Z-1668894-8f388ac81b26",
+  "run_status": "completed",
+  "errors": [],
   "coverage": {
     "schema_version": "mimosa-hook-coverage/v1",
-    "status": "partial",
+    "status": "complete",
     "scope": "hook_observed_diff",
     "baseline": {
-      "complete": false,
+      "complete": true,
       "captured_files": 50,
       "candidate_limit": 5000,
       "truncated": false,
       "enumeration_error_count": 0,
-      "snapshot_error_count": 23,
-      "compensated_target_count": 11
+      "snapshot_error_count": 0,
+      "compensated_target_count": 1
     },
     "change_tracking": {
-      "touched_observed": 11,
-      "touched_retained": 11,
+      "touched_observed": 1,
+      "touched_retained": 1,
       "truncated": false,
       "bash_mutation": true,
-      "bash_discovered": 11,
+      "bash_discovered": 1,
       "bash_discovery_limit": 80,
       "bash_discovery_truncated": false
     },
     "candidates": {
-      "eligible_files": 11,
-      "selected_files": 11,
+      "eligible_files": 1,
+      "selected_files": 1,
       "limit": 20,
       "truncated": false
     },
     "scanning": {
-      "required_files": 11,
-      "scanned_files": 11,
+      "required_files": 1,
+      "scanned_files": 1,
       "skipped_files": 0,
       "failed_files": 0,
       "project_checks_required": 0,
@@ -51,245 +45,37 @@
       "detail_limit": 3,
       "truncated": false
     },
-    "reason_counts": {
-      "baseline_partial": 1,
-      "project_check_failed": 1
-    },
-    "reasons": [
-      {
-        "code": "baseline_partial",
-        "stage": "baseline",
-        "target": ".",
-        "detail": "baseline capture had enumeration or snapshot errors",
-        "affects_completion": true
-      },
-      {
-        "code": "project_check_failed",
-        "stage": "baseline",
-        "target": ".",
-        "detail": "baseline_partial: baseline capture had enumeration or snapshot errors",
-        "affects_completion": true
-      }
-    ],
+    "reason_counts": {},
+    "reasons": [],
     "reasons_truncated": false
   },
-  "generated_at": "2026-11-07T23:44:25.075Z",
+  "generated_at": "2026-11-08T01:32:06.489Z",
   "session_id": "sess_de170339-385a-4fb5-af8c-ee6d04d38023",
   "target": ".",
-  "revision": "6cf78d421da8d7db281365c8f6f61c41cfbb42bb",
+  "revision": "9439319d0a6827cb5baa80740b96e28904b30f51",
   "rules_version": "unavailable",
-  "diff_hash": "0a09de07018dab0d68594b8d2361b4f6889e6cdcc52b33c8c6a1646bcc2d32c4",
+  "diff_hash": "dfe22c763b219ea5509943e4d6ba03490a847f0679aadf94b2ca8f5d0e2cac72",
   "diff": {
     "algorithm": "sha256",
-    "changed_file_count": 11,
+    "changed_file_count": 1,
     "changed_files": [
-      {
-        "file": "core/database.c",
-        "ranges": [
-          {
-            "start": 682,
-            "end": 698
-          },
-          {
-            "start": 702,
-            "end": 854
-          }
-        ],
-        "before_hash": "73f56b58414d80dfbf4c0a6aa08bd80440896bcf671b357ae085491b0d07240d",
-        "after_hash": "998bdb1ba6d4451c521a83ed2c1f50297c09384ecb4968a2c45000488933868c"
-      },
-      {
-        "file": "core/database.h",
-        "ranges": [
-          {
-            "start": 66,
-            "end": 87
-          }
-        ],
-        "before_hash": "60805daadd2869bddde7ecac1ea75cb0d3854142a032e1ca4a74f24bbc5cb5b3",
-        "after_hash": "a387a3a2f73f8f630cd23437acc658509800b5eb57fe8910712599dc8340e5b8"
-      },
-      {
-        "file": "core/sync_protocol.c",
-        "ranges": [
-          {
-            "start": 748,
-            "end": 1016
-          }
-        ],
-        "before_hash": "e9f02adb67c96ce2587c53624a95e16c684be52cfc7b7da43f11de5936181ac6",
-        "after_hash": "f9bd3ca769368905d0671767b7d2f20253a41dade72ec52ff51aaa493f18e1cc"
-      },
-      {
-        "file": "core/sync_protocol.h",
-        "ranges": [
-          {
-            "start": 54,
-            "end": 55
-          },
-          {
-            "start": 172,
-            "end": 186
-          },
-          {
-            "start": 207,
-            "end": 218
-          },
-          {
-            "start": 269,
-            "end": 295
-          }
-        ],
-        "before_hash": "a927fd5caf920d9d769aa4eda7eecce064c1e5009c217f63e66ab69c04832edd",
-        "after_hash": "2901c0e9189bbfca5a9538c3bbd360a654a247c0122e6ff5611a2e5ec1d45e97"
-      },
-      {
-        "file": "gui/gpgkeysdialog.cpp",
-        "ranges": [
-          {
-            "start": 1,
-            "end": 186
-          }
-        ],
-        "before_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "after_hash": "747857f94eb83dc03aad0736727220ced7c0f28789731a4345c5366cabe53e98"
-      },
-      {
-        "file": "gui/gpgkeysdialog.h",
-        "ranges": [
-          {
-            "start": 1,
-            "end": 48
-          }
-        ],
-        "before_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-        "after_hash": "8b923e4bd16c01048c1e0a70af61dabb33baaf91c0c74c766e05344104e2855c"
-      },
-      {
-        "file": "gui/mainwindow.cpp",
-        "ranges": [
-          {
-            "start": 4,
-            "end": 4
-          },
-          {
-            "start": 16,
-            "end": 16
-          },
-          {
-            "start": 222,
-            "end": 227
-          },
-          {
-            "start": 536,
-            "end": 538
-          },
-          {
-            "start": 661,
-            "end": 661
-          },
-          {
-            "start": 727,
-            "end": 735
-          }
-        ],
-        "before_hash": "73126a721f1f3beb61d7722de01a085462e5e3c5c3f563aef19a2038ec027df2",
-        "after_hash": "bee1ee03b5729029d81bf0acadfc9a70d08f471932ab7c50f6b34a0c8cae8ab2"
-      },
-      {
-        "file": "gui/mainwindow.h",
-        "ranges": [
-          {
-            "start": 19,
-            "end": 19
-          },
-          {
-            "start": 50,
-            "end": 50
-          },
-          {
-            "start": 83,
-            "end": 83
-          },
-          {
-            "start": 86,
-            "end": 87
-          }
-        ],
-        "before_hash": "194d8d485d3e35d6bee512c45525d81588fe2d9268f21e069403287889cf92e0",
-        "after_hash": "282c749a6c0a3747ff6ba3585b167c6c036e91261c3901c2ed65d1221c34c61d"
-      },
-      {
-        "file": "gui/syncdialog.cpp",
-        "ranges": [
-          {
-            "start": 244,
-            "end": 249
-          },
-          {
-            "start": 351,
-            "end": 356
-          },
-          {
-            "start": 430,
-            "end": 430
-          },
-          {
-            "start": 515,
-            "end": 596
-          },
-          {
-            "start": 599,
-            "end": 600
-          },
-          {
-            "start": 735,
-            "end": 856
-          }
-        ],
-        "before_hash": "3e48507b5da394d7a9118db0937bf381c86385e0e7f71dd247efab1148454110",
-        "after_hash": "d3c1911f5a15cf0d89e176462e692c298a8c42554b2dc55b22befc82277acb16"
-      },
-      {
-        "file": "gui/syncdialog.h",
-        "ranges": [
-          {
-            "start": 55,
-            "end": 55
-          },
-          {
-            "start": 69,
-            "end": 69
-          },
-          {
-            "start": 71,
-            "end": 77
-          }
-        ],
-        "before_hash": "25ce8e28763cb93805b1d5c89fcd5225fda33d8551545f9c689d1524c82b8796",
-        "after_hash": "e8e4aba876b5efb0eefaa7d9d849b63bc773247b28a9f5468979c45ed81c4944"
-      },
       {
         "file": "tests/test_sync_protocol.c",
         "ranges": [
           {
-            "start": 367,
-            "end": 472
-          },
-          {
-            "start": 485,
-            "end": 487
+            "start": 418,
+            "end": 418
           }
         ],
-        "before_hash": "28859d49e03dae7b828547cd45dbfbc29e46f4a8180dd1a028964383ec80c3c6",
-        "after_hash": "79456cd19d896d0fd64d5f44d28c2715d11e3f24d24db5e326c72ab9b5349a79"
+        "before_hash": "35d0cd1645d3560be8e8a90d362694047e0cd40d53a4eb21fd8769abf24d3009",
+        "after_hash": "1aafdc9eee3dc117eb268bfa4f634601d70904c4d2e4e4490799ac61bbab99c3"
       }
     ]
   },
   "timing": {
-    "started_at": "2026-11-07T23:44:23.344Z",
-    "completed_at": "2026-11-07T23:44:25.075Z",
-    "duration_ms": 1731,
+    "started_at": "2026-11-08T01:32:05.261Z",
+    "completed_at": "2026-11-08T01:32:06.489Z",
+    "duration_ms": 1228,
     "measurement": "hook_wall_clock"
   },
   "tokens": {
@@ -303,11 +89,11 @@
     "schemaVersion": "mimosa-gate-telemetry/v1",
     "profile": "gate",
     "operation": "Stop",
-    "outcome": "partial/INCONCLUSIVE",
-    "latencyMs": 1731,
-    "peakMemoryBytes": 217759744,
+    "outcome": "complete",
+    "latencyMs": 1228,
+    "peakMemoryBytes": 191377408,
     "memoryMeasurement": "max-observed-process-rss",
-    "scannedFiles": 11,
+    "scannedFiles": 1,
     "cache": {
       "hits": 0,
       "misses": 0,
@@ -332,8 +118,8 @@
   "finding_events": [],
   "findings": [],
   "artifacts": {
-    "immutable_report": ".mimosa/reports/task-review-sess_de170339-385a-4fb5-af8c-ee6d04d38023-20261107T234425075Z-266179-fee23aab78ac.json",
+    "immutable_report": ".mimosa/reports/task-review-sess_de170339-385a-4fb5-af8c-ee6d04d38023-20261108T013206489Z-1668894-8f388ac81b26.json",
     "latest_report": ".mimosa/reports/task-review-sess_de170339-385a-4fb5-af8c-ee6d04d38023.json",
-    "history_summary": ".mimosa/history/run-20261107T234425075Z-266179-fee23aab78ac.json"
+    "history_summary": ".mimosa/history/run-20261108T013206489Z-1668894-8f388ac81b26.json"
   }
 }
