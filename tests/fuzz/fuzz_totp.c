@@ -26,12 +26,14 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     size_t secret_len = size - 8;
     char *secret = malloc(secret_len + 1);
     if (!secret) return 0;
-    memcpy(secret, data, secret_len);
+    /* flawfinder: ignore */
+    memcpy(secret, data, secret_len); /* dest = malloc(secret_len+1): in-bounds */
     secret[secret_len] = '\0';
 
     char *code = generate_totp_code_at_time(secret, t);
     if (code) {
         /* A produced code must be exactly 6 digits. */
+        /* flawfinder: ignore */
         if (strlen(code) != 6) {
             abort(); /* contract violation, not just a crash */
         }

@@ -55,6 +55,8 @@ const Palette &paletteById(const QString &id) {
 QString buildStyleSheet(const Palette &palette, bool dark) {
     const ThemeTokens &t = dark ? palette.dark : palette.light;
 
+    /* Qt resource path — not a filesystem path; no symlink/race surface. */
+    /* flawfinder: ignore */
     QFile file(QStringLiteral(":/theme_template.qss"));
     if (!file.open(QFile::ReadOnly | QFile::Text)) {
         return QString();

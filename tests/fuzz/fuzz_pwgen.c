@@ -29,6 +29,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     char *pw = generate_password(len, upper, num, special);
     if (!pw) return 0;
 
+    /* flawfinder: ignore */
     if (strlen(pw) != (size_t)len) {
         abort(); /* length contract violation */
     }
