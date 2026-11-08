@@ -372,8 +372,8 @@ void SyncDialog::processRxBuffer() {
             return;
         }
         uint8_t clientPub[SYNC_EPHEMERAL_LEN];
-        /* flawfinder: ignore */
-        memcpy(clientPub, rxBuffer.constData() + 1, SYNC_EPHEMERAL_LEN);
+        std::copy(rxBuffer.constData() + 1, rxBuffer.constData() + 1 + SYNC_EPHEMERAL_LEN,
+                  clientPub);
         rxBuffer.remove(0, 1 + SYNC_EPHEMERAL_LEN);
 
         if (sync_session_derive(SYNC_ROLE_SERVER,
@@ -755,12 +755,14 @@ bool SyncDialog::applyGpgMergeReport(const sync_gpg_merge_report_t &report, QStr
             key.updated_at = r->winner.updated_at;
 
             // Find the local row by label (labels are the merge identity).
+            const QString winnerLabel =
+                QString::fromUtf8(r->winner.label ? r->winner.label : "");
             int count = 0;
             GpgKey *keys = database_gpg_get_all(&count);
             int localId = 0;
             for (int j = 0; j < count; j++) {
-                if (keys[j].label && r->winner.label &&
-                    strcasecmp(keys[j].label, r->winner.label) == 0) {
+                if (keys[j].label &&
+                    QString::fromUtf8(keys[j].label).compare(winnerLabel, Qt::CaseInsensitive) == 0) {
                     localId = keys[j].id;
                     break;
                 }
@@ -785,11 +787,14 @@ bool SyncDialog::applyGpgMergeReport(const sync_gpg_merge_report_t &report, QStr
             break;
         case SYNC_MERGE_DELETED: {
             // Locate by label; database_gpg_delete records the tombstone.
+            const QString deletedLabel =
+                QString::fromUtf8(r->label ? r->label : "");
             int count = 0;
             GpgKey *keys = database_gpg_get_all(&count);
             int localId = 0;
             for (int j = 0; j < count; j++) {
-                if (keys[j].label && strcasecmp(keys[j].label, r->label) == 0) {
+                if (keys[j].label &&
+                    QString::fromUtf8(keys[j].label).compare(deletedLabel, Qt::CaseInsensitive) == 0) {
                     localId = keys[j].id;
                     break;
                 }
