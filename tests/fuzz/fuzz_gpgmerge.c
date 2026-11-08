@@ -19,6 +19,15 @@
 
 #include "sync_protocol.h"
 
+/* Parser contract: surviving keys always carry a label. The merge guards
+ * defensively (NULL-label keys never match), but a NULL label surviving a
+ * successful parse would mean the serializer/parser pair drifted apart. */
+static void check_labels_nonnull(const sync_gpg_key_t *keys, int count) {
+    for (int i = 0; i < count; i++) {
+        if (keys[i].label == NULL) abort();
+    }
+}
+
 int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     /* Keep exec time bounded, matching fuzz_snapshot. */
     if (size < 2 || size > 256 * 1024) return 0;
@@ -30,18 +39,10 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     sync_gpg_key_t *lk = NULL, *rk = NULL;
     int ln = 0, rn = 0;
     if (sync_gpg_deserialize(data, half, &lk, &ln) == 0) {
-        /* Parser contract: surviving keys always carry a label. The merge
-         * guards defensively (NULL-label keys never match), but a NULL
-         * label surviving a successful parse would mean the serializer/
-         * parser pair drifted apart. */
-        for (int i = 0; i < ln; i++) {
-            if (lk[i].label == NULL) abort();
-        }
+        check_labels_nonnull(lk, ln);
     }
     if (sync_gpg_deserialize(data + half, size - half, &rk, &rn) == 0) {
-        for (int i = 0; i < rn; i++) {
-            if (rk[i].label == NULL) abort();
-        }
+        check_labels_nonnull(rk, rn);
     }
 
     /* Tombstones parsed from the same hostile bytes. */
@@ -69,7 +70,7 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
     }
 
     /* Round-trip: anything accepted must re-serialize and re-parse to the
-     * same key count. */
+     * same key count. Then free the local store. */
     if (lk) {
         uint8_t *buf = NULL;
         size_t bl = 0;
@@ -83,9 +84,10 @@ int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size) {
             memset(buf, 0, bl);
             free(buf);
         }
+        sync_gpg_keys_free(lk, ln);
+        lk = NULL;
     }
 
-    if (lk) sync_gpg_keys_free(lk, ln);
     if (rk) sync_gpg_keys_free(rk, rn);
     if (le) sync_entries_free(le, ln_e);
     if (re) sync_entries_free(re, rn_e);
