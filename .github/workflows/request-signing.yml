@@ -13,8 +13,8 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - name: Dispatch to OSSign
+      - name: Dispatch to OSSign (trusted workflow)
         id: dispatch
-        uses: OSSign/actions/workflow/dispatch@0e67f66216cad6f95810cec071d213d8eee2ce28 # v3
+        uses: OSSign/actions/workflow/trusted-dispatch@43b42df3dc71718e98aca212ee366f56c98c1270
         with:
           dispatch_only: true
