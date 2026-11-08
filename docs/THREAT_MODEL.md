@@ -27,7 +27,7 @@ STRIDE is a threat modeling methodology that helps to identify and categorize th
 
 **Threat:** An attacker with local access to the user's machine could try to tamper with the encrypted database file (`vault.db`) to corrupt data or gain unauthorized access.
 
-**Countermeasure:** The database is encrypted using SQLCipher, which employs an authenticated encryption scheme (AES-256 in CBC mode with HMAC-SHA1). This ensures both the confidentiality and integrity of the data. Any tampering with the database file will be detected by the HMAC, and the application will fail to open the database.
+**Countermeasure:** The database is encrypted using SQLCipher (AES-256-CBC with per-page HMAC integrity authentication). Any tampering with the database file is detected by the HMAC, and the application will fail to open the database. The OpenPGP key store lives inside the same encrypted database.
 
 ---
 
@@ -61,6 +61,26 @@ STRIDE is a threat modeling methodology that helps to identify and categorize th
 **Threat:** An attacker could attempt to brute-force the master password.
 
 **Countermeasure:** The use of Argon2id as the key derivation function makes brute-force attacks computationally expensive and slow, significantly increasing the time and resources required for a successful attack.
+
+---
+
+### Information Disclosure (LAN Sync)
+
+**Threat:** An attacker on the same network connects to the sync server, replays captured sessions, or passively records sync traffic.
+
+**Countermeasures:**
+- The sync session requires knowledge of a 512-bit one-time pairing secret that only exists in the QR code shown at pairing time; without it, the handshake cannot proceed.
+- Ephemeral X25519 + HKDF-SHA256 (PSK as salt, transcript-bound) gives forward secrecy: captured traffic cannot be decrypted even if a later pairing secret leaks.
+- All frames are ChaCha20-Poly1305 AEAD with sequence-number nonces and type-bound AAD; replays and re-ordering are rejected. Key confirmation uses a constant-time transcript comparison.
+- Stalled sessions are aborted after 30 seconds of inactivity; only one client may connect at a time.
+
+---
+
+### Information Disclosure (Device Theft / Backup)
+
+**Threat:** The Android device or a cloud backup exposes the vault.
+
+**Countermeasures:** The Android app enforces `FLAG_SECURE` (no screenshots/recents), `allowBackup=false` with explicit backup/data-extraction exclusion rules for the vault, a network security config that denies cleartext traffic, and optionally icon masquerading (the launcher icon/name can be switched to Calculator/Notes/Files variants) so the vault is not advertised on the home screen.
 
 ---
 

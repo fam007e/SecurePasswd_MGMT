@@ -99,15 +99,17 @@ Rapidly find your accounts using the global search features:
   ./securepasswd_cli --search "GitHub"
   ```
 
-## Mobile Synchronization
+## Two-Way Mobile Synchronization
 
-SecurePasswd_MGMT allows you to sync your encrypted vault to your mobile device:
+SecurePasswd_MGMT synchronizes your vault **bidirectionally** with the Android companion app over your local network:
 
-1.  Click the **Sync to Mobile** button on the toolbar.
-2.  The application will generate a one-time encryption key and start a secure local server.
-3.  A **QR Code** will be displayed containing the connection details and the temporary key.
-4.  Scan this QR code with your SecurePasswd Mobile app to securely transfer your vault.
-5.  All data is protected with **Chacha20-Poly1305** authenticated encryption during transit.
+1.  Click the **Sync** button on the toolbar.
+2.  Choose your network interface if several are available (and optionally set the **Port**, default 33261).
+3.  A **QR code** appears containing a one-time 512-bit pairing secret — scan it with the mobile app.
+4.  After an authenticated handshake, the mobile sends its vault snapshot; the desktop merges it (newer changes win, deletions propagate) and sends the merged vault back. Both devices end up identical.
+5.  Your stored **OpenPGP keys** are exchanged and merged in the same session.
+6.  A summary shows exactly what changed: `Added X · Updated Y · Deleted Z · Conflicts W`.
+7.  All traffic is end-to-end encrypted (X25519 + ChaCha20-Poly1305); the pairing secret is valid for that session only and never stored.
 
 ## Import/Export
 
@@ -116,6 +118,17 @@ You can import and export your password data in CSV format.
 - **To import:** Click the **Import** button and select a CSV file. If duplicate entries are detected (matching Service + Username), the application will automatically offer conflict resolution options.
 - **To export:** Click the **Export** button and choose a location. **WARNING:** Exported files contain unencrypted secrets and should be handled with extreme caution.
 
-## Changing the Theme
+## Themes and Color Palettes
 
-You can switch between a light and dark theme by clicking the **Theme** toggle button on the toolbar.
+- The **palette button** (paint icon) switches between three curated color families: **Nord** (default), **Dracula**, and **Solarized** — each has dark and light variants.
+- The **theme button** (moon/sun icon) opens a menu with **Follow System**, **Light**, and **Dark**. Follow System tracks your OS appearance live.
+- The **OpenPGP Keys** button opens the key manager (see below).
+
+## OpenPGP Keys
+
+Store armored GPG keys inside the encrypted vault:
+
+1.  Click the **OpenPGP Keys** button on the toolbar.
+2.  Paste your armored key block and fill in a label (the identifier used for sync), email, and key ID.
+3.  Keys participate in 2-way sync like password entries; deleting one records a tombstone so the removal propagates.
+4.  Use **Copy Public Key** to share your public key; secret keys never leave the vault in plaintext.

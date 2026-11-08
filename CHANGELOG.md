@@ -5,6 +5,32 @@ All notable changes to SecurePasswd_MGMT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to date-based versioning (YYYY.MM.DD).
 
+## [2026.11.08]
+
+### Added
+- **Two-Way Mobile Sync (v2):** Complete rewrite of mobile sync as an interactive, mutually-authenticated session: 512-bit pairing secret (vsync2 QR), ephemeral X25519 + HKDF-SHA256 key derivation bound to the handshake transcript, ChaCha20-Poly1305 frames with sequence-number nonces and type-bound AAD, key-confirmation exchange, and deterministic newer-wins merge with deletion tombstones (`updated_at` column + `deleted_entries` table).
+- **OpenPGP Key Storage:** Armored public/secret GPG keys as first-class vault records (`gpg_keys` table) with a desktop manager dialog and full 2-way sync support via the SPSNAP03 key-store section (`SYNC_FRAME_GPG`).
+- **Color Palettes:** Three curated palettes (Nord, Dracula, Solarized), each with dark and light variants, selected from an exclusive-checkmark toolbar menu; themes are generated from a token template (`theme_template.qss` + `gui/themes.cpp`).
+- **Tri-State Theme:** Follow System / Light / Dark menu replaces the binary toggle; the OS color scheme is followed live (Qt 6.5 `colorSchemeChanged`) and legacy `theme` settings migrate.
+- **Configurable Sync Port:** Preferred LAN port persisted per session with automatic fallback and re-bind handling.
+- **libFuzzer Targets:** Four fuzz harnesses (snapshot parser, AEAD frames, TOTP engine, password generator — with output-contract assertions) running in CI under ASan/UBSan; the snapshot harness also self-merges hostile records.
+- **F-Droid Reproducibility (Android):** Gradle dependency verification (871 pinned artifacts, strict CI), wrapper checksum pin, two-build byte-identity verification, published SHA256SUMS, hardened CSPRNG shim (getrandom, bias-free rejection sampling), OpenSSL bumped to 3.3.7.
+- **Android Feature Parity:** Two-way sync client, OpenPGP key screen, color palettes, tri-state theme cycle, alphabet fast-scroller, themed splash screen, app-icon masquerading (5 launcher aliases incl. a black & white minimalist variant and Calculator/Notes/Files disguises).
+
+### Changed
+- **DESIGN_TOKENS.md:** Shared design contract (palettes, shapes, behavior, copy) mirrored across both repositories.
+- **Sync Summary Format:** Cross-platform one-line result summary (`Added X · Updated Y · Deleted Z · Conflicts W`).
+- **Icons:** New palette and key glyphs; theme/recovery/exit icons recolored to `currentColor` for correct contrast in both themes.
+
+### Removed
+- **One-Shot Sync Protocol:** The legacy `vsync:` encrypted-dump sync (`sync_service.c`) is removed; old clients are rejected with an update prompt (breaking change — desktop and Android must ship together).
+
+### Fixed
+- **Session Cleanup:** Pairing secret and ephemeral keys are wiped on dialog close; a 30s inactivity timeout aborts stalled sessions; the ERROR frame is now actually delivered to the mobile side.
+- **Key Confirmation:** Constant-time comparison (`sync_ct_equal`) for the transcript check.
+- **Windows Build:** `sync_protocol.c` guards `<strings.h>` for MSVC.
+- **Silent Docs Exclusion:** `.gitignore`'s blanket `docs/` rule had excluded `DESIGN_TOKENS.md` from the repository.
+
 ## [2026.11.03]
 
 ### Added

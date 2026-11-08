@@ -50,15 +50,17 @@ compile_commands.json
 *.dmg
 *.nsi
 
-# Generated docs — CI builds & deploys to gh-pages
-docs/
+# Generated docs (doxygen/html) — CI builds & deploys to gh-pages
+docs/api/
 !docs/.gitkeep
-!docs/TESTING.md
-!docs/USER_GUIDE.md
-!docs/THREAT_MODEL.md
 
 # GDB logging env
 .gdbinit
 
 # Termux error log
 termux-err-log/
+
+# Mimosa security-hook session state (plugin working files;
+# nested copies exist wherever the hook's cwd was)
+.mimosa/
+**/.mimosa/

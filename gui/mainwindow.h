@@ -16,7 +16,9 @@ class QListWidget;
 class QTextEdit;
 class QToolBar;
 class QAction;
+class QActionGroup;
 class QPushButton;
+class QToolButton;
 
 /**
  * @class MainWindow
@@ -45,6 +47,7 @@ private slots:
     void onImport();
     void onExport();
     void onSync();
+    void onOpenGpgKeys();
     void onDelete();
     void onHealthCheck();
     void onToggleTheme();
@@ -77,9 +80,21 @@ private:
     QAction *syncAction;
     QAction *healthCheckAction;
     QAction *themeAction;
+    QAction *gpgKeysAction = nullptr;
+    QActionGroup *themeGroup = nullptr;
+    QToolButton *themeButton = nullptr;
+    QString uiMode = QStringLiteral("system"); /* system | light | dark */
+    QString resolvedTheme() const;
+    void syncThemeChecks();
+    QAction *paletteAction = nullptr;
+    QToolButton *paletteButton = nullptr;
+    QActionGroup *paletteGroup = nullptr;
+    void syncPaletteChecks();
     QAction *toggleRecoveryCodesAction;
     QAction *changePasswordAction;
     QString currentTheme;
+    QString currentPalette = QStringLiteral("nord");
+    bool systemTheme = false; /* true until the user picks a theme explicitly */
 
     // TOTP Display
     QLabel *totpLabel;

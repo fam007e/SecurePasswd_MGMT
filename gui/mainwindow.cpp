@@ -1,7 +1,9 @@
 #include "mainwindow.h"
 #include "entrydialog.h"
 #include "syncdialog.h"
+#include "gpgkeysdialog.h"
 #include "healthcheckdialog.h"
+#include "themes.h"
 #include "database.h"
 #include "totp.h"
 #include "platform_paths.h"
@@ -11,6 +13,12 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QToolBar>
+#include <QActionGroup>
+#include <QToolButton>
+#include <QMenu>
+#include <QGuiApplication>
+#include <QStyleHints>
+#include <QSettings>
 #include <QAction>
 #include <QMessageBox>
 #include <QFileDialog>
@@ -109,8 +117,26 @@ MainWindow::MainWindow(const QString& password, QWidget *parent) : QMainWindow(p
     setupUI();
     refreshEntryList();
 
-    currentTheme = settings.value("theme", "light").toString();
+    // Theme: ui_mode is "system" (default), "light" or "dark". The legacy
+    // "theme" key (binary toggle) is migrated once: light/dark keep their
+    // override, anything else means follow-system.
+    currentPalette = settings.value("palette", "nord").toString();
+    uiMode = settings.value("ui_mode").toString();
+    if (uiMode.isEmpty()) {
+        QString legacy = settings.value("theme").toString();
+        uiMode = (legacy == QLatin1String("light") || legacy == QLatin1String("dark"))
+                     ? legacy : QStringLiteral("system");
+    }
+    systemTheme = (uiMode == QLatin1String("system"));
+    currentTheme = resolvedTheme();
     loadTheme(currentTheme);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    connect(QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged, this, [this]() {
+        if (systemTheme) {
+            loadTheme(resolvedTheme());
+        }
+    });
+#endif
 }
 
 MainWindow::~MainWindow() {
@@ -187,6 +213,12 @@ void MainWindow::onExport() {
 void MainWindow::onSync() {
     SyncDialog dialog(this);
     dialog.exec();
+}
+
+void MainWindow::onOpenGpgKeys() {
+    GpgKeysDialog dialog(this);
+    dialog.exec();
+    refreshEntryList(); /* no-op for entries, but keeps future state fresh */
 }
 
 void MainWindow::onSearchChanged(const QString &text) {
@@ -497,6 +529,9 @@ void MainWindow::setupUI() {
     healthCheckAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_H));
     healthCheckAction->setToolTip("Run password health check (Alt+H)");
     toolBar->addAction(healthCheckAction);
+    gpgKeysAction = new QAction(QIcon(":/icons/key.svg"), "OpenPGP Keys", this);
+    gpgKeysAction->setToolTip("Manage stored OpenPGP keys");
+    toolBar->addAction(gpgKeysAction);
 
     changePasswordAction = new QAction(QIcon(":/icons/settings.svg"), "Change Master Password", this);
     changePasswordAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_S));
@@ -532,9 +567,68 @@ void MainWindow::setupUI() {
     });
     addAction(findAction);
 
+    // Theme control: tri-state menu (Follow System / Light / Dark) on the
+    // theme button. A binary toggle made follow-system mode a one-way trap
+    // — once overridden, it could never be restored.
+    themeButton = new QToolButton(this);
+    themeButton->setToolTip("Theme (Alt+Shift+T)");
+    themeButton->setPopupMode(QToolButton::InstantPopup);
+    QMenu *themeMenu = new QMenu(themeButton);
+    themeGroup = new QActionGroup(this);
+    QAction *followAction = themeMenu->addAction("Follow System");
+    followAction->setCheckable(true);
+    followAction->setData(QStringLiteral("system"));
+    QAction *lightAction = themeMenu->addAction("Light");
+    lightAction->setCheckable(true);
+    lightAction->setData(QStringLiteral("light"));
+    QAction *darkAction = themeMenu->addAction("Dark");
+    darkAction->setCheckable(true);
+    darkAction->setData(QStringLiteral("dark"));
+    themeGroup->addAction(followAction);
+    themeGroup->addAction(lightAction);
+    themeGroup->addAction(darkAction);
+    connect(themeGroup, &QActionGroup::triggered, this, [this](QAction *act) {
+        uiMode = act->data().toString();
+        QSettings settings("SecurePasswd_MGMT", "SecurePasswd_MGMT");
+        settings.setValue("ui_mode", uiMode);
+        systemTheme = (uiMode == QLatin1String("system"));
+        loadTheme(resolvedTheme());
+    });
+    themeButton->setMenu(themeMenu);
+    // Hidden accelerator action: Alt+Shift+T opens the theme menu.
     themeAction = new QAction(this);
     themeAction->setShortcut(QKeySequence(Qt::ALT | Qt::SHIFT | Qt::Key_T));
-    toolBar->addAction(themeAction);
+    themeAction->setIconVisibleInMenu(false);
+    connect(themeAction, &QAction::triggered, this, [this]() {
+        themeButton->showMenu();
+    });
+    addAction(themeAction);
+    toolBar->addWidget(themeButton);
+
+    paletteButton = new QToolButton(this);
+    paletteButton->setIcon(QIcon(":/icons/palette.svg"));
+    paletteButton->setToolTip("Color Palette");
+    paletteButton->setPopupMode(QToolButton::InstantPopup);
+    QMenu *paletteMenu = new QMenu(paletteButton);
+    // Exclusive group so selecting a palette unticks the previous one —
+    // plain checkable QActions in a menu never uncheck their siblings.
+    paletteGroup = new QActionGroup(this);
+    for (int i = 0; i < paletteCount(); i++) {
+        const Palette &p = paletteAt(i);
+        QAction *act = paletteMenu->addAction(QString::fromUtf8(p.name));
+        act->setCheckable(true);
+        act->setData(QLatin1String(p.id));
+        paletteGroup->addAction(act);
+        connect(act, &QAction::triggered, this, [this, act]() {
+            currentPalette = act->data().toString();
+            QSettings settings("SecurePasswd_MGMT", "SecurePasswd_MGMT");
+            settings.setValue("palette", currentPalette);
+            loadTheme(currentTheme);
+        });
+    }
+    paletteButton->setMenu(paletteMenu);
+    paletteAction = toolBar->addWidget(paletteButton);
+    syncPaletteChecks();
 
     toggleRecoveryCodesAction = new QAction(this);
     toggleRecoveryCodesAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_R));
@@ -594,9 +688,9 @@ void MainWindow::setupUI() {
     connect(exportAction, &QAction::triggered, this, &MainWindow::onExport);
     connect(syncAction, &QAction::triggered, this, &MainWindow::onSync);
     connect(healthCheckAction, &QAction::triggered, this, &MainWindow::onHealthCheck);
+    connect(gpgKeysAction, &QAction::triggered, this, &MainWindow::onOpenGpgKeys);
     connect(changePasswordAction, &QAction::triggered, this, &MainWindow::onChangePassword);
     connect(listWidget, &QListWidget::currentRowChanged, this, &MainWindow::onCurrentRowChanged);
-    connect(themeAction, &QAction::triggered, this, &MainWindow::onToggleTheme);
     connect(toggleRecoveryCodesAction, &QAction::triggered, this, &MainWindow::onToggleRecoveryCodes);
     connect(markUsedButton, &QPushButton::clicked, this, &MainWindow::onMarkAsUsed);
     connect(searchBar, &QLineEdit::textChanged, this, &MainWindow::onSearchChanged);
@@ -642,23 +736,44 @@ void MainWindow::onDelete() {
 }
 
 void MainWindow::onToggleTheme() {
-    if (currentTheme == "light") {
-        currentTheme = "dark";
-    } else {
-        currentTheme = "light";
-    }
-    QSettings settings("SecurePasswd_MGMT", "SecurePasswd_MGMT");
-    settings.setValue("theme", currentTheme);
-    loadTheme(currentTheme);
+    /* Legacy binary toggle: now a no-op kept for link compatibility.
+     * The tri-state theme menu on the toolbar handles Light/Dark/System. */
+}
+
+QString MainWindow::resolvedTheme() const {
+    if (uiMode == QLatin1String("light")) return QStringLiteral("light");
+    if (uiMode == QLatin1String("dark"))  return QStringLiteral("dark");
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    return (QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark)
+               ? QStringLiteral("dark") : QStringLiteral("light");
+#else
+    return QStringLiteral("light");
+#endif
 }
 
 void MainWindow::loadTheme(const QString& theme) {
-    QFile file(QString(":/%1.qss").arg(theme));
-    if (file.open( /* flawfinder: ignore */ QFile::ReadOnly | QFile::Text)) {
-        qApp->setStyleSheet(file.readAll());
-        file.close();
-    }
+    currentTheme = theme;
+    const Palette &palette = paletteById(currentPalette);
+    qApp->setStyleSheet(buildStyleSheet(palette, theme == QLatin1String("dark")));
     updateThemeIcon();
+    syncPaletteChecks();
+    syncThemeChecks();
+}
+
+void MainWindow::syncPaletteChecks() {
+    if (!paletteGroup) return;
+    const auto actions = paletteGroup->actions();
+    for (QAction *act : actions) {
+        act->setChecked(act->data().toString() == currentPalette);
+    }
+}
+
+void MainWindow::syncThemeChecks() {
+    if (!themeGroup) return;
+    const auto actions = themeGroup->actions();
+    for (QAction *act : actions) {
+        act->setChecked(act->data().toString() == uiMode);
+    }
 }
 
 void MainWindow::onChangePassword() {
@@ -769,11 +884,21 @@ void MainWindow::onMarkAsUsed() {
 }
 
 void MainWindow::updateThemeIcon() {
-    if (currentTheme == "light") {
-        themeAction->setIcon(QIcon(":/icons/darkmode.svg"));
-        themeAction->setText("Dark Theme");
-    } else {
-        themeAction->setIcon(QIcon(":/icons/lightmode.svg"));
-        themeAction->setText("Light Theme");
+    // The theme button reflects the resolved scheme; the menu carries the
+    // tri-state choice (Follow System / Light / Dark).
+    const QIcon icon = (currentTheme == QLatin1String("light"))
+                           ? QIcon(":/icons/lightmode.svg")
+                           : QIcon(":/icons/darkmode.svg");
+    if (themeButton) {
+        themeButton->setIcon(icon);
+        themeButton->setToolTip(
+            QString("Theme: %1 (Alt+Shift+T)")
+                .arg(uiMode == QLatin1String("system") ? "follows system"
+                     : uiMode == QLatin1String("dark") ? "dark" : "light"));
+    }
+    if (themeAction) {
+        themeAction->setIcon(icon);
+        themeAction->setText(currentTheme == QLatin1String("light")
+                                 ? "Dark Theme" : "Light Theme");
     }
 }

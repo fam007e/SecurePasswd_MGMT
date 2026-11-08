@@ -24,7 +24,7 @@ SecurePasswd_MGMT is designed with security-first principles and implements defe
 - **Parameters:** Secure defaults are used for memory cost (**128MB** - `1 << 17`), time cost (`3`), and parallelism (`1`) to make brute-force attacks computationally infeasible.
 
 ### Random Number Generation
-- **Source:** Libsodium's `randombytes_buf()` function.
+- **Source:** Libsodium's `randombytes_buf()` function (desktop); on Android, a hardened shim prefers the kernel `getrandom(2)` syscall, falls back to `/dev/urandom` with abort-on-failure, and implements bias-free rejection sampling for bounded draws.
 - **Usage:** Salt generation for Argon2 and secure password generation.
 - **Entropy Guarantee:** The password generator (in `core/password_generator.c`) uses a secured Fisher-Yates shuffle to guarantee the inclusion of at least one character from every selected category (Uppercase, Numbers, Special), ensuring high-entropy output even with shorter lengths.
 - **Quality:** Uses the operating system's best available Cryptographically Secure Pseudorandom Number Generator (CSPRNG).
@@ -41,7 +41,9 @@ SecurePasswd_MGMT is designed with security-first principles and implements defe
 - **Sanitization:** The codebase is regularly tested with AddressSanitizer (ASan), UndefinedBehaviorSanitizer (UBSan), and **Flawfinder**. As of **May 2026**, the codebase has undergone a major structural hardening effort, replacing over 280 manual `// flawfinder: ignore` overrides with fundamentally safe coding patterns. This ensures that our security posture is verifiable by automated tools without relying on manual suppressions. While the tool still reports baseline hits for standard C functions (like `strlen` and `memcpy`), these have been audited to ensure they are used exclusively with bounded limits and zero-initialized memory. We have achieved **0 High Severity (Level 4/5) hits** in the core and CLI source code.
 - **Thread Safety:** Critical sections, such as the Have I Been Pwned check, utilize thread-safe string manipulation functions (`strtok_r`) to prevent race conditions during concurrent execution.
 - **Static Analysis:** `cppcheck` and GitHub's **CodeQL** are employed to enforce code quality and catch potential leaks, logic errors, or complex security vulnerabilities early.
-- **Mobile Sync Security:** Synchronization between devices is protected using **Chacha20-Poly1305** authenticated encryption. The vault and its salt are packed and encrypted as a single blob with a unique nonce for every sync operation, ensuring both confidentiality and authenticity of the synced data.
+- **Two-Way Sync Security:** Sync sessions are mutually authenticated and forward-secret: a 512-bit pairing secret (delivered out-of-band via QR) salts an ephemeral X25519 handshake through HKDF-SHA256 bound to the handshake transcript; all traffic is ChaCha20-Poly1305 AEAD with per-direction keys, sequence-number nonnes bound into the AAD (replay/re-order protection), constant-time key confirmation, and a 30s inactivity timeout. The pairing secret never persists.
+- **OpenPGP Key Storage:** Armored public/secret keys are stored inside the SQLCipher vault (never plaintext on disk) and synced with the same authenticated merge rules as entries; secret-key material is wiped with `sodium_memzero` on release.
+- **Deterministic Merge:** All sync reconciliation uses a newer-wins engine with deletion tombstones; conflicting changes are reported in the session summary, and no data is ever silently replaced.
 - **Fetch on Demand:** Sensitive fields (passwords, TOTP secrets, recovery codes) are only fetched from the database when specifically requested for viewing or exporting. This minimizes the risk of secrets lingering in memory during general application use.
 
 ## Data Protection
@@ -77,6 +79,7 @@ The "Fetch on Demand" model complements this by ensuring that sensitive entry de
 ## File System Security
 
 - **Secure Permissions:** The application data directory is created with restrictive permissions (`0700` on Unix-like systems), ensuring only the owner can access it.
+- **Android Companion:** The Android client compiles the same C core via the NDK (Argon2id + SQLCipher + OpenSSL), enforces `FLAG_SECURE`, excludes the vault from backups and data extraction, blocks cleartext traffic via a network security config, and ships reproducible F-Droid builds (871 pinned dependency checksums, two-build CI verification, published SHA256SUMS).
 - **Default Location:** Data is stored in standard, OS-specific secure locations:
   - **Linux/macOS:** `~/.local/share/securepasswd/` (or follows `XDG_DATA_HOME`)
   - **Windows:** `%LOCALAPPDATA%\securepasswd\`

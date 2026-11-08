@@ -1,0 +1,248 @@
+/* ============================================================
+   SecurePasswd MGMT — Theme template
+   Placeholders (@token@) are substituted at runtime from the
+   palette registry in gui/themes.cpp. Token definitions and the
+   user-visible palettes are documented in docs/DESIGN_TOKENS.md;
+   the Android app (ui/theme/) mirrors the same values.
+   ============================================================ */
+
+QMainWindow,
+QDialog {
+    background-color: @background@;
+    color: @onSurface@;
+}
+
+QLabel {
+    color: @onSurface@;
+    background: transparent;
+}
+
+/* -- Lists -- */
+QListWidget {
+    background-color: @surface@;
+    border: 1px solid @outline@;
+    border-radius: 6px;
+    color: @onSurface@;
+    padding: 4px;
+    outline: none;
+}
+QListWidget::item {
+    padding: 6px 8px;
+    border-radius: 4px;
+}
+QListWidget::item:selected {
+    background-color: @outline@;
+    color: @onSurfaceBright@;
+}
+QListWidget::item:hover:!selected {
+    background-color: @surfaceHover@;
+}
+
+/* -- Bars -- */
+QToolBar {
+    background-color: @surface@;
+    border: none;
+    spacing: 4px;
+    padding: 4px;
+}
+QToolBar QToolButton {
+    color: @onSurface@;
+    border-radius: 6px;
+    padding: 6px;
+}
+QToolBar QToolButton:hover {
+    background-color: @outline@;
+}
+QToolBar QToolButton:pressed {
+    background-color: @surfaceHover@;
+}
+QStatusBar {
+    background-color: @surface@;
+    color: @onSurface@;
+}
+QMenuBar {
+    background-color: @surface@;
+    color: @onSurface@;
+}
+QMenuBar::item:selected {
+    background-color: @outline@;
+    border-radius: 4px;
+}
+QMenu {
+    background-color: @surface@;
+    color: @onSurface@;
+    border: 1px solid @outline@;
+    border-radius: 8px;
+    padding: 4px;
+}
+QMenu::item {
+    padding: 6px 24px 6px 12px;
+    border-radius: 4px;
+}
+QMenu::item:selected {
+    background-color: @outline@;
+}
+
+/* -- Progress (TOTP indicator) -- */
+QProgressBar {
+    border: 1px solid @outline@;
+    border-radius: 6px;
+    background-color: @surface@;
+    color: @onSurface@;
+    text-align: center;
+    height: 14px;
+}
+QProgressBar::chunk {
+    background-color: @primary@;
+    border-radius: 5px;
+}
+
+/* -- Buttons -- */
+QPushButton {
+    background-color: @outline@;
+    color: @onSurfaceBright@;
+    border: 1px solid @outline@;
+    border-radius: 6px;
+    padding: 8px 16px;
+    min-height: 18px;
+}
+QPushButton:hover {
+    background-color: @primaryHover@;
+    border-color: @primaryHover@;
+}
+QPushButton:pressed {
+    background-color: @primaryActive@;
+    border-color: @primaryActive@;
+}
+QPushButton:disabled {
+    background-color: @surface@;
+    color: @textDisabled@;
+    border-color: @surface@;
+}
+QPushButton:focus {
+    border: 1px solid @primary@;
+}
+QToolButton {
+    color: @onSurface@;
+    border-radius: 6px;
+    padding: 4px;
+}
+QToolButton:hover {
+    background-color: @outline@;
+}
+
+/* -- Inputs -- */
+QLineEdit {
+    background-color: @surface@;
+    color: @onSurface@;
+    border: 1px solid @outline@;
+    border-radius: 6px;
+    padding: 8px;
+    selection-background-color: @primaryHover@;
+    selection-color: @onSurfaceBright@;
+}
+QLineEdit:focus {
+    border: 1px solid @primary@;
+}
+QLineEdit:disabled {
+    color: @textDisabled@;
+}
+QComboBox {
+    background-color: @surface@;
+    color: @onSurface@;
+    border: 1px solid @outline@;
+    border-radius: 6px;
+    padding: 6px 8px;
+}
+QComboBox:focus {
+    border: 1px solid @primary@;
+}
+QComboBox QAbstractItemView {
+    background-color: @surface@;
+    color: @onSurface@;
+    border: 1px solid @outline@;
+    selection-background-color: @outline@;
+}
+QCheckBox, QRadioButton {
+    color: @onSurface@;
+    spacing: 8px;
+    padding: 4px;
+}
+QCheckBox::indicator, QRadioButton::indicator {
+    width: 16px;
+    height: 16px;
+    border: 1px solid @outline@;
+    border-radius: 4px;
+    background: @surface@;
+}
+QRadioButton::indicator {
+    border-radius: 8px;
+}
+QCheckBox::indicator:checked, QRadioButton::indicator:checked {
+    background: @primary@;
+    border-color: @primary@;
+}
+
+/* -- Scrollbars (slim, non-intrusive) -- */
+QScrollBar:vertical {
+    background: transparent;
+    width: 10px;
+    margin: 2px;
+}
+QScrollBar::handle:vertical {
+    background: @outline@;
+    border-radius: 4px;
+    min-height: 24px;
+}
+QScrollBar::handle:vertical:hover {
+    background: @primaryHover@;
+}
+QScrollBar::add-line, QScrollBar::sub-line {
+    height: 0;
+    width: 0;
+}
+QScrollBar:horizontal {
+    background: transparent;
+    height: 10px;
+    margin: 2px;
+}
+QScrollBar::handle:horizontal {
+    background: @outline@;
+    border-radius: 4px;
+    min-width: 24px;
+}
+QScrollBar::handle:horizontal:hover {
+    background: @primaryHover@;
+}
+
+/* -- Tooltips -- */
+QToolTip {
+    background-color: @surface@;
+    color: @onSurfaceBright@;
+    border: 1px solid @outline@;
+    border-radius: 4px;
+    padding: 4px 8px;
+}
+
+/* -- Cards (sync dialog, status/summary panels) -- */
+QFrame#statusCard,
+QFrame#summaryCard {
+    background-color: @surface@;
+    border: 1px solid @outline@;
+    border-radius: 12px;
+}
+QFrame#statusCard QLabel {
+    color: @onSurface@;
+    font-weight: 500;
+}
+QFrame#summaryCard QPlainTextEdit {
+    background: transparent;
+    border: none;
+    color: @onSurface@;
+}
+QFrame#summaryCard[variant="success"] {
+    border: 1px solid @success@;
+}
+QFrame#summaryCard[variant="error"] {
+    border: 1px solid @error@;
+}

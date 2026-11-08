@@ -38,6 +38,10 @@ qt_add_executable(securepasswd_gui
     healthcheckdialog.cpp
     syncdialog.h
     syncdialog.cpp
+    gpgkeysdialog.h
+    gpgkeysdialog.cpp
+    themes.h
+    themes.cpp
     icons.qrc
     qrcodegen/qrcodegen.cpp
 )
