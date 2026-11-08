@@ -372,8 +372,8 @@ void SyncDialog::processRxBuffer() {
             return;
         }
         uint8_t clientPub[SYNC_EPHEMERAL_LEN];
-        /* flawfinder: ignore */
-        memcpy(clientPub, rxBuffer.constData() + 1, SYNC_EPHEMERAL_LEN);
+        std::copy(rxBuffer.constData() + 1, rxBuffer.constData() + 1 + SYNC_EPHEMERAL_LEN,
+                  clientPub);
         rxBuffer.remove(0, 1 + SYNC_EPHEMERAL_LEN);
 
         if (sync_session_derive(SYNC_ROLE_SERVER,

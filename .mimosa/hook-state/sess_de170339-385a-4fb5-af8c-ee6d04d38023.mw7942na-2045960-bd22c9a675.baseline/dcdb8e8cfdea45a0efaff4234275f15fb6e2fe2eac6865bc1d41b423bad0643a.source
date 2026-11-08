@@ -18,7 +18,8 @@
 #include <sodium.h>
 
 static sqlite3 *db = NULL;
-static char current_db_path[4096] = {0}; // flawfinder: ignore
+/* flawfinder: ignore */
+static char current_db_path[4096] = {0};
 
 // Forward declaration for internal function
 static int initialize_schema();
@@ -34,14 +35,17 @@ int database_open(const char *db_path, const char *password) {
         db = NULL;
     }
 
-    snprintf(current_db_path, sizeof(current_db_path), "%s", db_path); // flawfinder: ignore
+    /* flawfinder: ignore */
+    snprintf(current_db_path, sizeof(current_db_path), "%s", db_path);
 
     uint8_t salt[SALT_LEN];
     uint8_t key[KEY_LEN];
 
     // Construct salt path
-    char salt_path[4128]; // flawfinder: ignore
-    snprintf(salt_path, sizeof(salt_path), "%s.salt", db_path); // flawfinder: ignore
+    /* flawfinder: ignore */
+    char salt_path[4128];
+    /* flawfinder: ignore */
+    snprintf(salt_path, sizeof(salt_path), "%s.salt", db_path);
 
     // Load or generate salt
     if (load_or_generate_salt(salt_path, salt) != 0) {
@@ -268,7 +272,8 @@ PasswordEntry* database_search(const char *query, int *count) {
     if (!db || !query) return NULL;
 
     sqlite3_stmt *stmt;
-    char like_query[1024]; // flawfinder: ignore
+    /* flawfinder: ignore */
+    char like_query[1024];
     snprintf(like_query, sizeof(like_query), "%%%s%%", query);
 
     // Count matching entries
@@ -508,13 +513,17 @@ int database_delete_entry(int id) {
     }
     sqlite3_bind_int(stmt, 1, id);
 
-    char service[512] = {0}; // flawfinder: ignore
-    char username[512] = {0}; // flawfinder: ignore
+    /* flawfinder: ignore */
+    char service[512] = {0};
+    /* flawfinder: ignore */
+    char username[512] = {0};
     if (sqlite3_step(stmt) == SQLITE_ROW) {
         const unsigned char *s = sqlite3_column_text(stmt, 0);
         const unsigned char *u = sqlite3_column_text(stmt, 1);
-        if (s) snprintf(service, sizeof(service), "%s", (const char *)s); // flawfinder: ignore
-        if (u) snprintf(username, sizeof(username), "%s", (const char *)u); // flawfinder: ignore
+        /* flawfinder: ignore */
+        if (s) snprintf(service, sizeof(service), "%s", (const char *)s);
+        /* flawfinder: ignore */
+        if (u) snprintf(username, sizeof(username), "%s", (const char *)u);
     }
     sqlite3_finalize(stmt);
 
@@ -757,10 +766,12 @@ int database_gpg_delete(int id) {
     const char *sel = "SELECT label FROM gpg_keys WHERE id = ?;";
     if (sqlite3_prepare_v2(db, sel, -1, &stmt, NULL) != SQLITE_OK) return -1;
     sqlite3_bind_int(stmt, 1, id);
-    char label[512] = {0}; // flawfinder: ignore
+    /* flawfinder: ignore */
+    char label[512] = {0};
     if (sqlite3_step(stmt) == SQLITE_ROW) {
         const unsigned char *l = sqlite3_column_text(stmt, 0);
-        if (l) snprintf(label, sizeof(label), "%s", (const char *)l); // flawfinder: ignore
+        /* flawfinder: ignore */
+        if (l) snprintf(label, sizeof(label), "%s", (const char *)l);
     }
     sqlite3_finalize(stmt);
 
@@ -881,10 +892,14 @@ int database_rekey(const char *new_password) {
     sodium_memzero(new_key, KEY_LEN);
 
     // SQLCipher rekey succeeded, now update the salt file
-    char salt_path[4128]; // flawfinder: ignore
-    char salt_path_new[4128]; // flawfinder: ignore
-    snprintf(salt_path, sizeof(salt_path), "%s.salt", current_db_path); // flawfinder: ignore
-    snprintf(salt_path_new, sizeof(salt_path_new), "%s.salt.new", current_db_path); // flawfinder: ignore
+    /* flawfinder: ignore */
+    char salt_path[4128];
+    /* flawfinder: ignore */
+    char salt_path_new[4128];
+    /* flawfinder: ignore */
+    snprintf(salt_path, sizeof(salt_path), "%s.salt", current_db_path);
+    /* flawfinder: ignore */
+    snprintf(salt_path_new, sizeof(salt_path_new), "%s.salt.new", current_db_path);
 
     // Atomic-ish swap: write to .new then rename
     if (save_salt(salt_path_new, new_salt) != 0) {
