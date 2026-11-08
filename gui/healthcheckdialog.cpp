@@ -4,6 +4,7 @@
 #include <QHeaderView>
 #include <QDialogButtonBox>
 #include <QMap>
+#include <QPointer>
 #include <QtConcurrent/QtConcurrent>
 #include <QLabel>
 
@@ -19,6 +20,7 @@ HealthCheckDialog::HealthCheckDialog(const QVector<GUIPasswordEntry> &entries, Q
     setMinimumSize(600, 400);
 
     qRegisterMetaType<PwnedResult>();
+    m_hibpCancel = QSharedPointer<std::atomic_bool>::create(false);
 
     QVBoxLayout *layout = new QVBoxLayout(this);
 
@@ -93,11 +95,20 @@ void HealthCheckDialog::startHibpChecks() {
     // Copy entries to pass to the thread
     QVector<GUIPasswordEntry> entriesCopy = m_entries;
 
+    // The worker must never touch `this`: the dialog can be destroyed while
+    // the task is still queued or running (SIGSEGV-at-0x0 via freed members,
+    // seen in a core dump as runFunctor -> 0x0). Talk to the dialog only
+    // through a QPointer, and cancel via a shared atomic the lambda owns by
+    // value alongside the dialog.
+    QPointer<HealthCheckDialog> self(this);
+    QSharedPointer<std::atomic_bool> cancel = m_hibpCancel;
+    cancel->store(false, std::memory_order_relaxed);
+
     // Use a copy of the database context or ensure thread-safe access
     // Note: SQLCipher/SQLite is usually built with threadsafe=1
-    QFuture<void> future = QtConcurrent::run([entriesCopy, this]() {
+    QFuture<void> future = QtConcurrent::run([entriesCopy, self, cancel]() {
         for (const auto &entry : entriesCopy) {
-            if (m_hibpWatcher.isCanceled()) break;
+            if (cancel->load(std::memory_order_relaxed) || self.isNull()) break;
 
             PasswordEntry *db_entry = database_get_entry_secure(entry.id);
             if (db_entry) {
@@ -106,8 +117,9 @@ void HealthCheckDialog::startHibpChecks() {
                     int pwnCount = is_password_pwned(password);
                     if (pwnCount > 0) {
                         PwnedResult result = {entry.service, pwnCount};
-                        // This is thread-safe because handlePwnedResult is invoked via a queued connection
-                        QMetaObject::invokeMethod(this, "handlePwnedResult", Qt::QueuedConnection, Q_ARG(PwnedResult, result));
+                        // Thread-safe via queued connection; a destroyed
+                        // receiver simply drops the queued event.
+                        QMetaObject::invokeMethod(self.data(), "handlePwnedResult", Qt::QueuedConnection, Q_ARG(PwnedResult, result));
                     }
                 }
                 free_password_entries(db_entry, 1);
@@ -115,6 +127,15 @@ void HealthCheckDialog::startHibpChecks() {
         }
     });
     m_hibpWatcher.setFuture(future);
+}
+
+HealthCheckDialog::~HealthCheckDialog()
+{
+    // Stop the worker promptly and sever its access to this dialog. The
+    // in-flight is_password_pwned() network call still completes, but the
+    // loop breaks before touching anything owned by the destroyed dialog.
+    m_hibpCancel->store(true, std::memory_order_relaxed);
+    m_hibpWatcher.cancel();
 }
 
 void HealthCheckDialog::handlePwnedResult(PwnedResult result)
