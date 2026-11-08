@@ -411,7 +411,6 @@ static void test_gpg_serialize_roundtrip(void **state) {
     /* Wrong magic must be rejected. */
     sync_gpg_key_t *oe2 = NULL;
     int ne2 = 0;
-    assert_int_equal(sync_gpg_deserialize(buf, len, &oe2, &ne2) == 0 ? 0 : 0, 0);
     buf[5] = 'X';
     assert_int_equal(sync_gpg_deserialize(buf, len, &oe2, &ne2), -1);
 
