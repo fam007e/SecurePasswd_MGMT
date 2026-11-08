@@ -415,6 +415,7 @@ static void test_gpg_serialize_roundtrip(void **state) {
     assert_int_equal(sync_gpg_deserialize(buf, len, &oe2, &ne2), -1);
 
     if (buf2) { memset(buf2, 0, len2); free(buf2); }
+    sync_gpg_keys_free(out, n); /* roundtrip result */
     if (oe) sync_gpg_keys_free(oe, ne);
     if (oe2) sync_gpg_keys_free(oe2, ne2);
     memset(buf, 0, len); free(buf);
