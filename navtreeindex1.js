@@ -1,5 +1,6 @@
 var NAVTREEINDEX1 =
 {
+"main_8c.html#a71088943da91eb1bcc58b090b0bffc9f":[19,0,0,0,10],
 "main_8c.html#a7a1c3120898f2b97fe6b00124a7163f9":[19,0,0,0,4],
 "main_8c.html#a7e92276eb940d0072640bcf4ae0acffb":[19,0,0,0,13],
 "main_8c.html#a95f99ae82d984d421ad09bce1b9168f0":[19,0,0,0,2],
@@ -248,6 +249,5 @@ var NAVTREEINDEX1 =
 "structsync__session__t.html#adb47cfeeab7fef137929ccea32b71ab8":[18,0,22,4],
 "structsync__session__t.html#adb92280436de08302980ac4256190df7":[18,0,22,3],
 "structsync__tombstone__t.html":[18,0,23],
-"structsync__tombstone__t.html#a48a823b4ef39f5bc861223eddb26fe11":[18,0,23,2],
-"structsync__tombstone__t.html#aae494dec539620585184883450c57716":[18,0,23,1]
+"structsync__tombstone__t.html#a48a823b4ef39f5bc861223eddb26fe11":[18,0,23,2]
 };

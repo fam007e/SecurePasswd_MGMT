@@ -1,5 +1,6 @@
 var NAVTREEINDEX2 =
 {
+"structsync__tombstone__t.html#aae494dec539620585184883450c57716":[18,0,23,1],
 "structsync__tombstone__t.html#ab22b64e648cdc3a63c2bf8c142f43519":[18,0,23,0],
 "sync__protocol_8c.html":[19,0,1,10],
 "sync__protocol_8c.html#a063313c09eb0c74d9309a6b10817c634":[19,0,1,10,36],

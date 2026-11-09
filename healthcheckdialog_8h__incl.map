@@ -1,13 +1,17 @@
 <map id="gui/healthcheckdialog.h" name="gui/healthcheckdialog.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="112,5,289,33"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="247,5,424,33"/>
 <area shape="rect" id="Node000002" title=" " alt="" coords="5,81,79,109"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="171,36,85,77,83,72,174,31"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="282,36,95,83,93,78,282,31"/>
 <area shape="rect" id="Node000003" title=" " alt="" coords="103,81,176,109"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="192,32,162,71,158,67,188,35"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="298,35,189,78,187,73,303,32"/>
 <area shape="rect" id="Node000004" title=" " alt="" coords="199,81,325,109"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="212,31,244,69,239,69,211,36"/>
-<area shape="rect" id="Node000005" href="$passwordentry_8h.html" title=" " alt="" coords="349,81,476,109"/>
-<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="239,31,363,75,358,76,238,36"/>
-<area shape="rect" id="Node000006" title=" " alt="" coords="378,157,447,184"/>
-<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="415,107,415,143,411,139,411,111"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="325,32,287,72,284,68,320,35"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="349,81,471,109"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="349,31,388,70,383,70,348,36"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="496,81,562,109"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="370,31,484,75,478,76,370,36"/>
+<area shape="rect" id="Node000007" href="$passwordentry_8h.html" title=" " alt="" coords="586,81,714,109"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="392,31,581,76,576,78,392,36"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="615,157,685,184"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="652,107,652,143,648,139,648,111"/>
 </map>

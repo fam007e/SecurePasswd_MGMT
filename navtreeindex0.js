@@ -14,6 +14,7 @@ var NAVTREEINDEX0 =
 "classGpgKeysDialog.html":[18,0,4],
 "classGpgKeysDialog.html#aace5110096211eab1dcfb1c93c0212a4":[18,0,4,0],
 "classHealthCheckDialog.html":[18,0,6],
+"classHealthCheckDialog.html#aa6b77e19a982d9a9206eb41e2e4036d4":[18,0,6,1],
 "classHealthCheckDialog.html#aee4aac272516dcfce54307e570f01e85":[18,0,6,0],
 "classMainWindow.html":[18,0,7],
 "classMainWindow.html#a5ba411f4e7ebde4420e0016ed3858383":[18,0,7,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX0 =
 "main_8c.html#a46f939d4551766abf37491503ca43013":[19,0,0,0,19],
 "main_8c.html#a61d6c42b8a25a0288de82fa0da956000":[19,0,0,0,9],
 "main_8c.html#a64b162980d0c90da6383e5a747e04091":[19,0,0,0,18],
-"main_8c.html#a71076beec4dafbafccb03b8cf6253a2e":[19,0,0,0,15],
-"main_8c.html#a71088943da91eb1bcc58b090b0bffc9f":[19,0,0,0,10]
+"main_8c.html#a71076beec4dafbafccb03b8cf6253a2e":[19,0,0,0,15]
 };
