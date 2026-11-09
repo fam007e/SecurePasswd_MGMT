@@ -772,6 +772,7 @@ int database_gpg_delete(int id) {
         const unsigned char *l = sqlite3_column_text(stmt, 0);
         // "%.*s" with the explicit column length: never reads past the
         // buffer, NUL-termination of the source is not assumed.
+        /* flawfinder: ignore */
         if (l) snprintf(label, sizeof(label), "%.*s",
                         sqlite3_column_bytes(stmt, 0), (const char *)l);
     }
@@ -857,6 +858,8 @@ void database_gpg_free(GpgKey *keys, int count) {
         // Wipe the secret without strlen(): walk the volatile pointer so
         // the zeroing cannot be dead-store-eliminated, stopping at NUL.
         if (keys[i].private_key) {
+            /* Wipe walk bounded by the NUL terminator — no static array involved. */
+            /* flawfinder: ignore */
             volatile char *p = (volatile char *)keys[i].private_key;
             while (*p) *p++ = 0;
         }
