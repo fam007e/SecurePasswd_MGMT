@@ -4,6 +4,8 @@
 #include <QDialog>
 #include <QVector>
 #include <QFutureWatcher>
+#include <QSharedPointer>
+#include <atomic>
 #include "passwordentry.h"
 
 class QTreeWidget;
@@ -29,6 +31,7 @@ class HealthCheckDialog : public QDialog
 
 public:
     explicit HealthCheckDialog(const QVector<GUIPasswordEntry> &entries, QWidget *parent = nullptr);
+    ~HealthCheckDialog() override;
 
 private slots:
     void handlePwnedResult(PwnedResult result);
@@ -43,6 +46,9 @@ private:
     QTreeWidget *treeWidget;
     QHash<QString, QTreeWidgetItem*> categoryItems;
     QFutureWatcher<void> m_hibpWatcher;
+    // Shared with the HIBP worker thread; set in the destructor so the
+    // lambda never dereferences this dialog after it is gone.
+    QSharedPointer<std::atomic_bool> m_hibpCancel;
 };
 
 #endif // HEALTHCHECKDIALOG_H
