@@ -3,7 +3,7 @@
 Shared design vocabulary for the desktop (Qt 6 Widgets) and Android
 (Jetpack Compose) apps. Both must stay in sync:
 
-- Desktop themes: `gui/dark.qss`, `gui/light.qss`
+- Desktop theme template: `gui/theme_template.qss` (compiled via Qt Resource `:/themes/theme_template.qss`)
 - Android theme: `app/src/main/java/com/securepasswd/mgmt/ui/theme/` (`Color.kt`, `Theme.kt`)
 
 ## Brand palettes

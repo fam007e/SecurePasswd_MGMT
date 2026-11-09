@@ -58,14 +58,12 @@ Guidelines for contributing to the project, including security-focused developme
 
 ## For Developers
 
-### Modified Files Summary
-1. `core/database.c` - Delete entry verification, recovery codes support
-2. `cli/main.c` - Enhanced health check, feature parity with GUI
-3. `gui/healthcheckdialog.cpp` - Updated thresholds
-4. `gui/mainwindow.{h,cpp}` - Segfault fix, icon-only toolbar, recovery toggle
-5. `gui/main.cpp` - Database status check
-6. `gui/entrydialog.{h,cpp}` - Entry validation, recovery codes display logic
-7. `core/password_generator.{h,c}` - Relocated to core, guaranteed entropy shuffle
+### Component Structure
+- `core/`: Core C library (SQLCipher database, Argon2id KDF, TOTP, HIBP, password generator, sync protocol)
+- `cli/`: C command-line interface
+- `gui/`: C++ Qt6 Graphical User Interface (views, dialogs, themes)
+- `tests/`: cmocka test suites and libFuzzer targets
+- `docs/`: Threat model, testing guide, design tokens, and user guide
 
 ### Build Status
 - CLI: Building successfully
@@ -73,8 +71,8 @@ Guidelines for contributing to the project, including security-focused developme
 - Tests: All passing
 
 ### Testing Locations
-- Unit tests: `tests/test_core.c`, `tests/test_cmocka.c`, `tests/test_sync_protocol.c` (13 protocol tests)
-- Fuzz targets: `tests/fuzz/` (snapshot, frames, TOTP, password generator)
+- Unit tests: `tests/test_core.c`, `tests/test_cmocka.c`, `tests/test_sync_protocol.c` (14 protocol tests)
+- Fuzz targets: `tests/fuzz/` (snapshot, frames, TOTP, password generator, GPG merge)
 - Test execution: `ctest --test-dir build`
 
 ## Additional Resources

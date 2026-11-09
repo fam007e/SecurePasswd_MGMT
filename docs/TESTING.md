@@ -41,20 +41,21 @@ Test project build
 
 ### Sync Protocol Tests (`./sync_protocol_tests`)
 
-13 cmocka cases covering the 2-way sync protocol:
+14 cmocka cases covering the 2-way sync protocol:
 - **Handshake:** X25519 roundtrip, wrong-PSK rejection, constant-time key confirmation.
 - **AEAD Frames:** roundtrip, tamper rejection, replay/re-order rejection, wrong-type rejection.
 - **Snapshots:** serialization roundtrip, trailing-garbage rejection.
-- **Merge:** add/update/conflict/tombstone semantics, deterministic tie-break, GPG key store merge.
+- **Merge:** add/update/conflict/tombstone semantics, deterministic tie-break, GPG key store merge (including NULL label safety).
 - **Helpers:** constant-time comparison.
 
 ## Fuzz Testing
 
-Four libFuzzer targets run in CI (ASan + UBSan + LeakSanitizer) on every push:
+Five libFuzzer targets run in CI (ASan + UBSan + LeakSanitizer) on every push:
 - **fuzz_snapshot:** hostile snapshots -> parser -> merge engine (incl. self-merge) -> re-serialization.
 - **fuzz_frames:** hostile AEAD frames -> decrypt -> chained snapshot parse.
 - **fuzz_totp:** arbitrary secrets + timestamps; asserts exactly-6-digit output.
 - **fuzz_pwgen:** adversarial lengths/charsets; asserts length and class contracts.
+- **fuzz_gpgmerge:** hostile SPSNAP03 key-store sections -> parser -> merge engine -> serialize/re-parse roundtrips.
 
 Cumulative runs exceed 75 million executions with zero findings.
 
