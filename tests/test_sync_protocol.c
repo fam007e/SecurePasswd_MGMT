@@ -18,7 +18,8 @@ static void test_ct_equal(void **state) {
     (void)state;
     const uint8_t a[8] = { 1, 2, 3, 4, 5, 6, 7, 8 };
     uint8_t b[8];
-    memcpy(b, a, sizeof(a));
+    /* flawfinder: ignore */
+    memcpy(b, a, sizeof(a)); /* sizeof(a) == sizeof(b) */
     assert_int_equal(sync_ct_equal(a, b, sizeof(a)), 1);
     assert_int_equal(sync_ct_equal(a, a, sizeof(a)), 1);
 
@@ -103,10 +104,12 @@ static void test_frame_roundtrip_and_direction(void **state) {
     uint8_t frame[128], plain[128];
     size_t flen = 0, plen = 0;
     assert_int_equal(sync_frame_encrypt(&client, SYNC_FRAME_SNAPSHOT,
+                                        /* flawfinder: ignore */
                                         (const uint8_t *)msg, strlen(msg),
                                         frame, sizeof(frame), &flen), 0);
     assert_int_equal(sync_frame_decrypt(&server, SYNC_FRAME_SNAPSHOT,
                                         frame, flen, plain, sizeof(plain), &plen), 0);
+    /* flawfinder: ignore */
     assert_int_equal(plen, strlen(msg));
     assert_memory_equal(plain, msg, plen);
 
@@ -218,7 +221,8 @@ static void test_snapshot_roundtrip(void **state) {
     /* Trailing garbage must be rejected. */
     uint8_t *evil = malloc(len + 1);
     assert(evil != NULL);
-    memcpy(evil, buf, len);
+    /* flawfinder: ignore */
+    memcpy(evil, buf, len); /* dest = malloc(len+1): in-bounds */
     evil[len] = 0x41;
     sync_entry_t *oe3 = NULL;
     sync_tombstone_t *ot3 = NULL;
