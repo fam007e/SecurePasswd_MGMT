@@ -444,6 +444,41 @@ static void test_gpg_merge_cases(void **state) {
     sync_gpg_keys_wipe(remote, 2);
 }
 
+/* Contract-hardening test for the merge guards: keys with NULL labels (a
+ * violation the parser can never produce, but the merge API must tolerate
+ * since it also serves caller-built arrays) must not crash, match nothing,
+ * and produce no bogus results. Exercises both guard sites added for the
+ * Mimosa deep-scan NonNullParamChecker finding. */
+static void test_gpg_merge_null_labels(void **state) {
+    (void)state;
+    sync_gpg_key_t local[2], remote[2];
+    local[0] = mk_key("Alpha", "a@x.org", "AAAA0001", "priv-a", 100);
+    local[1] = mk_key("Beta", "b@x.org", "BBBB1111", "priv-b", 200);
+    free(local[1].label);
+    local[1].label = NULL; /* hostile: identity missing */
+
+    remote[0] = mk_key("alpha", "a@x.org", "AAAA0001", "priv-a", 100);
+    remote[1] = mk_key("Gamma", "g@x.org", "GGGG3333", "priv-g", 300);
+    free(remote[1].label);
+    remote[1].label = NULL; /* hostile on the other side too */
+
+    sync_gpg_merge_report_t rep;
+    assert_int_equal(sync_merge_gpg_keys(local, 2, remote, 2, NULL, 0, NULL, 0, &rep), 0);
+    /* "alpha" matches "Alpha" case-insensitively -> identical. Both NULL-label
+     * keys are unmatchable: "Beta" is silently kept local (no tombstone), the
+     * NULL-label remote key is skipped entirely — no crash, no bogus results. */
+    assert_int_equal(rep.identical, 1);
+    assert_int_equal(rep.added, 0);
+    assert_int_equal(rep.deleted, 0);
+    assert_int_equal(rep.conflicts, 0);
+    assert_int_equal(rep.result_count, 1);
+    assert_int_equal(rep.results[0].action, SYNC_MERGE_IDENTICAL);
+
+    sync_gpg_merge_report_free(&rep);
+    sync_gpg_keys_wipe(local, 2); /* NULL-tolerant by contract */
+    sync_gpg_keys_wipe(remote, 2);
+}
+
 static void test_gpg_merge_conflict_and_tombstone(void **state) {
     (void)state;
     sync_gpg_key_t local[1], remote[1];
@@ -488,6 +523,7 @@ int main(void) {
         cmocka_unit_test(test_merge_identical_entries),
         cmocka_unit_test(test_gpg_serialize_roundtrip),
         cmocka_unit_test(test_gpg_merge_cases),
+        cmocka_unit_test(test_gpg_merge_null_labels),
         cmocka_unit_test(test_gpg_merge_conflict_and_tombstone),
     };
     return cmocka_run_group_tests(tests, NULL, NULL);
