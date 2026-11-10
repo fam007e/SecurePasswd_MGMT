@@ -23,12 +23,15 @@ The main window is divided into the following sections:
 
 The toolbar uses icons for all major functions (hover for tooltips):
 
-- **Add/Edit/Delete:** Managed your password repository.
+- **Add/Edit/Delete:** Manage your password repository.
 - **Copy Username/Password/TOTP:** One-click clipboard functionality (clears after 30 sec).
 - **Import/Export:** CSV data migration.
 - **Health Check:** Security audit of your entire database.
-- **Theme Toggle:** Switch between light and dark mode.
-- **Recovery Codes Toggle:** NEW: Opt-in visibility for 2FA recovery codes.
+- **Vault Sync:** Bidirectional synchronization with the Android companion app.
+- **OpenPGP Keys:** Manage armored public and secret GPG keys.
+- **Color Palette:** Select between Nord, Dracula, and Solarized palettes.
+- **Theme Menu:** Choose between Follow System, Light, and Dark modes.
+- **Recovery Codes Toggle:** Opt-in visibility for 2FA recovery codes.
 - **Exit:** Securely close the application.
 
 ## Adding a New Entry

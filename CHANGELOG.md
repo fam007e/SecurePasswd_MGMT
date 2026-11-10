@@ -5,6 +5,24 @@ All notable changes to SecurePasswd_MGMT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to date-based versioning (YYYY.MM.DD).
 
+## [2026.11.10]
+
+### Fixed
+- **Health Check crash:** Closing the Password Health Check dialog while the Have I Been Pwned check was still running crashed the app (use-after-free in the background worker). The worker no longer touches the dialog after it is destroyed and stops promptly. (Latent since the HIBP feature landed.)
+- **Sync merge hardening:** The OpenPGP key-store merge (`sync_merge_gpg_keys`) now symmetrically guards NULL key labels in both identity-lookup loops, the GPG tombstone lookup rejects NULL labels, and identity-less keys are never propagated during a merge — closing all paths flagged by a deep static-analysis scan.
+- **QSS theme loading:** Switched from `QFile` filesystem read to `QResource` for the QSS template, eliminating the CWE-362 race condition flagged by code-scanning alert #525 (FF1040) — zero filesystem surface.
+- **`cppcheck` struct warnings:** Resolved `uninitMemberVarNoCtor` warnings across GUI headers (`Palette::id/name`, `GUIPasswordEntry::id`, `PwnedResult::pwnCount`) with in-class default member initializers.
+- **List navigation UX:** First account entry auto-selected on load and after search; Tab goes directly from search bar to account list; Down Arrow / Enter from search jumps to the list.
+
+### Changed
+- **Scanner hygiene:** All 18 Flawfinder code-scanning alerts verified as false positives and annotated in code with per-site justifications (comparison-only pointer arrays, constant format strings, generator-owned strings, provably-bounded test copies, Qt resource paths).
+
+### Added
+- **Keyboard shortcuts:** Comprehensive shortcuts across all GUI views — toolbar (`Alt+K` GPG keys, `Alt+Shift+P` palette, `Alt+Shift+M` mark used), list (`Enter`/double-click edit, `Delete` remove, `Esc` clear search, `Down`/`Enter` jump from search), dialogs (`Ctrl+S` save, `Ctrl+N` new key, `Ctrl+Shift+C` copy key, `Alt+G` generate, `Ctrl+C` copy sync code, `Alt+R` recovery codes), and `&` mnemonics in the Password Generator.
+- **Keyboard Shortcuts Reference:** New section in `docs/USER_GUIDE.md` documenting every shortcut.
+- **Fuzzing:** New `fuzz_gpgmerge` harness (libFuzzer + ASan/UBSan) covering the SPSNAP03 key-store parser, the merge engine on hostile input, tombstone cross-application, and serialize/re-parse round-trips.
+- **Tests:** cmocka contract test for NULL-label merge inputs; CI Cppcheck gate stays at zero findings.
+
 ## [2026.11.08]
 
 ### Added

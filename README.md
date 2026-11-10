@@ -45,6 +45,7 @@
 - **OpenPGP Key Manager:** Import, edit and copy armored GPG keys from a dedicated dialog.
 - **Palettes & Tri-State Theme:** Three curated color palettes (Nord, Dracula, Solarized), each with dark and light variants, plus Follow System / Light / Dark theme selection.
 - **Configurable Sync Port:** Preferred LAN port (default 33261) with automatic fallback.
+- **Keyboard Navigation & Shortcuts:** Seamless keyboard navigation across all views (search-to-list auto-focus, entry quick actions, global dialog shortcuts).
 
 ### Cross-Platform Sync
 - **Two-Way Vault Sync:** Synchronize bidirectionally with the Android companion app over your LAN. A 512-bit one-time pairing secret (QR code) drives an ephemeral X25519 handshake with HKDF-SHA256 (forward secrecy + mutual authentication) and ChaCha20-Poly1305 AEAD frames with replay protection.
@@ -60,7 +61,7 @@
 ## Requirements
 
 - **C/C++ Compiler** (GCC, Clang, MSVC)
-- **CMake** (version 3.10 or higher)
+- **CMake** (version 3.21 or higher)
 - **Libsodium** library
 - **Argon2** library (`libargon2`)
 - **SQLCipher** library
