@@ -92,38 +92,38 @@ $(function(){initNavTree('md_docs_2TESTING.html','',''); });
   <div class="headertitle"><div class="title">Testing and Verification Summary </div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p><a class="anchor" id="autotoc_md115"></a></p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md116"></a>
+<div class="textblock"><p><a class="anchor" id="autotoc_md119"></a></p>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md120"></a>
 Overview</h1>
 <p>This document provides a summary of the testing and verification performed for the current hardened release of SecurePasswd_MGMT.</p>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md117"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md121"></a>
 Build Verification</h1>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md118"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md122"></a>
 Build Status: ✓ PASS (Multi-Platform)</h2>
 <p>The project is verified to build and pass all tests on:</p><ul>
 <li><b>Linux (Ubuntu/Arch):</b> GCC &amp; Clang</li>
 <li><b>Windows (10/11):</b> MSVC 2022 via vcpkg</li>
 <li><b>macOS:</b> Clang via Homebrew</li>
 </ul>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md119"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md123"></a>
 Security Verification</h1>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md120"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md124"></a>
 Static Analysis</h2>
 <ul>
 <li><b>Flawfinder:</b> <b>0 Hits</b> in source directories (audited baseline). 280+ manual overrides were replaced with structural security hardening.</li>
 <li><b>Cppcheck:</b> <b>0 Warnings</b>. Exhaustive analysis confirms safe code patterns and resolved include dependencies.</li>
 <li><b>CodeQL:</b> <b>✓ PASS</b>. Intentional cleartext storage in the user-triggered export feature has been audited and suppressed.</li>
 </ul>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md121"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md125"></a>
 Dynamic Analysis (Sanitizers)</h2>
 <ul>
 <li><b>AddressSanitizer (ASan):</b> <b>✓ PASS</b>. Zero memory leaks or out-of-bounds accesses detected across the entire test suite.</li>
 <li><b>UndefinedBehaviorSanitizer (UBSan):</b> <b>✓ PASS</b>. Zero instances of undefined behavior detected.</li>
 </ul>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md122"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md126"></a>
 Unit Test Execution</h1>
 <p>Unit tests are executed automatically on every Pull Request using GitHub Actions across all three major platforms.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md123"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md127"></a>
 Test Summary</h2>
 <div class="fragment"><div class="line">Test project build</div>
 <div class="line"> 1/3 Test  #1: CoreTests ........................   Passed</div>
@@ -131,25 +131,26 @@ Test Summary</h2>
 <div class="line"> 3/3 Test  #3: SyncProtocolTests ................   Passed</div>
 <div class="line"> </div>
 <div class="line">100% tests passed, 0 tests failed out of 3</div>
-</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md124"></a>
+</div><!-- fragment --><h2 class="doxsection"><a class="anchor" id="autotoc_md128"></a>
 Sync Protocol Tests (<span class="tt">./sync_protocol_tests</span>)</h2>
-<p>13 cmocka cases covering the 2-way sync protocol:</p><ul>
+<p>14 cmocka cases covering the 2-way sync protocol:</p><ul>
 <li><b>Handshake:</b> X25519 roundtrip, wrong-PSK rejection, constant-time key confirmation.</li>
 <li><b>AEAD Frames:</b> roundtrip, tamper rejection, replay/re-order rejection, wrong-type rejection.</li>
 <li><b>Snapshots:</b> serialization roundtrip, trailing-garbage rejection.</li>
-<li><b>Merge:</b> add/update/conflict/tombstone semantics, deterministic tie-break, GPG key store merge.</li>
+<li><b>Merge:</b> add/update/conflict/tombstone semantics, deterministic tie-break, GPG key store merge (including NULL label safety).</li>
 <li><b>Helpers:</b> constant-time comparison.</li>
 </ul>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md125"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md129"></a>
 Fuzz Testing</h1>
-<p>Four libFuzzer targets run in CI (ASan + UBSan + LeakSanitizer) on every push:</p><ul>
+<p>Five libFuzzer targets run in CI (ASan + UBSan + LeakSanitizer) on every push:</p><ul>
 <li><b>fuzz_snapshot:</b> hostile snapshots -&gt; parser -&gt; merge engine (incl. self-merge) -&gt; re-serialization.</li>
 <li><b>fuzz_frames:</b> hostile AEAD frames -&gt; decrypt -&gt; chained snapshot parse.</li>
 <li><b>fuzz_totp:</b> arbitrary secrets + timestamps; asserts exactly-6-digit output.</li>
 <li><b>fuzz_pwgen:</b> adversarial lengths/charsets; asserts length and class contracts.</li>
+<li><b>fuzz_gpgmerge:</b> hostile SPSNAP03 key-store sections -&gt; parser -&gt; merge engine -&gt; serialize/re-parse roundtrips.</li>
 </ul>
 <p>Cumulative runs exceed 75 million executions with zero findings.</p>
-<h2 class="doxsection"><a class="anchor" id="autotoc_md126"></a>
+<h2 class="doxsection"><a class="anchor" id="autotoc_md130"></a>
 Core Tests (<span class="tt">./core_tests</span>)</h2>
 <p>Verified functionalities include:</p><ul>
 <li><b>Database Lifecycle:</b> Open, Create, Wrong Key Detection.</li>
@@ -158,7 +159,7 @@ Core Tests (<span class="tt">./core_tests</span>)</h2>
 <li><b>Identity Retrieval:</b> Duplicate detection for secure imports.</li>
 <li><b>TOTP:</b> RFC 6238 compliant code generation.</li>
 </ul>
-<h1 class="doxsection"><a class="anchor" id="autotoc_md127"></a>
+<h1 class="doxsection"><a class="anchor" id="autotoc_md131"></a>
 Test Environment (CI Baseline)</h1>
 <p><b>Operating Systems:</b> Linux (ubuntu-latest), Windows (windows-latest), macOS (macos-latest) <b>Compilers:</b> GCC 13+, MSVC 19+, AppleClang 15+ <b>Dependencies:</b> SQLCipher 4.x, Libsodium 1.0.18+, Argon2 2019+, libcsv 3.0+</p>
 <hr  />

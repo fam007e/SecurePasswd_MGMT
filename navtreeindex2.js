@@ -1,5 +1,9 @@
 var NAVTREEINDEX2 =
 {
+"structsync__session__t.html#adb47cfeeab7fef137929ccea32b71ab8":[18,0,22,4],
+"structsync__session__t.html#adb92280436de08302980ac4256190df7":[18,0,22,3],
+"structsync__tombstone__t.html":[18,0,23],
+"structsync__tombstone__t.html#a48a823b4ef39f5bc861223eddb26fe11":[18,0,23,2],
 "structsync__tombstone__t.html#aae494dec539620585184883450c57716":[18,0,23,1],
 "structsync__tombstone__t.html#ab22b64e648cdc3a63c2bf8c142f43519":[18,0,23,0],
 "sync__protocol_8c.html":[19,0,1,10],

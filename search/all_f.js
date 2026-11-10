@@ -22,5 +22,5 @@ var searchData=
   ['memorystruct_19',['MemoryStruct',['../structMemoryStruct.html',1,'']]],
   ['min_5fversion_20',['MIN_VERSION',['../classqrcodegen_1_1QrCode.html#a49443c1e43f8c73b6a5c6069c6b24bd4',1,'qrcodegen::QrCode']]],
   ['mode_21',['Mode',['../classqrcodegen_1_1QrSegment_1_1Mode.html',1,'qrcodegen::QrSegment']]],
-  ['multi_20platform_22',['Build Status: ✓ PASS (Multi-Platform)',['../md_docs_2TESTING.html#autotoc_md118',1,'']]]
+  ['multi_20platform_22',['Build Status: ✓ PASS (Multi-Platform)',['../md_docs_2TESTING.html#autotoc_md122',1,'']]]
 ];

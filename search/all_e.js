@@ -1,7 +1,7 @@
 var searchData=
 [
   ['label_0',['label',['../structGpgKey.html#a3c60551ef143731e0dceee02740ca6b1',1,'GpgKey::label'],['../structsync__gpg__key__t.html#ad193a1708c235a1baa6e35657edf8ffc',1,'sync_gpg_key_t::label'],['../structsync__gpg__merge__result__t.html#a7d9d37d46d2b7ec6a7c57e0b280a6d97',1,'sync_gpg_merge_result_t::label']]],
-  ['legend_1',['Categories Legend',['../md_CHANGELOG.html#autotoc_md114',1,'']]],
+  ['legend_1',['Categories Legend',['../md_CHANGELOG.html#autotoc_md118',1,'']]],
   ['len_2',['len',['../structsp__buf__t.html#a6495cb9b34a64dd0f0011e4f610c7159',1,'sp_buf_t::len'],['../structsp__reader__t.html#a8257584da0347b16eaed8b10caf3e09a',1,'sp_reader_t::len']]],
   ['license_3',['LICENSE',['../LICENSE.html',1,'']]],
   ['license_4',['License',['../index.html#autotoc_md25',1,'']]],
