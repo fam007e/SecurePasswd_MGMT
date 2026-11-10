@@ -13,13 +13,13 @@ PasswordGeneratorDialog::PasswordGeneratorDialog(QWidget *parent)
     lengthSpinBox = new QSpinBox(this);
     lengthSpinBox->setRange(8, 128);
     lengthSpinBox->setValue(16);
-    formLayout->addRow("Length:", lengthSpinBox);
+    formLayout->addRow("&Length:", lengthSpinBox);
 
-    uppercaseCheckBox = new QCheckBox("Include Uppercase (A-Z)", this);
+    uppercaseCheckBox = new QCheckBox("Include &Uppercase (A-Z)", this);
     uppercaseCheckBox->setChecked(true);
-    numbersCheckBox = new QCheckBox("Include Numbers (0-9)", this);
+    numbersCheckBox = new QCheckBox("Include &Numbers (0-9)", this);
     numbersCheckBox->setChecked(true);
-    specialCheckBox = new QCheckBox("Include Special (!@#$%^&*())", this);
+    specialCheckBox = new QCheckBox("Include &Special (!@#$%^&*())", this);
     specialCheckBox->setChecked(true);
 
     mainLayout->addLayout(formLayout);

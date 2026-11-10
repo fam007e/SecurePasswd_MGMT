@@ -4,7 +4,7 @@
 #include <QString>
 
 struct GUIPasswordEntry {
-    int id;
+    int id = 0;
     QString service;
     QString username;
     // Sensitive fields (password, totpSecret, recoveryCodes)

@@ -132,3 +132,34 @@ Store armored GPG keys inside the encrypted vault:
 2.  Paste your armored key block and fill in a label (the identifier used for sync), email, and key ID.
 3.  Keys participate in 2-way sync like password entries; deleting one records a tombstone so the removal propagates.
 4.  Use **Copy Public Key** to share your public key; secret keys never leave the vault in plaintext.
+
+## Keyboard Shortcuts Reference
+
+| Scope | Action | Shortcut |
+| :--- | :--- | :--- |
+| **Main Window** | Add Entry | `Alt+A` |
+| | Edit Selected Entry | `Alt+E` or `Enter` / Double-Click on entry |
+| | Delete Selected Entry | `Alt+D` or `Delete` key on list |
+| | Copy Username | `Alt+U` |
+| | Copy Password | `Alt+P` |
+| | Copy TOTP Code | `Alt+T` |
+| | Focus Search Bar | `Ctrl+F` |
+| | Clear Search & Focus List | `Esc` (in Search Bar) |
+| | Health Check | `Alt+H` |
+| | OpenPGP Keys | `Alt+K` |
+| | Change Master Password | `Alt+S` |
+| | Import CSV | `Alt+I` |
+| | Export CSV | `Alt+X` |
+| | Sync to Mobile | `Alt+M` |
+| | Theme Menu (System / Light / Dark) | `Alt+Shift+T` |
+| | Color Palette Menu | `Alt+Shift+P` |
+| | Toggle Recovery Codes View | `Alt+R` |
+| | Mark Recovery Code as Used | `Alt+Shift+M` |
+| | Exit Application | `Alt+Q` |
+| **Add/Edit Entry** | Generate Password | `Alt+G` |
+| **OpenPGP Keys** | Save / Update Key | `Ctrl+S` or `Alt+S` |
+| | New Key / Clear Form | `Ctrl+N` or `Alt+N` |
+| | Copy Public Key | `Ctrl+Shift+C` or `Alt+C` |
+| | Delete Key | `Delete` key on list or `Alt+D` |
+| **Vault Sync** | Copy Sync Code | `Ctrl+C` |
+| **Password Generator**| Jump to Length / Toggles | `Alt+L`, `Alt+U`, `Alt+N`, `Alt+S` |

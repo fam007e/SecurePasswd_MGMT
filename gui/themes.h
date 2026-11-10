@@ -27,8 +27,8 @@ struct ThemeTokens {
 };
 
 struct Palette {
-    const char *id;      /* stable settings key */
-    const char *name;    /* user-visible name */
+    const char *id = nullptr;      /* stable settings key */
+    const char *name = nullptr;    /* user-visible name */
     ThemeTokens dark;
     ThemeTokens light;
 };

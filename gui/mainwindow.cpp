@@ -36,6 +36,7 @@
 #include <QPushButton>
 #include <QStatusBar>
 #include <QListWidget>
+#include <QShortcut>
 #include <vector>
 
 // Forward declaration for CSV callbacks
@@ -248,6 +249,9 @@ void MainWindow::onSearchChanged(const QString &text) {
     }
 
     free_password_entries(db_entries, count);
+    if (listWidget->count() > 0) {
+        listWidget->setCurrentRow(0);
+    }
 }
 
 void MainWindow::refreshEntryList() {
@@ -276,6 +280,9 @@ void MainWindow::refreshEntryList() {
     }
 
     free_password_entries(db_entries, count);
+    if (listWidget->count() > 0) {
+        listWidget->setCurrentRow(0);
+    }
 }
 
 void MainWindow::onCurrentRowChanged(int currentRow) {
@@ -483,6 +490,29 @@ void MainWindow::setupUI() {
     searchBar->addAction(QIcon(":/icons/search.svg"), QLineEdit::LeadingPosition);
     mainLayout->addWidget(searchBar);
 
+    QShortcut *searchEscShortcut = new QShortcut(QKeySequence(Qt::Key_Escape), searchBar);
+    searchEscShortcut->setContext(Qt::WidgetShortcut);
+    connect(searchEscShortcut, &QShortcut::activated, this, [this]() {
+        searchBar->clear();
+        listWidget->setFocus();
+    });
+
+    QShortcut *searchDownShortcut = new QShortcut(QKeySequence(Qt::Key_Down), searchBar);
+    searchDownShortcut->setContext(Qt::WidgetShortcut);
+    connect(searchDownShortcut, &QShortcut::activated, this, [this]() {
+        listWidget->setFocus();
+        if (listWidget->count() > 0 && listWidget->currentRow() < 0) {
+            listWidget->setCurrentRow(0);
+        }
+    });
+
+    connect(searchBar, &QLineEdit::returnPressed, this, [this]() {
+        listWidget->setFocus();
+        if (listWidget->count() > 0 && listWidget->currentRow() < 0) {
+            listWidget->setCurrentRow(0);
+        }
+    });
+
     // Toolbar
     toolBar = new QToolBar(this);
     toolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -530,7 +560,8 @@ void MainWindow::setupUI() {
     healthCheckAction->setToolTip("Run password health check (Alt+H)");
     toolBar->addAction(healthCheckAction);
     gpgKeysAction = new QAction(QIcon(":/icons/key.svg"), "OpenPGP Keys", this);
-    gpgKeysAction->setToolTip("Manage stored OpenPGP keys");
+    gpgKeysAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_K));
+    gpgKeysAction->setToolTip("Manage stored OpenPGP keys (Alt+K)");
     toolBar->addAction(gpgKeysAction);
 
     changePasswordAction = new QAction(QIcon(":/icons/settings.svg"), "Change Master Password", this);
@@ -571,6 +602,7 @@ void MainWindow::setupUI() {
     // theme button. A binary toggle made follow-system mode a one-way trap
     // — once overridden, it could never be restored.
     themeButton = new QToolButton(this);
+    themeButton->setFocusPolicy(Qt::NoFocus);
     themeButton->setToolTip("Theme (Alt+Shift+T)");
     themeButton->setPopupMode(QToolButton::InstantPopup);
     QMenu *themeMenu = new QMenu(themeButton);
@@ -606,8 +638,9 @@ void MainWindow::setupUI() {
     toolBar->addWidget(themeButton);
 
     paletteButton = new QToolButton(this);
+    paletteButton->setFocusPolicy(Qt::NoFocus);
     paletteButton->setIcon(QIcon(":/icons/palette.svg"));
-    paletteButton->setToolTip("Color Palette");
+    paletteButton->setToolTip("Color Palette (Alt+Shift+P)");
     paletteButton->setPopupMode(QToolButton::InstantPopup);
     QMenu *paletteMenu = new QMenu(paletteButton);
     // Exclusive group so selecting a palette unticks the previous one —
@@ -627,6 +660,14 @@ void MainWindow::setupUI() {
         });
     }
     paletteButton->setMenu(paletteMenu);
+    // Hidden accelerator action: Alt+Shift+P opens the palette menu.
+    QAction *paletteActionAccelerator = new QAction(this);
+    paletteActionAccelerator->setShortcut(QKeySequence(Qt::ALT | Qt::SHIFT | Qt::Key_P));
+    paletteActionAccelerator->setIconVisibleInMenu(false);
+    connect(paletteActionAccelerator, &QAction::triggered, this, [this]() {
+        paletteButton->showMenu();
+    });
+    addAction(paletteActionAccelerator);
     paletteAction = toolBar->addWidget(paletteButton);
     syncPaletteChecks();
 
@@ -649,6 +690,14 @@ void MainWindow::setupUI() {
     listWidget = new QListWidget(this);
     mainLayout->addWidget(listWidget);
 
+    // Pressing Return/Enter or double-clicking an entry triggers edit
+    connect(listWidget, &QListWidget::itemActivated, this, &MainWindow::onEdit);
+
+    // Pressing Delete key while the entry list is focused prompts to delete the entry
+    QShortcut *listDeleteShortcut = new QShortcut(QKeySequence::Delete, listWidget);
+    listDeleteShortcut->setContext(Qt::WidgetShortcut);
+    connect(listDeleteShortcut, &QShortcut::activated, this, &MainWindow::onDelete);
+
     // TOTP display
     QHBoxLayout *totpLayout = new QHBoxLayout();
     totpLabel = new QLabel("------", this);
@@ -669,6 +718,8 @@ void MainWindow::setupUI() {
     recoveryLayout->addWidget(recoveryCodesList);
 
     markUsedButton = new QPushButton("Mark as Used", this);
+    markUsedButton->setShortcut(QKeySequence(Qt::ALT | Qt::SHIFT | Qt::Key_M));
+    markUsedButton->setToolTip("Mark recovery code as used (Alt+Shift+M)");
     recoveryLayout->addWidget(markUsedButton);
     mainLayout->addLayout(recoveryLayout);
 
@@ -698,6 +749,10 @@ void MainWindow::setupUI() {
     // TOTP timer
     totpTimer = new QTimer(this);
     connect(totpTimer, &QTimer::timeout, this, &MainWindow::updateTotpDisplay);
+
+    // Tab order & initial focus
+    QWidget::setTabOrder(searchBar, listWidget);
+    searchBar->setFocus();
 
     // Security: Clear clipboard on exit
     connect(qApp, &QApplication::aboutToQuit, this, []() {
@@ -812,9 +867,11 @@ void MainWindow::updateRecoveryCodesIcon() {
     if (recoveryCodesEnabled) {
         toggleRecoveryCodesAction->setIcon(QIcon(":/icons/recovery-enabled.svg"));
         toggleRecoveryCodesAction->setText("Disable Recovery Codes");
+        toggleRecoveryCodesAction->setToolTip("Disable 2FA Recovery Codes (Alt+R)");
     } else {
         toggleRecoveryCodesAction->setIcon(QIcon(":/icons/recovery-disabled.svg"));
         toggleRecoveryCodesAction->setText("Enable Recovery Codes");
+        toggleRecoveryCodesAction->setToolTip("Enable 2FA Recovery Codes (Alt+R)");
     }
 }
 
