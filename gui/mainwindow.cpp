@@ -839,9 +839,11 @@ void MainWindow::updateRecoveryCodesIcon() {
     if (recoveryCodesEnabled) {
         toggleRecoveryCodesAction->setIcon(QIcon(":/icons/recovery-enabled.svg"));
         toggleRecoveryCodesAction->setText("Disable Recovery Codes");
+        toggleRecoveryCodesAction->setToolTip("Disable 2FA Recovery Codes (Alt+R)");
     } else {
         toggleRecoveryCodesAction->setIcon(QIcon(":/icons/recovery-disabled.svg"));
         toggleRecoveryCodesAction->setText("Enable Recovery Codes");
+        toggleRecoveryCodesAction->setToolTip("Enable 2FA Recovery Codes (Alt+R)");
     }
 }
 
