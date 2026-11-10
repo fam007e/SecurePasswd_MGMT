@@ -14,7 +14,7 @@ class QTreeWidgetItem;
 // Struct to pass HIBP results between threads
 struct PwnedResult {
     QString serviceName;
-    int pwnCount;
+    int pwnCount = 0;
 };
 Q_DECLARE_METATYPE(PwnedResult)
 

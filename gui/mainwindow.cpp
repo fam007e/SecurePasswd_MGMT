@@ -36,6 +36,7 @@
 #include <QPushButton>
 #include <QStatusBar>
 #include <QListWidget>
+#include <QShortcut>
 #include <vector>
 
 // Forward declaration for CSV callbacks
@@ -483,6 +484,13 @@ void MainWindow::setupUI() {
     searchBar->addAction(QIcon(":/icons/search.svg"), QLineEdit::LeadingPosition);
     mainLayout->addWidget(searchBar);
 
+    QShortcut *searchEscShortcut = new QShortcut(QKeySequence(Qt::Key_Escape), searchBar);
+    searchEscShortcut->setContext(Qt::WidgetShortcut);
+    connect(searchEscShortcut, &QShortcut::activated, this, [this]() {
+        searchBar->clear();
+        listWidget->setFocus();
+    });
+
     // Toolbar
     toolBar = new QToolBar(this);
     toolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -530,7 +538,8 @@ void MainWindow::setupUI() {
     healthCheckAction->setToolTip("Run password health check (Alt+H)");
     toolBar->addAction(healthCheckAction);
     gpgKeysAction = new QAction(QIcon(":/icons/key.svg"), "OpenPGP Keys", this);
-    gpgKeysAction->setToolTip("Manage stored OpenPGP keys");
+    gpgKeysAction->setShortcut(QKeySequence(Qt::ALT | Qt::Key_K));
+    gpgKeysAction->setToolTip("Manage stored OpenPGP keys (Alt+K)");
     toolBar->addAction(gpgKeysAction);
 
     changePasswordAction = new QAction(QIcon(":/icons/settings.svg"), "Change Master Password", this);
@@ -607,7 +616,7 @@ void MainWindow::setupUI() {
 
     paletteButton = new QToolButton(this);
     paletteButton->setIcon(QIcon(":/icons/palette.svg"));
-    paletteButton->setToolTip("Color Palette");
+    paletteButton->setToolTip("Color Palette (Alt+Shift+P)");
     paletteButton->setPopupMode(QToolButton::InstantPopup);
     QMenu *paletteMenu = new QMenu(paletteButton);
     // Exclusive group so selecting a palette unticks the previous one —
@@ -627,6 +636,14 @@ void MainWindow::setupUI() {
         });
     }
     paletteButton->setMenu(paletteMenu);
+    // Hidden accelerator action: Alt+Shift+P opens the palette menu.
+    QAction *paletteActionAccelerator = new QAction(this);
+    paletteActionAccelerator->setShortcut(QKeySequence(Qt::ALT | Qt::SHIFT | Qt::Key_P));
+    paletteActionAccelerator->setIconVisibleInMenu(false);
+    connect(paletteActionAccelerator, &QAction::triggered, this, [this]() {
+        paletteButton->showMenu();
+    });
+    addAction(paletteActionAccelerator);
     paletteAction = toolBar->addWidget(paletteButton);
     syncPaletteChecks();
 
@@ -649,6 +666,14 @@ void MainWindow::setupUI() {
     listWidget = new QListWidget(this);
     mainLayout->addWidget(listWidget);
 
+    // Pressing Return/Enter or double-clicking an entry triggers edit
+    connect(listWidget, &QListWidget::itemActivated, this, &MainWindow::onEdit);
+
+    // Pressing Delete key while the entry list is focused prompts to delete the entry
+    QShortcut *listDeleteShortcut = new QShortcut(QKeySequence::Delete, listWidget);
+    listDeleteShortcut->setContext(Qt::WidgetShortcut);
+    connect(listDeleteShortcut, &QShortcut::activated, this, &MainWindow::onDelete);
+
     // TOTP display
     QHBoxLayout *totpLayout = new QHBoxLayout();
     totpLabel = new QLabel("------", this);
@@ -669,6 +694,8 @@ void MainWindow::setupUI() {
     recoveryLayout->addWidget(recoveryCodesList);
 
     markUsedButton = new QPushButton("Mark as Used", this);
+    markUsedButton->setShortcut(QKeySequence(Qt::ALT | Qt::SHIFT | Qt::Key_M));
+    markUsedButton->setToolTip("Mark recovery code as used (Alt+Shift+M)");
     recoveryLayout->addWidget(markUsedButton);
     mainLayout->addLayout(recoveryLayout);
 

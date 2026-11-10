@@ -89,7 +89,9 @@ SyncDialog::SyncDialog(QWidget *parent) : QDialog(parent) {
     layout->addWidget(summaryCard);
 
     QHBoxLayout *btnLayout = new QHBoxLayout();
-    copyButton = new QPushButton(QIcon(":/icons/copy_passwd.svg"), "Copy Sync Code", this);
+    copyButton = new QPushButton(QIcon(":/icons/copy_passwd.svg"), "&Copy Sync Code", this);
+    copyButton->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_C));
+    copyButton->setToolTip("Copy Sync Code (Ctrl+C)");
     closeButton = new QPushButton(QIcon(":/icons/exit.svg"), "Close", this);
     btnLayout->addWidget(copyButton);
     btnLayout->addWidget(closeButton);

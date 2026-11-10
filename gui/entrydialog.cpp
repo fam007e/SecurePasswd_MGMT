@@ -30,7 +30,9 @@ EntryDialog::EntryDialog(QWidget *parent)
     QHBoxLayout *passwordLayout = new QHBoxLayout();
     passwordEdit = new QLineEdit(this);
     passwordEdit->setEchoMode(QLineEdit::Password);
-    generateButton = new QPushButton("Generate", this);
+    generateButton = new QPushButton("&Generate", this);
+    generateButton->setShortcut(QKeySequence(Qt::ALT | Qt::Key_G));
+    generateButton->setToolTip("Generate random password (Alt+G)");
     passwordLayout->addWidget(passwordEdit);
     passwordLayout->addWidget(generateButton);
 

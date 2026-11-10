@@ -5,6 +5,7 @@
 #include <QGuiApplication>
 #include <QClipboard>
 #include <QMessageBox>
+#include <QShortcut>
 
 extern "C" {
 #include "database.h"
@@ -40,10 +41,21 @@ GpgKeysDialog::GpgKeysDialog(QWidget *parent) : QDialog(parent) {
     layout->addWidget(statusLabel);
 
     QHBoxLayout *buttons = new QHBoxLayout;
-    saveButton = new QPushButton("Save Key", this);
-    QPushButton *clearButton = new QPushButton("New", this);
-    deleteButton = new QPushButton("Delete", this);
-    copyButton = new QPushButton("Copy Public Key", this);
+    saveButton = new QPushButton("&Save Key", this);
+    saveButton->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
+    saveButton->setToolTip("Save or update key (Ctrl+S)");
+
+    QPushButton *clearButton = new QPushButton("&New", this);
+    clearButton->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_N));
+    clearButton->setToolTip("Create new key / clear form (Ctrl+N)");
+
+    deleteButton = new QPushButton("&Delete", this);
+    deleteButton->setToolTip("Delete selected key (Delete or Alt+D)");
+
+    copyButton = new QPushButton("&Copy Public Key", this);
+    copyButton->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_C));
+    copyButton->setToolTip("Copy public key to clipboard (Ctrl+Shift+C)");
+
     QPushButton *closeButton = new QPushButton("Close", this);
     buttons->addWidget(saveButton);
     buttons->addWidget(clearButton);
@@ -52,6 +64,11 @@ GpgKeysDialog::GpgKeysDialog(QWidget *parent) : QDialog(parent) {
     buttons->addStretch(1);
     buttons->addWidget(closeButton);
     layout->addLayout(buttons);
+
+    // Delete key shortcut when keyList is focused
+    QShortcut *keyListDeleteShortcut = new QShortcut(QKeySequence::Delete, keyList);
+    keyListDeleteShortcut->setContext(Qt::WidgetShortcut);
+    connect(keyListDeleteShortcut, &QShortcut::activated, this, &GpgKeysDialog::onDelete);
 
     connect(keyList, &QListWidget::itemSelectionChanged,
             this, &GpgKeysDialog::onSelectionChanged);
@@ -62,7 +79,7 @@ GpgKeysDialog::GpgKeysDialog(QWidget *parent) : QDialog(parent) {
         editingId = 0;
         labelEdit->clear(); emailEdit->clear(); keyIdEdit->clear(); keyEdit->clear();
         keyList->clearSelection();
-        saveButton->setText("Save Key");
+        saveButton->setText("&Save Key");
     });
     connect(closeButton, &QPushButton::clicked, this, &QDialog::accept);
 
@@ -113,7 +130,7 @@ void GpgKeysDialog::onSelectionChanged() {
             keyEdit->setPlainText(
                 keys[i].public_key && keys[i].public_key[0]
                     ? keys[i].public_key : keys[i].private_key);
-            saveButton->setText("Update Key");
+            saveButton->setText("&Update Key");
             break;
         }
     }
@@ -143,7 +160,7 @@ void GpgKeysDialog::onAddOrSave() {
         return;
     }
     editingId = 0;
-    saveButton->setText("Save Key");
+    saveButton->setText("&Save Key");
     labelEdit->clear(); emailEdit->clear(); keyIdEdit->clear(); keyEdit->clear();
     reload();
     statusLabel->setText("Key stored (encrypted with the vault).");
@@ -165,7 +182,7 @@ void GpgKeysDialog::onDelete() {
         return;
     }
     editingId = 0;
-    saveButton->setText("Save Key");
+    saveButton->setText("&Save Key");
     labelEdit->clear(); emailEdit->clear(); keyIdEdit->clear(); keyEdit->clear();
     reload();
 }
