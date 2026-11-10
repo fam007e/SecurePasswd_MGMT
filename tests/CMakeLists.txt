@@ -59,7 +59,7 @@ add_test(NAME SyncProtocolTests COMMAND sync_protocol_tests)
 #     -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"
 option(ENABLE_FUZZING "Build libFuzzer fuzz targets for the sync protocol (requires clang)" OFF)
 if(ENABLE_FUZZING)
-    foreach(fuzz_target fuzz_snapshot fuzz_frames fuzz_totp fuzz_pwgen)
+    foreach(fuzz_target fuzz_snapshot fuzz_frames fuzz_totp fuzz_pwgen fuzz_gpgmerge)
         add_executable(${fuzz_target} fuzz/${fuzz_target}.c)
         target_include_directories(${fuzz_target} PRIVATE ../)
         target_link_libraries(${fuzz_target} PRIVATE core_lib)

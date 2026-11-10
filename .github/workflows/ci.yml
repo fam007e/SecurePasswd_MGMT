@@ -148,7 +148,7 @@ jobs:
           -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address,undefined"
 
     - name: Build fuzz targets
-      run: cmake --build build-fuzz --target fuzz_snapshot fuzz_frames fuzz_totp fuzz_pwgen -j"$(nproc)"
+      run: cmake --build build-fuzz --target fuzz_snapshot fuzz_frames fuzz_totp fuzz_pwgen fuzz_gpgmerge -j"$(nproc)"
 
     - name: Fuzz snapshot parser
       run: |
@@ -173,6 +173,12 @@ jobs:
         mkdir -p corpus_pwgen
         ./build-fuzz/tests/fuzz_pwgen -max_total_time=30 -max_len=8 \
           -rss_limit_mb=4096 corpus_pwgen/
+
+    - name: Fuzz GPG key-store parser and merge
+      run: |
+        mkdir -p corpus_gpgmerge
+        ./build-fuzz/tests/fuzz_gpgmerge -max_total_time=45 -max_len=262144 \
+          -rss_limit_mb=4096 corpus_gpgmerge/
 
     - name: Upload crash artifacts
       if: failure()
