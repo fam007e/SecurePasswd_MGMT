@@ -249,6 +249,9 @@ void MainWindow::onSearchChanged(const QString &text) {
     }
 
     free_password_entries(db_entries, count);
+    if (listWidget->count() > 0) {
+        listWidget->setCurrentRow(0);
+    }
 }
 
 void MainWindow::refreshEntryList() {
@@ -277,6 +280,9 @@ void MainWindow::refreshEntryList() {
     }
 
     free_password_entries(db_entries, count);
+    if (listWidget->count() > 0) {
+        listWidget->setCurrentRow(0);
+    }
 }
 
 void MainWindow::onCurrentRowChanged(int currentRow) {
@@ -491,6 +497,22 @@ void MainWindow::setupUI() {
         listWidget->setFocus();
     });
 
+    QShortcut *searchDownShortcut = new QShortcut(QKeySequence(Qt::Key_Down), searchBar);
+    searchDownShortcut->setContext(Qt::WidgetShortcut);
+    connect(searchDownShortcut, &QShortcut::activated, this, [this]() {
+        listWidget->setFocus();
+        if (listWidget->count() > 0 && listWidget->currentRow() < 0) {
+            listWidget->setCurrentRow(0);
+        }
+    });
+
+    connect(searchBar, &QLineEdit::returnPressed, this, [this]() {
+        listWidget->setFocus();
+        if (listWidget->count() > 0 && listWidget->currentRow() < 0) {
+            listWidget->setCurrentRow(0);
+        }
+    });
+
     // Toolbar
     toolBar = new QToolBar(this);
     toolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -580,6 +602,7 @@ void MainWindow::setupUI() {
     // theme button. A binary toggle made follow-system mode a one-way trap
     // — once overridden, it could never be restored.
     themeButton = new QToolButton(this);
+    themeButton->setFocusPolicy(Qt::NoFocus);
     themeButton->setToolTip("Theme (Alt+Shift+T)");
     themeButton->setPopupMode(QToolButton::InstantPopup);
     QMenu *themeMenu = new QMenu(themeButton);
@@ -615,6 +638,7 @@ void MainWindow::setupUI() {
     toolBar->addWidget(themeButton);
 
     paletteButton = new QToolButton(this);
+    paletteButton->setFocusPolicy(Qt::NoFocus);
     paletteButton->setIcon(QIcon(":/icons/palette.svg"));
     paletteButton->setToolTip("Color Palette (Alt+Shift+P)");
     paletteButton->setPopupMode(QToolButton::InstantPopup);
@@ -725,6 +749,10 @@ void MainWindow::setupUI() {
     // TOTP timer
     totpTimer = new QTimer(this);
     connect(totpTimer, &QTimer::timeout, this, &MainWindow::updateTotpDisplay);
+
+    // Tab order & initial focus
+    QWidget::setTabOrder(searchBar, listWidget);
+    searchBar->setFocus();
 
     // Security: Clear clipboard on exit
     connect(qApp, &QApplication::aboutToQuit, this, []() {
