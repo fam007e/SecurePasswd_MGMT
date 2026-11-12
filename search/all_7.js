@@ -32,5 +32,5 @@ var searchData=
   ['desktop_20integration_29',['Desktop Integration',['../index.html#autotoc_md7',1,'']]],
   ['development_30',['Security-Focused Development',['../md_CONTRIBUTING.html#autotoc_md47',1,'']]],
   ['documentation_31',['API Documentation',['../index.html#autotoc_md22',1,'']]],
-  ['dynamic_20analysis_20sanitizers_32',['Dynamic Analysis (Sanitizers)',['../md_docs_2TESTING.html#autotoc_md125',1,'']]]
+  ['dynamic_20analysis_20sanitizers_32',['Dynamic Analysis (Sanitizers)',['../md_docs_2TESTING.html#autotoc_md127',1,'']]]
 ];

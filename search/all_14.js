@@ -6,7 +6,7 @@ var searchData=
   ['recovery_5fcodes_3',['recovery_codes',['../structPasswordEntry.html#ab20f4bcf8cc4fa6ef69e4d07ac41dec9',1,'PasswordEntry::recovery_codes'],['../structsync__entry__t.html#a6a7c710a88cf6494581e1b5f38a3959b',1,'sync_entry_t::recovery_codes']]],
   ['recv_5fseq_4',['recv_seq',['../structsync__session__t.html#ab77fab36abc6fdddcd4c83ba51623edf',1,'sync_session_t']]],
   ['release_20guidelines_5',['Release Guidelines',['../md_CONTRIBUTING.html#autotoc_md52',1,'']]],
-  ['removed_6',['Removed',['../md_CHANGELOG.html#autotoc_md72',1,'']]],
+  ['removed_6',['Removed',['../md_CHANGELOG.html#autotoc_md74',1,'']]],
   ['reporting_20security_20vulnerabilities_7',['Reporting Security Vulnerabilities',['../md_SECURITY.html#autotoc_md45',1,'']]],
   ['requirements_8',['Requirements',['../md_SECURITY.html#autotoc_md43',1,'Health Check Requirements'],['../index.html#autotoc_md8',1,'Requirements']]],
   ['responsibilities_9',['Enforcement Responsibilities',['../md_CODE__OF__CONDUCT.html#autotoc_md56',1,'']]],

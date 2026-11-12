@@ -7,5 +7,5 @@ var searchData=
   ['desktop_20integration_4',['Desktop Integration',['../index.html#autotoc_md7',1,'']]],
   ['development_5',['Security-Focused Development',['../md_CONTRIBUTING.html#autotoc_md47',1,'']]],
   ['documentation_6',['API Documentation',['../index.html#autotoc_md22',1,'']]],
-  ['dynamic_20analysis_20sanitizers_7',['Dynamic Analysis (Sanitizers)',['../md_docs_2TESTING.html#autotoc_md125',1,'']]]
+  ['dynamic_20analysis_20sanitizers_7',['Dynamic Analysis (Sanitizers)',['../md_docs_2TESTING.html#autotoc_md127',1,'']]]
 ];
