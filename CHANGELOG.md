@@ -5,6 +5,11 @@ All notable changes to SecurePasswd_MGMT will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to date-based versioning (YYYY.MM.DD).
 
+## [2026.11.12]
+
+### Fixed
+- **Two-way sync protocol deadlock:** Resolved a circular wait condition between the desktop server and mobile client during 2-way sync where the desktop withheld the merged vault snapshot until after receiving the mobile client's OpenPGP key section, while the mobile client waited for the merged snapshot before sending its keys. The desktop server now transmits the merged vault snapshot immediately upon receiving and merging the mobile snapshot (`handleFrame` at `State::AwaitSnapshot`), allowing the handshake to proceed seamlessly through OpenPGP key synchronization to completion.
+
 ## [2026.11.10]
 
 ### Fixed

@@ -522,8 +522,14 @@ void SyncDialog::handleFrame(const QByteArray &frame) {
         pendingRemoteTombCount = remote_tomb_count;
         pendingSummary = summary;
 
+        // Send the merged vault snapshot back to the mobile client
+        // immediately — the client blocks waiting for it before it
+        // can proceed to the GPG phase.
+        sendMergedSnapshot();
+        if (state == State::Failed) return;
+
         state = State::AwaitGpg;
-        statusLabel->setText("Merged vault. Receiving OpenPGP keys…");
+        statusLabel->setText("Merged vault sent. Receiving OpenPGP keys…");
         break;
     }
     case State::AwaitGpg: {
@@ -597,13 +603,11 @@ void SyncDialog::handleFrame(const QByteArray &frame) {
         database_gpg_free(local_keys, local_key_count);
         sync_gpg_merge_report_free(&grep);
 
-        sendMergedSnapshot();
-        if (state == State::Failed) return;
         sendMergedGpgKeys();
         if (state == State::Failed) return;
 
         state = State::AwaitAck;
-        statusLabel->setText("Merging complete. Sending merged vault…");
+        statusLabel->setText("Merging complete. Awaiting mobile acknowledgement…");
         break;
     }
     case State::AwaitAck: {
